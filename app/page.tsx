@@ -1,5 +1,9 @@
 import Link from "next/link";
 import CategoryCard from "./components/CategoryCard";
+import pool from "@/lib/db";
+import { RowDataPacket } from "mysql2";
+
+export const dynamic = 'force-dynamic';
 
 interface Category {
   id: number;
@@ -9,17 +13,27 @@ interface Category {
   comingSoon?: boolean;
 }
 
+interface TemplateRow extends RowDataPacket {
+  id: number;
+  title: string;
+  description: string;
+  image_url: string;
+  coming_soon: boolean;
+}
+
 async function getTemplates(): Promise<Category[]> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3012'}/api/templates`, {
-      cache: 'no-store',
-    });
+    const [rows] = await pool.query<TemplateRow[]>(
+      'SELECT id, title, description, image_url, coming_soon FROM templates WHERE is_active = TRUE ORDER BY display_order ASC'
+    );
     
-    if (!res.ok) {
-      throw new Error('Failed to fetch templates');
-    }
-    
-    return res.json();
+    return rows.map((row: TemplateRow) => ({
+      id: row.id,
+      title: row.title,
+      description: row.description,
+      image: row.image_url,
+      comingSoon: row.coming_soon,
+    }));
   } catch (error) {
     console.error('Error fetching templates:', error);
     return [];

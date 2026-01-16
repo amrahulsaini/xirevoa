@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS templates (
     title VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
     image_url VARCHAR(500) NOT NULL,
+    ai_prompt TEXT,
     coming_soon BOOLEAN DEFAULT FALSE,
     display_order INT DEFAULT 0,
     is_active BOOLEAN DEFAULT TRUE,
