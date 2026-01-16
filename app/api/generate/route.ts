@@ -90,10 +90,13 @@ export async function POST(request: NextRequest) {
         const filename = `generated-${Date.now()}.png`;
         const filepath = path.join(publicDir, filename);
         fs.writeFileSync(filepath, generatedBuffer);
+        
+        console.log(`Image saved to: ${filepath}`);
+        console.log(`File size: ${generatedBuffer.length} bytes`);
 
         return NextResponse.json({
           success: true,
-          imageUrl: `/generated/${filename}`,
+          imageUrl: `/api/generated/${filename}`,
           message: 'Image generated successfully',
         });
       }
