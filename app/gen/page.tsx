@@ -11,6 +11,7 @@ interface Template {
   description: string;
   image_url: string;
   ai_prompt: string | null;
+  coming_soon: boolean;
 }
 
 export default function GenPage() {
