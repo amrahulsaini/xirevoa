@@ -55,6 +55,7 @@ export async function POST(request: NextRequest) {
     const fullPrompt = `${aiPrompt}. Transform the person in the provided image according to this description.`;
 
     // Generate image with Google GenAI
+    console.log('Sending request to Gemini with prompt:', fullPrompt);
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash-image',
       contents: [
@@ -72,6 +73,8 @@ export async function POST(request: NextRequest) {
       ],
     });
 
+    console.log('Gemini response:', JSON.stringify(response, null, 2));
+
     // Process the response
     if (!response.candidates || response.candidates.length === 0) {
       return NextResponse.json(
@@ -81,6 +84,8 @@ export async function POST(request: NextRequest) {
     }
 
     const candidate = response.candidates[0];
+    console.log('Candidate:', JSON.stringify(candidate, null, 2));
+    
     if (!candidate.content || !candidate.content.parts) {
       return NextResponse.json(
         { error: 'Invalid response structure from AI model' },
@@ -89,6 +94,7 @@ export async function POST(request: NextRequest) {
     }
 
     for (const part of candidate.content.parts) {
+      console.log('Part:', JSON.stringify(part, null, 2));
       if (part.inlineData && part.inlineData.data) {
         const imageData = part.inlineData.data;
         const generatedBuffer = Buffer.from(imageData, 'base64');
