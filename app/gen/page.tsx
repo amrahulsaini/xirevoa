@@ -237,13 +237,24 @@ export default function GenPage() {
                   </div>
                 ) : generatedImage ? (
                   <div className="space-y-4">
-                    <div className="relative h-96 rounded-xl overflow-hidden">
-                      <img src={generatedImage} alt="Generated" className="w-full h-full object-cover" />
+                    <div className="relative h-96 rounded-xl overflow-hidden bg-zinc-800">
+                      <img 
+                        src={generatedImage} 
+                        alt="Generated" 
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          console.error('Image failed to load:', generatedImage);
+                          e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect fill="%23333" width="400" height="400"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EImage Load Error%3C/text%3E%3C/svg%3E';
+                        }}
+                        onLoad={() => console.log('Image loaded successfully:', generatedImage)}
+                      />
                     </div>
                     <div className="flex gap-4">
                       <a
                         href={generatedImage}
-                        download
+                        download={`xirevoa-${Date.now()}.png`}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="flex-1 bg-yellow-400 text-black font-bold py-3 rounded-xl hover:bg-yellow-500 transition-colors text-center"
                       >
                         Download Image
