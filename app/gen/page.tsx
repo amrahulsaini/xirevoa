@@ -238,7 +238,7 @@ export default function GenPage() {
                 ) : generatedImage ? (
                   <div className="space-y-4">
                     <div className="relative h-96 rounded-xl overflow-hidden">
-                      <Image src={generatedImage} alt="Generated" fill className="object-cover" />
+                      <img src={generatedImage} alt="Generated" className="w-full h-full object-cover" />
                     </div>
                     <div className="flex gap-4">
                       <a
