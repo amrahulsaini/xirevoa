@@ -22,6 +22,7 @@ export default function AdminPage() {
   const [editingTemplate, setEditingTemplate] = useState<Template | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     id: 0,
@@ -91,10 +92,24 @@ export default function AdminPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please upload an image file');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image size should be less than 5MB');
+      return;
+    }
+
     setUploading(true);
+    setUploadProgress(0);
     
     try {
       // Create preview
+      setUploadProgress(20);
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
@@ -102,6 +117,7 @@ export default function AdminPage() {
       reader.readAsDataURL(file);
 
       // Upload to server
+      setUploadProgress(40);
       const uploadFormData = new FormData();
       uploadFormData.append('file', file);
 
@@ -110,17 +126,27 @@ export default function AdminPage() {
         body: uploadFormData,
       });
 
+      setUploadProgress(80);
+
       if (!res.ok) {
-        throw new Error('Upload failed');
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Upload failed');
       }
 
       const data = await res.json();
-      setFormData({ ...formData, image_url: data.imageUrl });
-    } catch (error) {
+      setFormData(prev => ({ ...prev, image_url: data.imageUrl }));
+      setUploadProgress(100);
+      
+      console.log('Image uploaded successfully:', data.imageUrl);
+    } catch (error: any) {
       console.error('Upload error:', error);
-      alert('Failed to upload image');
+      alert(`Failed to upload image: ${error.message}`);
+      setImagePreview(null);
     } finally {
-      setUploading(false);
+      setTimeout(() => {
+        setUploading(false);
+        setUploadProgress(0);
+      }, 500);
     }
   };
 
@@ -296,11 +322,19 @@ export default function AdminPage() {
                     </button>
                   </div>
                 ) : null}
-                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-zinc-700 rounded-lg cursor-pointer hover:border-yellow-400 transition-colors">
-                  <Upload className="w-8 h-8 text-zinc-600 mb-2" />
-                  <span className="text-zinc-500 text-sm">
-                    {uploading ? 'Uploading...' : 'Click to upload image'}
-                  </span>
+                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-zinc-700 rounded-lg cursor-pointer hover:border-yellow-400 transition-colors relative overflow-hidden">
+                  {uploading && (
+                    <div 
+                      className="absolute inset-0 bg-yellow-400/20 transition-all duration-300"
+                      style={{ width: `${uploadProgress}%` }}
+                    />
+                  )}
+                  <div className="relative z-10 flex flex-col items-center">
+                    <Upload className="w-8 h-8 text-zinc-600 mb-2" />
+                    <span className="text-zinc-500 text-sm">
+                      {uploading ? `Uploading... ${uploadProgress}%` : 'Click to upload image'}
+                    </span>
+                  </div>
                   <input
                     type="file"
                     className="hidden"
@@ -310,7 +344,7 @@ export default function AdminPage() {
                   />
                 </label>
                 {formData.image_url && (
-                  <p className="text-xs text-zinc-500 mt-2">Current: {formData.image_url}</p>
+                  <p className="text-xs text-green-500 mt-2">✓ Uploaded: {formData.image_url}</p>
                 )}
               </div>
 
