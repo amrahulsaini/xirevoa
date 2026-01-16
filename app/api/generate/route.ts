@@ -80,7 +80,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    for (const part of response.candidates[0].content.parts) {
+    const candidate = response.candidates[0];
+    if (!candidate.content || !candidate.content.parts) {
+      return NextResponse.json(
+        { error: 'Invalid response structure from AI model' },
+        { status: 500 }
+      );
+    }
+
+    for (const part of candidate.content.parts) {
       if (part.inlineData) {
         const imageData = part.inlineData.data;
         const generatedBuffer = Buffer.from(imageData, 'base64');
