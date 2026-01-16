@@ -46,34 +46,17 @@ export async function POST(request: NextRequest) {
       apiKey: process.env.GOOGLE_AI_API_KEY,
     });
 
-    // Convert uploaded image to base64
-    const bytes = await image.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    const base64Image = buffer.toString('base64');
-
-    // Construct prompt with user image context
-    const fullPrompt = `${aiPrompt}. Transform the person in the provided image according to this description.`;
+    // Construct prompt - keep it simple
+    const fullPrompt = `${aiPrompt}. Create a professional quality image based on this description.`;
 
     // Generate image with Google GenAI
     console.log('Sending request to Gemini with prompt:', fullPrompt);
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash-image',
-      contents: [
-        {
-          parts: [
-            { text: fullPrompt },
-            {
-              inlineData: {
-                mimeType: image.type,
-                data: base64Image,
-              },
-            },
-          ],
-        },
-      ],
+      contents: fullPrompt,
     });
 
-    console.log('Gemini response:', JSON.stringify(response, null, 2));
+    console.log('Gemini response received');
 
     // Process the response
     if (!response.candidates || response.candidates.length === 0) {
@@ -84,7 +67,6 @@ export async function POST(request: NextRequest) {
     }
 
     const candidate = response.candidates[0];
-    console.log('Candidate:', JSON.stringify(candidate, null, 2));
     
     if (!candidate.content || !candidate.content.parts) {
       return NextResponse.json(
@@ -94,7 +76,6 @@ export async function POST(request: NextRequest) {
     }
 
     for (const part of candidate.content.parts) {
-      console.log('Part:', JSON.stringify(part, null, 2));
       if (part.inlineData && part.inlineData.data) {
         const imageData = part.inlineData.data;
         const generatedBuffer = Buffer.from(imageData, 'base64');
