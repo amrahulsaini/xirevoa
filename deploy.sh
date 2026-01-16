@@ -20,7 +20,7 @@ if [ -d "$APP_DIR" ]; then
     git stash
     
     # Pull latest changes
-    git pull origin main
+    git pull origin master
 else
     echo "Directory doesn't exist, cloning repository..."
     mkdir -p "$(dirname "$APP_DIR")"
