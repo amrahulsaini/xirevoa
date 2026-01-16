@@ -73,6 +73,13 @@ export async function POST(request: NextRequest) {
     });
 
     // Process the response
+    if (!response.candidates || response.candidates.length === 0) {
+      return NextResponse.json(
+        { error: 'No response from AI model' },
+        { status: 500 }
+      );
+    }
+
     for (const part of response.candidates[0].content.parts) {
       if (part.inlineData) {
         const imageData = part.inlineData.data;
