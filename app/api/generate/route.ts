@@ -46,14 +46,32 @@ export async function POST(request: NextRequest) {
       apiKey: process.env.GOOGLE_AI_API_KEY,
     });
 
+    // Convert uploaded image to base64
+    const bytes = await image.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+    const base64Image = buffer.toString('base64');
+
     // Construct prompt - keep it simple
-    const fullPrompt = `${aiPrompt}. Create a professional quality image based on this description.`;
+    const fullPrompt = `${aiPrompt}`;
 
     // Generate image with Google GenAI
     console.log('Sending request to Gemini with prompt:', fullPrompt);
+    console.log('Including user uploaded image as face reference');
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash-image',
-      contents: fullPrompt,
+      contents: [
+        {
+          parts: [
+            { text: fullPrompt },
+            {
+              inlineData: {
+                mimeType: image.type,
+                data: base64Image,
+              },
+            },
+          ],
+        },
+      ],
     });
 
     console.log('Gemini response received');
