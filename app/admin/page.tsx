@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Edit, Trash2, Plus } from 'lucide-react';
+import { X, Edit, Trash2, Plus, Upload } from 'lucide-react';
 
 interface Template {
   id: number;
@@ -21,6 +21,8 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [editingTemplate, setEditingTemplate] = useState<Template | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     id: 0,
     title: '',
@@ -60,6 +62,7 @@ export default function AdminPage() {
         display_order: template.display_order,
         is_active: template.is_active,
       });
+      setImagePreview(template.image_url);
       setEditingTemplate(template);
     } else {
       setFormData({
@@ -72,6 +75,7 @@ export default function AdminPage() {
         display_order: templates.length + 1,
         is_active: true,
       });
+      setImagePreview(null);
       setEditingTemplate(null);
     }
     setIsModalOpen(true);
@@ -80,6 +84,44 @@ export default function AdminPage() {
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingTemplate(null);
+    setImagePreview(null);
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    
+    try {
+      // Create preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+
+      // Upload to server
+      const uploadFormData = new FormData();
+      uploadFormData.append('file', file);
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: uploadFormData,
+      });
+
+      if (!res.ok) {
+        throw new Error('Upload failed');
+      }
+
+      const data = await res.json();
+      setFormData({ ...formData, image_url: data.imageUrl });
+    } catch (error) {
+      console.error('Upload error:', error);
+      alert('Failed to upload image');
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -236,14 +278,40 @@ export default function AdminPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold mb-2">Image URL</label>
-                <input
-                  type="text"
-                  value={formData.image_url}
-                  onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:outline-none focus:border-yellow-400"
-                  required
-                />
+                <label className="block text-sm font-semibold mb-2">Template Image</label>
+                {imagePreview ? (
+                  <div className="relative mb-4">
+                    <div className="relative h-48 rounded-lg overflow-hidden border border-zinc-700">
+                      <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setImagePreview(null);
+                        setFormData({ ...formData, image_url: '' });
+                      }}
+                      className="absolute top-2 right-2 bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ) : null}
+                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-zinc-700 rounded-lg cursor-pointer hover:border-yellow-400 transition-colors">
+                  <Upload className="w-8 h-8 text-zinc-600 mb-2" />
+                  <span className="text-zinc-500 text-sm">
+                    {uploading ? 'Uploading...' : 'Click to upload image'}
+                  </span>
+                  <input
+                    type="file"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    disabled={uploading}
+                  />
+                </label>
+                {formData.image_url && (
+                  <p className="text-xs text-zinc-500 mt-2">Current: {formData.image_url}</p>
+                )}
               </div>
 
               <div>
