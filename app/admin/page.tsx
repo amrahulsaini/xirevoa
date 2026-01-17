@@ -9,6 +9,7 @@ interface Template {
   description: string;
   image_url: string;
   ai_prompt: string | null;
+  tags: string | null;
   coming_soon: boolean;
   display_order: number;
   is_active: boolean;
@@ -30,6 +31,7 @@ export default function AdminPage() {
     description: '',
     image_url: '',
     ai_prompt: '',
+    tags: '',
     coming_soon: false,
     display_order: 0,
     is_active: true,
@@ -59,6 +61,7 @@ export default function AdminPage() {
         description: template.description,
         image_url: template.image_url,
         ai_prompt: template.ai_prompt || '',
+        tags: template.tags || '',
         coming_soon: template.coming_soon,
         display_order: template.display_order,
         is_active: template.is_active,
@@ -76,6 +79,7 @@ export default function AdminPage() {
         description: '',
         image_url: '',
         ai_prompt: '',
+        tags: '',
         coming_soon: false,
         display_order: templates.length + 1,
         is_active: true,
@@ -372,6 +376,17 @@ export default function AdminPage() {
                   onChange={(e) => setFormData({ ...formData, ai_prompt: e.target.value })}
                   className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:outline-none focus:border-yellow-400 h-32"
                   placeholder="Enter the AI generation prompt for this template..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold mb-2">Tags</label>
+                <input
+                  type="text"
+                  value={formData.tags}
+                  onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:outline-none focus:border-yellow-400"
+                  placeholder="e.g., portrait, nature, artistic (comma-separated)"
                 />
               </div>
 

@@ -8,6 +8,7 @@ interface Template extends RowDataPacket {
   description: string;
   image_url: string;
   ai_prompt: string | null;
+  tags: string | null;
   coming_soon: boolean;
   display_order: number;
   is_active: boolean;
@@ -36,7 +37,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { title, description, image_url, ai_prompt, coming_soon, display_order, is_active } = body;
+    const { title, description, image_url, ai_prompt, tags, coming_soon, display_order, is_active } = body;
 
     if (!title || !description) {
       return NextResponse.json(
@@ -46,8 +47,8 @@ export async function POST(request: NextRequest) {
     }
 
     const [result] = await pool.query<ResultSetHeader>(
-      'INSERT INTO templates (title, description, image_url, ai_prompt, coming_soon, display_order, is_active) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [title, description, image_url || '', ai_prompt || null, coming_soon || false, display_order || 0, is_active !== false]
+      'INSERT INTO templates (title, description, image_url, ai_prompt, tags, coming_soon, display_order, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [title, description, image_url || '', ai_prompt || null, tags || null, coming_soon || false, display_order || 0, is_active !== false]
     );
 
     return NextResponse.json(
@@ -67,7 +68,7 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
-    const { id, title, description, image_url, ai_prompt, coming_soon, display_order, is_active } = body;
+    const { id, title, description, image_url, ai_prompt, tags, coming_soon, display_order, is_active } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -77,8 +78,8 @@ export async function PUT(request: NextRequest) {
     }
 
     await pool.query(
-      'UPDATE templates SET title = ?, description = ?, image_url = ?, ai_prompt = ?, coming_soon = ?, display_order = ?, is_active = ? WHERE id = ?',
-      [title, description, image_url, ai_prompt || null, coming_soon || false, display_order || 0, is_active !== false, id]
+      'UPDATE templates SET title = ?, description = ?, image_url = ?, ai_prompt = ?, tags = ?, coming_soon = ?, display_order = ?, is_active = ? WHERE id = ?',
+      [title, description, image_url, ai_prompt || null, tags || null, coming_soon || false, display_order || 0, is_active !== false, id]
     );
 
     return NextResponse.json({ message: 'Template updated successfully' });
