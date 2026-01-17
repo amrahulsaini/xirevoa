@@ -17,8 +17,18 @@ interface TemplateData extends RowDataPacket {
   tags: string | null;
 }
 
+interface OutfitTemplateData extends RowDataPacket {
+  id: number;
+  name: string;
+  description: string;
+  outfit_image_url: string;
+  ai_prompt: string | null;
+  category: string;
+}
+
 async function getTemplateBySlug(slug: string) {
   try {
+    // Check regular templates first
     const [rows] = await pool.query<TemplateData[]>(
       'SELECT id, title, description, image_url, ai_prompt, tags FROM templates WHERE is_active = TRUE'
     );
@@ -28,16 +38,39 @@ async function getTemplateBySlug(slug: string) {
       return templateSlug === slug;
     });
     
-    if (!template) return null;
+    if (template) {
+      return {
+        id: template.id,
+        title: template.title,
+        description: template.description,
+        image: template.image_url,
+        aiPrompt: template.ai_prompt || '',
+        tags: template.tags || '',
+      };
+    }
     
-    return {
-      id: template.id,
-      title: template.title,
-      description: template.description,
-      image: template.image_url,
-      aiPrompt: template.ai_prompt || '',
-      tags: template.tags || '',
-    };
+    // Check outfit templates
+    const [outfitRows] = await pool.query<OutfitTemplateData[]>(
+      'SELECT id, name, description, outfit_image_url, ai_prompt, category FROM outfit_templates WHERE is_active = TRUE'
+    );
+    
+    const outfitTemplate = outfitRows.find(row => {
+      const templateSlug = row.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      return templateSlug === slug;
+    });
+    
+    if (outfitTemplate) {
+      return {
+        id: outfitTemplate.id,
+        title: outfitTemplate.name,
+        description: outfitTemplate.description,
+        image: outfitTemplate.outfit_image_url,
+        aiPrompt: outfitTemplate.ai_prompt || '',
+        tags: outfitTemplate.category || '',
+      };
+    }
+    
+    return null;
   } catch (error) {
     console.error('Error fetching template:', error);
     return null;
