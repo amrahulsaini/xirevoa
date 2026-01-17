@@ -163,11 +163,6 @@ export default function AdminPage() {
       return;
     }
     
-    if (!formData.image_url) {
-      alert('Please upload an image');
-      return;
-    }
-    
     try {
       const method = editingTemplate ? 'PUT' : 'POST';
       const res = await fetch('/api/admin/templates', {

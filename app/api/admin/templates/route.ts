@@ -38,16 +38,16 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { title, description, image_url, ai_prompt, coming_soon, display_order, is_active } = body;
 
-    if (!title || !description || !image_url) {
+    if (!title || !description) {
       return NextResponse.json(
-        { error: 'Title, description, and image_url are required' },
+        { error: 'Title and description are required' },
         { status: 400 }
       );
     }
 
     const [result] = await pool.query<ResultSetHeader>(
       'INSERT INTO templates (title, description, image_url, ai_prompt, coming_soon, display_order, is_active) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [title, description, image_url, ai_prompt || null, coming_soon || false, display_order || 0, is_active !== false]
+      [title, description, image_url || '', ai_prompt || null, coming_soon || false, display_order || 0, is_active !== false]
     );
 
     return NextResponse.json(
