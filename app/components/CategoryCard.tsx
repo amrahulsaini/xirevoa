@@ -48,11 +48,11 @@ export default function CategoryCard({
         />
         
         {/* Coming Soon Badge */}
-        {comingSoon && (
+        {comingSoon ? (
           <div className="absolute top-3 right-3 px-3 py-1.5 bg-yellow-500 text-black text-xs font-bold rounded-full shadow-lg backdrop-blur-sm">
             SOON
           </div>
-        )}
+        ) : null}
 
         {/* Info Icon - Top Left */}
         <button className="absolute top-3 left-3 w-9 h-9 bg-black/60 backdrop-blur-md rounded-full flex items-center justify-center border border-yellow-500/30 hover:bg-yellow-500/20 hover:border-yellow-500 transition-all group/info opacity-0 group-hover:opacity-100">
