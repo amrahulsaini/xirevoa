@@ -86,61 +86,68 @@ export default function CategoryCard({
       {/* Info Modal */}
       {showInfoModal && (
         <div 
-          className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto"
           onClick={() => setShowInfoModal(false)}
         >
           <div 
-            className="bg-zinc-900 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-yellow-500/30"
+            className="bg-zinc-900 rounded-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden border border-yellow-500/30 my-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="sticky top-0 bg-zinc-900 border-b border-zinc-800 p-4 flex justify-between items-center">
-              <h3 className="text-xl font-bold text-yellow-400">{title}</h3>
+            <div className="bg-zinc-900 border-b border-zinc-800 p-4 sm:p-6 flex justify-between items-center">
+              <h3 className="text-lg sm:text-xl font-bold text-yellow-400">{title}</h3>
               <button
                 onClick={() => setShowInfoModal(false)}
-                className="w-8 h-8 rounded-full bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center transition-colors"
+                className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center transition-colors"
               >
                 <X className="w-5 h-5 text-gray-400" />
               </button>
             </div>
 
-            {/* Modal Content */}
-            <div className="p-6">
-              {/* Template Image */}
+            {/* Modal Content - Horizontal Layout */}
+            <div className="flex flex-col md:flex-row overflow-hidden">
+              {/* Left Side - Image */}
               {imgSrc && (
-                <div className="mb-6 rounded-lg overflow-hidden border border-zinc-800">
-                  <Image
-                    src={imgSrc}
-                    alt={title}
-                    width={800}
-                    height={600}
-                    className="w-full h-auto object-contain"
-                  />
+                <div className="md:w-1/2 bg-zinc-800/50 overflow-y-auto max-h-[50vh] md:max-h-[calc(90vh-88px)]">
+                  <div className="p-4 sm:p-6">
+                    <Image
+                      src={imgSrc}
+                      alt={title}
+                      width={800}
+                      height={1000}
+                      className="w-full h-auto object-contain rounded-lg"
+                    />
+                  </div>
                 </div>
               )}
 
-              {/* Description */}
-              <div className="mb-6">
-                <h4 className="text-sm font-semibold text-yellow-400 mb-2">Description</h4>
-                <p className="text-gray-300 leading-relaxed">{description}</p>
-              </div>
+              {/* Right Side - Details */}
+              <div className="md:w-1/2 overflow-y-auto max-h-[40vh] md:max-h-[calc(90vh-88px)]">
+                <div className="p-4 sm:p-6 space-y-6">
+                  {/* Description */}
+                  <div>
+                    <h4 className="text-sm font-semibold text-yellow-400 mb-3">Description</h4>
+                    <p className="text-gray-300 leading-relaxed text-sm sm:text-base">{description}</p>
+                  </div>
 
-              {/* Use Template Button */}
-              <Link
-                href={comingSoon ? "#" : "/gen"}
-                className={`block w-full px-6 py-4 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold rounded-xl transition-all duration-300 transform hover:scale-105 text-center ${
-                  comingSoon ? 'cursor-not-allowed opacity-60' : 'hover:shadow-lg hover:shadow-yellow-500/50'
-                }`}
-                onClick={(e) => {
-                  if (comingSoon) {
-                    e.preventDefault();
-                  } else {
-                    setShowInfoModal(false);
-                  }
-                }}
-              >
-                {comingSoon ? "Coming Soon" : "Use This Template →"}
-              </Link>
+                  {/* Use Template Button */}
+                  <Link
+                    href={comingSoon ? "#" : "/gen"}
+                    className={`block w-full px-6 py-4 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold rounded-xl transition-all duration-300 transform hover:scale-105 text-center ${
+                      comingSoon ? 'cursor-not-allowed opacity-60' : 'hover:shadow-lg hover:shadow-yellow-500/50'
+                    }`}
+                    onClick={(e) => {
+                      if (comingSoon) {
+                        e.preventDefault();
+                      } else {
+                        setShowInfoModal(false);
+                      }
+                    }}
+                  >
+                    {comingSoon ? "Coming Soon" : "Use This Template →"}
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
         </div>
