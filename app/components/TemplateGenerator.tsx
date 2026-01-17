@@ -71,13 +71,16 @@ export default function TemplateGenerator({ template }: TemplateGeneratorProps) 
       setProgress(40);
 
       // Generate AI image
+      const generateFormData = new FormData();
+      generateFormData.append('image', userImage);
+      generateFormData.append('templateId', template.id.toString());
+      if (template.aiPrompt) {
+        generateFormData.append('prompt', template.aiPrompt);
+      }
+
       const generateRes = await fetch('/api/generate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          imageUrl,
-          prompt: template.aiPrompt,
-        }),
+        body: generateFormData,
       });
 
       setProgress(80);
