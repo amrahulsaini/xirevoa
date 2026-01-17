@@ -184,8 +184,11 @@ FIRST IMAGE (coming next): This is the user's face. Extract this person's face, 
           file: outfitDiskPath,
           config: { mimeType },
         });
-
-        uploadedOutfit = { uri: uploadedFile.uri, mimeType: uploadedFile.mimeType };
+        if (uploadedFile && typeof uploadedFile.uri === 'string' && typeof uploadedFile.mimeType === 'string') {
+          uploadedOutfit = { uri: uploadedFile.uri, mimeType: uploadedFile.mimeType };
+        } else {
+          throw new Error('Upload did not return valid uri and mimeType');
+        }
       } catch (error) {
         console.error('Error uploading outfit image to GenAI Files API:', error);
       }
@@ -227,3 +230,58 @@ FIRST IMAGE (coming next): This is the user's face. Extract this person's face, 
       model: 'gemini-2.5-flash-image',
       contents,
     });
+
+    console.log('Gemini response received');
+
+    if (!response.candidates || response.candidates.length === 0) {
+      return NextResponse.json(
+        { error: 'No response from AI model' },
+        { status: 500 }
+      );
+    }
+
+    const candidate = response.candidates[0];
+    if (!candidate.content || !candidate.content.parts) {
+      return NextResponse.json(
+        { error: 'Invalid response structure from AI model' },
+        { status: 500 }
+      );
+    }
+
+    for (const part of candidate.content.parts) {
+      if (part.inlineData && part.inlineData.data) {
+        const imageData = part.inlineData.data;
+        const generatedBuffer = Buffer.from(imageData, 'base64');
+
+        const publicDir = path.join(process.cwd(), 'public', 'generated');
+        if (!fs.existsSync(publicDir)) {
+          fs.mkdirSync(publicDir, { recursive: true });
+        }
+
+        const filename = `generated-${Date.now()}.png`;
+        const filepath = path.join(publicDir, filename);
+        fs.writeFileSync(filepath, generatedBuffer);
+
+        console.log(`Image saved to: ${filepath}`);
+        console.log(`File size: ${generatedBuffer.length} bytes`);
+
+        return NextResponse.json({
+          success: true,
+          imageUrl: `/api/generated/${filename}`,
+          message: 'Image generated successfully',
+        });
+      }
+    }
+
+    return NextResponse.json(
+      { error: 'No image data in response' },
+      { status: 500 }
+    );
+  } catch (error: any) {
+    console.error('Generation error:', error);
+    return NextResponse.json(
+      { error: error.message || 'Failed to generate image' },
+      { status: 500 }
+    );
+  }
+}
