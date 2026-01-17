@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import CategoryCard from "./components/CategoryCard";
 import pool from "@/lib/db";
 import { RowDataPacket } from "mysql2";
@@ -60,8 +61,14 @@ export default async function Home() {
               <div className="flex items-center gap-4">
                 <div className="relative">
                   <div className="absolute inset-0 bg-yellow-500 rounded-2xl blur-xl opacity-50" />
-                  <div className="relative h-12 w-12 rounded-2xl bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center font-black text-black text-2xl shadow-lg">
-                    X
+                  <div className="relative h-12 w-12 rounded-2xl overflow-hidden shadow-lg">
+                    <Image
+                      src="/logo.png"
+                      alt="Xirevoa AI Logo"
+                      width={48}
+                      height={48}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                 </div>
                 <div>
