@@ -238,16 +238,18 @@ export default function AdminPage() {
                   </td>
                   <td className="px-4 py-4">{template.display_order}</td>
                   <td className="px-4 py-4">
-                    <span className={`px-2 py-1 rounded text-xs ${
-                      template.is_active ? 'bg-green-900 text-green-400' : 'bg-red-900 text-red-400'
-                    }`}>
-                      {template.is_active ? 'Active' : 'Inactive'}
-                    </span>
-                    {template.coming_soon && (
-                      <span className="ml-2 px-2 py-1 rounded text-xs bg-yellow-900 text-yellow-400">
-                        Coming Soon
+                    <div className="flex gap-2">
+                      <span className={`px-2 py-1 rounded text-xs ${
+                        template.is_active ? 'bg-green-900 text-green-400' : 'bg-red-900 text-red-400'
+                      }`}>
+                        {template.is_active ? 'Active' : 'Inactive'}
                       </span>
-                    )}
+                      {template.coming_soon && (
+                        <span className="px-2 py-1 rounded text-xs bg-yellow-900 text-yellow-400">
+                          Coming Soon
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="px-4 py-4">
                     <div className="flex gap-2">
