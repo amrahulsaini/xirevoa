@@ -8,6 +8,7 @@ import Link from "next/link";
 interface CategoryCardProps {
   id: number;
   title: string;
+  slug: string;
   description: string;
   image: string;
   comingSoon?: boolean;
@@ -16,6 +17,7 @@ interface CategoryCardProps {
 export default function CategoryCard({
   id,
   title,
+  slug,
   description,
   image,
   comingSoon,
@@ -69,7 +71,7 @@ export default function CategoryCard({
           {/* Action Button - Bottom */}
           <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/90 via-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <Link
-              href={comingSoon ? "#" : "/gen"}
+              href={comingSoon ? "#" : `/${slug}`}
               className={`block w-full px-5 py-3 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold rounded-xl transition-all duration-300 transform hover:scale-105 text-center ${
                 comingSoon ? 'cursor-not-allowed opacity-60' : 'hover:shadow-lg hover:shadow-yellow-500/50'
               }`}
@@ -132,7 +134,7 @@ export default function CategoryCard({
 
                   {/* Use Template Button */}
                   <Link
-                    href={comingSoon ? "#" : "/gen"}
+                    href={comingSoon ? "#" : `/${slug}`}
                     className={`block w-full px-6 py-4 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold rounded-xl transition-all duration-300 transform hover:scale-105 text-center ${
                       comingSoon ? 'cursor-not-allowed opacity-60' : 'hover:shadow-lg hover:shadow-yellow-500/50'
                     }`}

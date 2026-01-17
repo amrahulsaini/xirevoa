@@ -1,7 +1,6 @@
-import Link from "next/link";
-import Image from "next/image";
-import { Coins, User, Menu } from "lucide-react";
 import CategoryCard from "./components/CategoryCard";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
 import pool from "@/lib/db";
 import { RowDataPacket } from "mysql2";
 
@@ -10,8 +9,10 @@ export const dynamic = 'force-dynamic';
 interface Category {
   id: number;
   title: string;
+  slug: string;
   description: string;
   image: string;
+  tags: string;
   comingSoon?: boolean;
 }
 
@@ -20,20 +21,31 @@ interface TemplateRow extends RowDataPacket {
   title: string;
   description: string;
   image_url: string;
+  tags: string | null;
   coming_soon: boolean;
 }
 
-async function getTemplates(): Promise<Category[]> {
+async function getTemplates(searchQuery?: string): Promise<Category[]> {
   try {
-    const [rows] = await pool.query<TemplateRow[]>(
-      'SELECT id, title, description, image_url, coming_soon FROM templates WHERE is_active = TRUE ORDER BY display_order ASC'
-    );
+    let query = 'SELECT id, title, description, image_url, tags, coming_soon FROM templates WHERE is_active = TRUE';
+    const params: any[] = [];
+    
+    if (searchQuery) {
+      query += ' AND (title LIKE ? OR tags LIKE ?)';
+      params.push(`%${searchQuery}%`, `%${searchQuery}%`);
+    }
+    
+    query += ' ORDER BY display_order ASC';
+    
+    const [rows] = await pool.query<TemplateRow[]>(query, params);
     
     return rows.map((row: TemplateRow) => ({
       id: row.id,
       title: row.title,
+      slug: row.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
       description: row.description,
       image: row.image_url,
+      tags: row.tags || '',
       comingSoon: row.coming_soon,
     }));
   } catch (error) {
@@ -42,8 +54,12 @@ async function getTemplates(): Promise<Category[]> {
   }
 }
 
-export default async function Home() {
-  const categories = await getTemplates();
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: { search?: string };
+}) {
+  const categories = await getTemplates(searchParams.search);
   return (
     <div className="min-h-screen bg-black">
       {/* Animated Background */}
@@ -55,8 +71,51 @@ export default async function Home() {
 
       {/* Content */}
       <div className="relative z-10">
-        {/* Header */}
-        <header className="fixed top-0 left-0 right-0 z-50 border-b border-zinc-800/50 bg-black/95 backdrop-blur-xl">
+        <Header />
+
+        {/* Spacer for fixed header */}
+        <div className="h-16 sm:h-20"></div>
+
+        {/* Categories Grid - Pinterest Masonry Style */}
+        <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
+          {searchParams.search && (
+            <div className="mb-6">
+              <p className="text-zinc-400">
+                Search results for: <span className="text-yellow-400 font-semibold">{searchParams.search}</span>
+              </p>
+              <p className="text-zinc-500 text-sm mt-1">{categories.length} templates found</p>
+            </div>
+          )}
+          
+          {/* Masonry Grid */}
+          <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4">
+            {categories.map((category) => (
+              <div key={category.id} className="break-inside-avoid">
+                <CategoryCard
+                  id={category.id}
+                  title={category.title}
+                  slug={category.slug}
+                  description={category.description}
+                  image={category.image}
+                  comingSoon={category.comingSoon}
+                />
+              </div>
+            ))}
+          </div>
+
+          {categories.length === 0 && (
+            <div className="text-center py-20">
+              <p className="text-zinc-400 text-lg">No templates found</p>
+              <a href="/" className="text-yellow-400 hover:underline mt-2 inline-block">Clear search</a>
+            </div>
+          )}
+        </section>
+
+        <Footer />
+      </div>
+    </div>
+  );
+}
           <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
             <div className="flex items-center justify-between">
               {/* Logo Section */}
