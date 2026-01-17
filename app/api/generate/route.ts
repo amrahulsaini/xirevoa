@@ -51,8 +51,13 @@ export async function POST(request: NextRequest) {
       }
 
       const outfit = rows[0];
-      aiPrompt = customPrompt || outfit.ai_prompt || 'Swap the face from the first image with the face in the second image. Maintain natural lighting and proportions.';
+      aiPrompt = customPrompt || outfit.ai_prompt || 'Take the face from the user uploaded image and seamlessly place it onto the person wearing the outfit in the second image. Match the lighting, skin tone, and angle to make it look natural and realistic. Preserve all facial features from the user image while maintaining the outfit and pose from the template image.';
       outfitImagePath = outfit.outfit_image_url;
+      
+      console.log('Using outfit template:', outfit.name);
+      console.log('AI Prompt from database:', outfit.ai_prompt);
+      console.log('Custom prompt provided:', customPrompt);
+      console.log('Final prompt being used:', aiPrompt);
     } else {
       // Fetch regular template
       const [rows] = await pool.query<Template[]>(
@@ -69,6 +74,11 @@ export async function POST(request: NextRequest) {
 
       const template = rows[0];
       aiPrompt = customPrompt || template.ai_prompt || 'Generate an AI-enhanced image';
+      
+      console.log('Using regular template:', template.title);
+      console.log('AI Prompt from database:', template.ai_prompt);
+      console.log('Custom prompt provided:', customPrompt);
+      console.log('Final prompt being used:', aiPrompt);
     }
 
     // Initialize Google GenAI
