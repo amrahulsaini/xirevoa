@@ -11,12 +11,20 @@ interface Template extends RowDataPacket {
   ai_prompt: string | null;
 }
 
+interface OutfitTemplate extends RowDataPacket {
+  id: number;
+  name: string;
+  ai_prompt: string | null;
+  outfit_image_url: string;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const image = formData.get('image') as File;
     const templateId = formData.get('templateId') as string;
     const customPrompt = formData.get('prompt') as string;
+    const isOutfit = formData.get('isOutfit') === 'true';
 
     if (!image || !templateId) {
       return NextResponse.json(
@@ -25,21 +33,43 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Fetch template AI prompt from database
-    const [rows] = await pool.query<Template[]>(
-      'SELECT id, title, ai_prompt FROM templates WHERE id = ?',
-      [templateId]
-    );
+    let aiPrompt = 'Generate an AI-enhanced image';
+    let outfitImagePath: string | null = null;
 
-    if (rows.length === 0) {
-      return NextResponse.json(
-        { error: 'Template not found' },
-        { status: 404 }
+    if (isOutfit) {
+      // Fetch outfit template
+      const [rows] = await pool.query<OutfitTemplate[]>(
+        'SELECT id, name, ai_prompt, outfit_image_url FROM outfit_templates WHERE id = ?',
+        [templateId]
       );
-    }
 
-    const template = rows[0];
-    const aiPrompt = customPrompt || template.ai_prompt || 'Generate an AI-enhanced image';
+      if (rows.length === 0) {
+        return NextResponse.json(
+          { error: 'Outfit template not found' },
+          { status: 404 }
+        );
+      }
+
+      const outfit = rows[0];
+      aiPrompt = customPrompt || outfit.ai_prompt || 'Swap the face from the first image with the face in the second image. Maintain natural lighting and proportions.';
+      outfitImagePath = outfit.outfit_image_url;
+    } else {
+      // Fetch regular template
+      const [rows] = await pool.query<Template[]>(
+        'SELECT id, title, ai_prompt FROM templates WHERE id = ?',
+        [templateId]
+      );
+
+      if (rows.length === 0) {
+        return NextResponse.json(
+          { error: 'Template not found' },
+          { status: 404 }
+        );
+      }
+
+      const template = rows[0];
+      aiPrompt = customPrompt || template.ai_prompt || 'Generate an AI-enhanced image';
+    }
 
     // Initialize Google GenAI
     const ai = new GoogleGenAI({
@@ -51,25 +81,49 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(bytes);
     const base64Image = buffer.toString('base64');
 
-    // Construct prompt - keep it simple
+    // Construct prompt
     const fullPrompt = `${aiPrompt}`;
+
+    // Build content parts
+    const contentParts: any[] = [
+      { text: fullPrompt },
+      {
+        inlineData: {
+          mimeType: image.type,
+          data: base64Image,
+        },
+      },
+    ];
+
+    // If outfit template, add the outfit image
+    if (isOutfit && outfitImagePath) {
+      try {
+        // Read outfit image from public directory
+        const outfitPath = path.join(process.cwd(), 'public', outfitImagePath.replace('/api/', ''));
+        const outfitImageBuffer = fs.readFileSync(outfitPath);
+        const outfitBase64 = outfitImageBuffer.toString('base64');
+        
+        contentParts.push({
+          inlineData: {
+            mimeType: 'image/jpeg',
+            data: outfitBase64,
+          },
+        });
+
+        console.log('Including outfit template image for face swap');
+      } catch (error) {
+        console.error('Error reading outfit image:', error);
+      }
+    }
 
     // Generate image with Google GenAI
     console.log('Sending request to Gemini with prompt:', fullPrompt);
-    console.log('Including user uploaded image as face reference');
+    console.log('Number of images:', isOutfit ? 2 : 1);
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash-image',
       contents: [
         {
-          parts: [
-            { text: fullPrompt },
-            {
-              inlineData: {
-                mimeType: image.type,
-                data: base64Image,
-              },
-            },
-          ],
+          parts: contentParts,
         },
       ],
     });

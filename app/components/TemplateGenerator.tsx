@@ -12,9 +12,10 @@ interface TemplateGeneratorProps {
     image: string;
     aiPrompt: string;
   };
+  isOutfit?: boolean;
 }
 
-export default function TemplateGenerator({ template }: TemplateGeneratorProps) {
+export default function TemplateGenerator({ template, isOutfit = false }: TemplateGeneratorProps) {
   const [userImage, setUserImage] = useState<File | null>(null);
   const [userImagePreview, setUserImagePreview] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
@@ -74,6 +75,7 @@ export default function TemplateGenerator({ template }: TemplateGeneratorProps) 
       const generateFormData = new FormData();
       generateFormData.append('image', userImage);
       generateFormData.append('templateId', template.id.toString());
+      generateFormData.append('isOutfit', isOutfit.toString());
       if (template.aiPrompt) {
         generateFormData.append('prompt', template.aiPrompt);
       }
