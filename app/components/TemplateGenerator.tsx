@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Upload, Wand2, Download } from "lucide-react";
+import { Upload, Wand2, Download, RefreshCw } from "lucide-react";
 import Image from "next/image";
 
 interface TemplateGeneratorProps {
@@ -90,18 +90,28 @@ export default function TemplateGenerator({ template }: TemplateGeneratorProps) 
         throw new Error(error.error || 'Failed to generate image');
       }
 
-      const { generatedImageUrl } = await generateRes.json();
-      setGeneratedImage(generatedImageUrl);
+      const result = await generateRes.json();
+      console.log('Generate result:', result);
+      setGeneratedImage(result.imageUrl);
       setProgress(100);
     } catch (error: any) {
       console.error('Generation error:', error);
       alert(`Failed to generate: ${error.message}`);
+      setGenerating(false);
+      setProgress(0);
     } finally {
       setTimeout(() => {
         setGenerating(false);
         setProgress(0);
       }, 500);
     }
+  };
+
+  const handleReset = () => {
+    setUserImage(null);
+    setUserImagePreview(null);
+    setGeneratedImage(null);
+    setProgress(0);
   };
 
   return (
@@ -116,58 +126,92 @@ export default function TemplateGenerator({ template }: TemplateGeneratorProps) 
 
       {/* Generator Grid */}
       <div className="grid md:grid-cols-2 gap-6 mb-8">
-        {/* Upload Section */}
-        <div className="bg-zinc-900 rounded-2xl p-6 border border-zinc-800">
-          <h3 className="text-xl font-bold text-yellow-400 mb-4">Upload Your Photo</h3>
-          
-          {userImagePreview ? (
-            <div className="relative mb-4">
-              <div className="aspect-square rounded-lg overflow-hidden border border-zinc-700">
-                <img src={userImagePreview} alt="Your photo" className="w-full h-full object-cover" />
+        {/* Upload Section - Hidden during generation */}
+        {!generating && (
+          <div className="bg-zinc-900 rounded-2xl p-6 border border-zinc-800">
+            <h3 className="text-xl font-bold text-yellow-400 mb-4">Upload Your Photo</h3>
+            
+            {userImagePreview ? (
+              <div className="relative mb-4">
+                <div className="aspect-square rounded-lg overflow-hidden border border-zinc-700">
+                  <img src={userImagePreview} alt="Your photo" className="w-full h-full object-cover" />
+                </div>
+                <button
+                  onClick={() => {
+                    setUserImage(null);
+                    setUserImagePreview(null);
+                  }}
+                  className="absolute top-2 right-2 bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
+                >
+                  Remove
+                </button>
               </div>
+            ) : (
+              <label className="flex flex-col items-center justify-center w-full aspect-square border-2 border-dashed border-zinc-700 rounded-lg cursor-pointer hover:border-yellow-400 transition-colors">
+                <Upload className="w-12 h-12 text-zinc-600 mb-4" />
+                <span className="text-zinc-500 text-center px-4">
+                  Click to upload your photo
+                  <br />
+                  <span className="text-xs">Max 10MB</span>
+                </span>
+                <input
+                  type="file"
+                  className="hidden"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                />
+              </label>
+            )}
+
+            <button
+              onClick={handleGenerate}
+              disabled={!userImage || generating}
+              className="w-full mt-4 px-6 py-4 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold rounded-xl hover:shadow-lg hover:shadow-yellow-500/50 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
+            >
+              <Wand2 className="w-5 h-5" />
+              Generate Image
+            </button>
+          </div>
+        )}
+
+        {/* Result Section - Full width during generation */}
+        <div className={`bg-zinc-900 rounded-2xl p-6 border border-zinc-800 ${generating ? 'md:col-span-2' : ''}`}>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-bold text-yellow-400">Generated Result</h3>
+            {generatedImage && !generating && (
               <button
-                onClick={() => {
-                  setUserImage(null);
-                  setUserImagePreview(null);
-                }}
-                className="absolute top-2 right-2 bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
+                onClick={handleReset}
+                className="flex items-center gap-2 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-yellow-400 rounded-lg transition-colors"
               >
-                Remove
+                <RefreshCw className="w-4 h-4" />
+                Try Another
               </button>
-            </div>
-          ) : (
-            <label className="flex flex-col items-center justify-center w-full aspect-square border-2 border-dashed border-zinc-700 rounded-lg cursor-pointer hover:border-yellow-400 transition-colors">
-              <Upload className="w-12 h-12 text-zinc-600 mb-4" />
-              <span className="text-zinc-500 text-center px-4">
-                Click to upload your photo
-                <br />
-                <span className="text-xs">Max 10MB</span>
-              </span>
-              <input
-                type="file"
-                className="hidden"
-                accept="image/*"
-                onChange={handleImageUpload}
-              />
-            </label>
-          )}
-
-          <button
-            onClick={handleGenerate}
-            disabled={!userImage || generating}
-            className="w-full mt-4 px-6 py-4 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold rounded-xl hover:shadow-lg hover:shadow-yellow-500/50 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
-          >
-            <Wand2 className="w-5 h-5" />
-            {generating ? `Generating... ${progress}%` : 'Generate Image'}
-          </button>
-        </div>
-
-        {/* Result Section */}
-        <div className="bg-zinc-900 rounded-2xl p-6 border border-zinc-800">
-          <h3 className="text-xl font-bold text-yellow-400 mb-4">Generated Result</h3>
+            )}
+          </div>
           
-          <div className="aspect-square rounded-lg overflow-hidden border border-zinc-700 bg-zinc-800/50 flex items-center justify-center">
-            {generatedImage ? (
+          <div className="aspect-square rounded-lg overflow-hidden border border-zinc-700 bg-zinc-800/50 flex items-center justify-center relative">
+            {generating ? (
+              <div className="relative w-full h-full">
+                {userImagePreview && (
+                  <img 
+                    src={userImagePreview} 
+                    alt="Processing" 
+                    className="w-full h-full object-cover blur-md opacity-50" 
+                  />
+                )}
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60">
+                  <div className="w-16 h-16 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin mb-4"></div>
+                  <p className="text-white font-bold text-lg mb-2">Generating Magic...</p>
+                  <p className="text-yellow-400 font-bold text-xl">{progress}%</p>
+                  <div className="w-64 h-2 bg-zinc-700 rounded-full mt-4 overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-yellow-400 to-yellow-500 transition-all duration-300"
+                      style={{ width: `${progress}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+            ) : generatedImage ? (
               <img src={generatedImage} alt="Generated" className="w-full h-full object-cover" />
             ) : (
               <div className="text-center text-zinc-600">
@@ -177,7 +221,7 @@ export default function TemplateGenerator({ template }: TemplateGeneratorProps) 
             )}
           </div>
 
-          {generatedImage && (
+          {generatedImage && !generating && (
             <a
               href={generatedImage}
               download="xirevoa-generated.png"

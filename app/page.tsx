@@ -1,4 +1,5 @@
 import CategoryCard from "./components/CategoryCard";
+import CategoryRow from "./components/CategoryRow";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import pool from "@/lib/db";
@@ -13,6 +14,7 @@ interface Category {
   description: string;
   image: string;
   tags: string;
+  category?: string;
   comingSoon?: boolean;
 }
 
@@ -23,6 +25,14 @@ interface TemplateRow extends RowDataPacket {
   image_url: string;
   tags: string | null;
   coming_soon: boolean;
+}
+
+interface OutfitTemplateRow extends RowDataPacket {
+  id: number;
+  name: string;
+  description: string;
+  outfit_image_url: string;
+  category: string;
 }
 
 async function getTemplates(searchQuery?: string): Promise<Category[]> {
@@ -54,12 +64,87 @@ async function getTemplates(searchQuery?: string): Promise<Category[]> {
   }
 }
 
+async function getOutfitTemplates(): Promise<Category[]> {
+  try {
+    const [rows] = await pool.query<OutfitTemplateRow[]>(
+      'SELECT id, name, description, outfit_image_url, category FROM outfit_templates WHERE is_active = TRUE ORDER BY display_order ASC'
+    );
+    
+    return rows.map((row: OutfitTemplateRow) => ({
+      id: row.id,
+      title: row.name,
+      slug: row.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+      description: row.description,
+      image: row.outfit_image_url,
+      tags: row.category,
+      category: row.category,
+    }));
+  } catch (error) {
+    console.error('Error fetching outfit templates:', error);
+    return [];
+  }
+}
+
 export default async function Home({
   searchParams,
 }: {
   searchParams: { search?: string };
 }) {
-  const categories = await getTemplates(searchParams.search);
+  const templates = await getTemplates(searchParams.search);
+  const outfitTemplates = await getOutfitTemplates();
+  
+  // If searching, show grid view
+  if (searchParams.search) {
+    return (
+      <div className="min-h-screen bg-black">
+        <div className="fixed inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl -top-48 -left-48 animate-pulse" />
+          <div className="absolute w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl top-1/2 -right-48 animate-pulse delay-1000" />
+          <div className="absolute w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl -bottom-48 left-1/2 animate-pulse delay-2000" />
+        </div>
+
+        <div className="relative z-10">
+          <Header />
+          <div className="h-16 sm:h-20"></div>
+
+          <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
+            <div className="mb-6">
+              <p className="text-zinc-400">
+                Search results for: <span className="text-yellow-400 font-semibold">{searchParams.search}</span>
+              </p>
+              <p className="text-zinc-500 text-sm mt-1">{templates.length} templates found</p>
+            </div>
+            
+            <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4">
+              {templates.map((category) => (
+                <div key={category.id} className="break-inside-avoid">
+                  <CategoryCard
+                    id={category.id}
+                    title={category.title}
+                    slug={category.slug}
+                    description={category.description}
+                    image={category.image}
+                    comingSoon={category.comingSoon}
+                  />
+                </div>
+              ))}
+            </div>
+
+            {templates.length === 0 && (
+              <div className="text-center py-20">
+                <p className="text-zinc-400 text-lg">No templates found</p>
+                <a href="/" className="text-yellow-400 hover:underline mt-2 inline-block">Clear search</a>
+              </div>
+            )}
+          </section>
+
+          <Footer />
+        </div>
+      </div>
+    );
+  }
+  
+  // Default view with category rows
   return (
     <div className="min-h-screen bg-black">
       {/* Animated Background */}
@@ -76,40 +161,35 @@ export default async function Home({
         {/* Spacer for fixed header */}
         <div className="h-16 sm:h-20"></div>
 
-        {/* Categories Grid - Pinterest Masonry Style */}
+        {/* Hero Section */}
         <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
-          {searchParams.search && (
-            <div className="mb-6">
-              <p className="text-zinc-400">
-                Search results for: <span className="text-yellow-400 font-semibold">{searchParams.search}</span>
-              </p>
-              <p className="text-zinc-500 text-sm mt-1">{categories.length} templates found</p>
-            </div>
-          )}
-          
-          {/* Masonry Grid */}
-          <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4">
-            {categories.map((category) => (
-              <div key={category.id} className="break-inside-avoid">
-                <CategoryCard
-                  id={category.id}
-                  title={category.title}
-                  slug={category.slug}
-                  description={category.description}
-                  image={category.image}
-                  comingSoon={category.comingSoon}
-                />
-              </div>
-            ))}
+          <div className="text-center mb-12">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white mb-4">
+              For you
+            </h1>
+            <p className="text-zinc-400 text-lg">Transform yourself with AI magic</p>
           </div>
-
-          {categories.length === 0 && (
-            <div className="text-center py-20">
-              <p className="text-zinc-400 text-lg">No templates found</p>
-              <a href="/" className="text-yellow-400 hover:underline mt-2 inline-block">Clear search</a>
-            </div>
-          )}
         </section>
+
+        {/* Category Rows */}
+        <div className="container mx-auto px-4 sm:px-6 pb-12">
+          {/* Change Outfit Category */}
+          {outfitTemplates.length > 0 && (
+            <CategoryRow
+              categoryName="Change Outfit"
+              categoryImage={outfitTemplates[0]?.image}
+              templates={outfitTemplates}
+            />
+          )}
+
+          {/* All Templates Category */}
+          {templates.length > 0 && (
+            <CategoryRow
+              categoryName="All Templates"
+              templates={templates}
+            />
+          )}
+        </div>
 
         <Footer />
       </div>
