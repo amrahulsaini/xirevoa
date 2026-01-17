@@ -27,6 +27,14 @@ interface TemplateRow extends RowDataPacket {
   coming_soon: boolean;
 }
 
+interface OutfitTemplateRow extends RowDataPacket {
+  id: number;
+  name: string;
+  description: string;
+  outfit_image_url: string;
+  category: string;
+}
+
 async function getTemplates(searchQuery?: string): Promise<Category[]> {
   try {
     let query = 'SELECT id, title, description, image_url, tags, coming_soon FROM templates WHERE is_active = TRUE';
@@ -56,12 +64,34 @@ async function getTemplates(searchQuery?: string): Promise<Category[]> {
   }
 }
 
+async function getOutfitTemplates(): Promise<Category[]> {
+  try {
+    const [rows] = await pool.query<OutfitTemplateRow[]>(
+      'SELECT id, name, description, outfit_image_url, category FROM outfit_templates WHERE is_active = TRUE ORDER BY display_order ASC'
+    );
+    
+    return rows.map((row: OutfitTemplateRow) => ({
+      id: row.id,
+      title: row.name,
+      slug: row.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+      description: row.description,
+      image: row.outfit_image_url,
+      tags: row.category,
+      category: row.category,
+    }));
+  } catch (error) {
+    console.error('Error fetching outfit templates:', error);
+    return [];
+  }
+}
+
 export default async function Home({
   searchParams,
 }: {
   searchParams: { search?: string };
 }) {
   const templates = await getTemplates(searchParams.search);
+  const outfitTemplates = await getOutfitTemplates();
   
   // If searching, show grid view
   if (searchParams.search) {
@@ -131,17 +161,47 @@ export default async function Home({
         {/* Spacer for fixed header */}
         <div className="h-16 sm:h-20"></div>
 
+        {/* Hero Section */}
+        <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white mb-4">
+              For you
+            </h1>
+            <p className="text-zinc-400 text-lg">Transform yourself with AI magic</p>
+          </div>
+        </section>
+
         {/* Category Rows */}
         <div className="container mx-auto px-4 sm:px-6 pb-8">
-          {/* All Templates Category */}
-          {templates.length > 0 && (
+          {/* Change Outfit Category */}
+          {outfitTemplates.length > 0 && (
             <CategoryRow
-              categoryName="All Templates"
-              categoryImage={templates[0]?.image}
-              templates={templates}
+              categoryName="Change Outfit"
+              categoryImage={outfitTemplates[0]?.image}
+              templates={outfitTemplates}
             />
           )}
         </div>
+
+        {/* All Templates - Masonry Grid */}
+        <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
+          <h2 className="text-2xl sm:text-3xl font-black text-white mb-6">All Templates</h2>
+          
+          <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4">
+            {templates.map((category) => (
+              <div key={category.id} className="break-inside-avoid">
+                <CategoryCard
+                  id={category.id}
+                  title={category.title}
+                  slug={category.slug}
+                  description={category.description}
+                  image={category.image}
+                  comingSoon={category.comingSoon}
+                />
+              </div>
+            ))}
+          </div>
+        </section>
 
         <Footer />
       </div>
