@@ -91,21 +91,10 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(bytes);
     const base64Image = buffer.toString('base64');
 
-    // Construct prompt
-    const fullPrompt = `${aiPrompt}`;
-
     // Build content parts
-    const contentParts: any[] = [
-      { text: fullPrompt },
-      {
-        inlineData: {
-          mimeType: image.type,
-          data: base64Image,
-        },
-      },
-    ];
+    const contentParts: any[] = [];
 
-    // If outfit template, add the outfit image
+    // If outfit template, structure differently for face swap
     if (isOutfit && outfitImagePath) {
       try {
         // Read outfit image from public directory
@@ -113,22 +102,53 @@ export async function POST(request: NextRequest) {
         const outfitImageBuffer = fs.readFileSync(outfitPath);
         const outfitBase64 = outfitImageBuffer.toString('base64');
         
-        contentParts.push({
-          inlineData: {
-            mimeType: 'image/jpeg',
-            data: outfitBase64,
+        // For face swap: First show user face, then outfit image
+        contentParts.push(
+          { text: `I have two images. First image: A person's face (the face to use). Second image: A person wearing an outfit (the outfit to keep). ${aiPrompt}` },
+          {
+            inlineData: {
+              mimeType: image.type,
+              data: base64Image,
+            },
           },
-        });
+          {
+            inlineData: {
+              mimeType: 'image/jpeg',
+              data: outfitBase64,
+            },
+          }
+        );
 
-        console.log('Including outfit template image for face swap');
+        console.log('Including both images for face swap - User face + Outfit template');
       } catch (error) {
         console.error('Error reading outfit image:', error);
+        // Fallback to single image
+        contentParts.push(
+          { text: aiPrompt },
+          {
+            inlineData: {
+              mimeType: image.type,
+              data: base64Image,
+            },
+          }
+        );
       }
+    } else {
+      // Regular template - single image
+      contentParts.push(
+        { text: aiPrompt },
+        {
+          inlineData: {
+            mimeType: image.type,
+            data: base64Image,
+          },
+        }
+      );
     }
 
     // Generate image with Google GenAI
-    console.log('Sending request to Gemini with prompt:', fullPrompt);
-    console.log('Number of images:', isOutfit ? 2 : 1);
+    console.log('Sending request to Gemini');
+    console.log('Number of images:', contentParts.filter(p => p.inlineData).length);
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash-image',
       contents: [
