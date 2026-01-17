@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenAI, createPartFromUri, createUserContent } from '@google/genai';
 import * as fs from 'fs';
+import * as os from 'os';
 import * as path from 'path';
 import pool from '@/lib/db';
 import { RowDataPacket } from 'mysql2';
@@ -150,74 +151,79 @@ FIRST IMAGE (coming next): This is the user's face. Extract this person's face, 
       );
     }
 
-    // Generate image with Google GenAI
+    // Convert uploaded image to base64
     console.log('Sending request to Gemini');
     console.log('Number of images:', contentParts.filter(p => p.inlineData).length);
     
+
+    // Build multi-part contents (uses the same pattern you shared: upload + createPartFromUri + inlineData)
+    let contents: any;
+
+    if (isOutfit && outfitImagePath) {
+      // Outfit mode: we upload the outfit template image and attach the user's face as inline data.
+      // This makes the ordering/meaning unambiguous.
+      const outfitDiskPath = path.join(
+        process.cwd(),
+        'public',
+        outfitImagePath
+          .replace('/api/cdn/', 'cdn/')
+          .replace('/api/generated/', 'generated/')
+      );
+
+      let uploadedOutfit: { uri: string; mimeType: string } | null = null;
+      try {
+        const ext = path.extname(outfitDiskPath).toLowerCase();
+        const mimeType =
+          ext === '.png'
+            ? 'image/png'
+            : ext === '.webp'
+              ? 'image/webp'
+              : 'image/jpeg';
+
+        const uploadedFile = await ai.files.upload({
+          file: outfitDiskPath,
+          config: { mimeType },
+        });
+
+        uploadedOutfit = { uri: uploadedFile.uri, mimeType: uploadedFile.mimeType };
+      } catch (error) {
+        console.error('Error uploading outfit image to GenAI Files API:', error);
+      }
+
+      // If upload failed, fall back to inline for outfit image.
+      if (!uploadedOutfit) {
+        const outfitBuf = fs.readFileSync(outfitDiskPath);
+        const outfitBase64 = outfitBuf.toString('base64');
+        contents = createUserContent([
+          'FIRST IMAGE (User): face photo (use this face).',
+          { inlineData: { mimeType: image.type, data: base64Image } },
+          'SECOND IMAGE (Template): outfit/body reference (keep this outfit, pose, background).',
+          { inlineData: { mimeType: 'image/jpeg', data: outfitBase64 } },
+          `INSTRUCTION: ${aiPrompt}`,
+        ]);
+      } else {
+        contents = createUserContent([
+          'FIRST IMAGE (User): face photo (use this face).',
+          { inlineData: { mimeType: image.type, data: base64Image } },
+          'SECOND IMAGE (Template): outfit/body reference (keep this outfit, pose, background).',
+          createPartFromUri(uploadedOutfit.uri, uploadedOutfit.mimeType),
+          `INSTRUCTION: ${aiPrompt}`,
+        ]);
+      }
+
+      console.log('Outfit mode: sending 2 images (user + outfit)');
+    } else {
+      // Regular templates: single user image + prompt
+      contents = createUserContent([
+        aiPrompt,
+        { inlineData: { mimeType: image.type, data: base64Image } },
+      ]);
+    }
+
+    // Generate image with Google GenAI
+    console.log('Sending request to Gemini');
+
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash-image',
-      contents: [
-        {
-          parts: contentParts,
-        },
-      ],
+      contents,
     });
-
-    console.log('Gemini response received');
-
-    // Process the response
-    if (!response.candidates || response.candidates.length === 0) {
-      return NextResponse.json(
-        { error: 'No response from AI model' },
-        { status: 500 }
-      );
-    }
-
-    const candidate = response.candidates[0];
-    
-    if (!candidate.content || !candidate.content.parts) {
-      return NextResponse.json(
-        { error: 'Invalid response structure from AI model' },
-        { status: 500 }
-      );
-    }
-
-    for (const part of candidate.content.parts) {
-      if (part.inlineData && part.inlineData.data) {
-        const imageData = part.inlineData.data;
-        const generatedBuffer = Buffer.from(imageData, 'base64');
-
-        // Create generated images directory if it doesn't exist
-        const publicDir = path.join(process.cwd(), 'public', 'generated');
-        if (!fs.existsSync(publicDir)) {
-          fs.mkdirSync(publicDir, { recursive: true });
-        }
-
-        // Save generated image with unique filename
-        const filename = `generated-${Date.now()}.png`;
-        const filepath = path.join(publicDir, filename);
-        fs.writeFileSync(filepath, generatedBuffer);
-        
-        console.log(`Image saved to: ${filepath}`);
-        console.log(`File size: ${generatedBuffer.length} bytes`);
-
-        return NextResponse.json({
-          success: true,
-          imageUrl: `/api/generated/${filename}`,
-          message: 'Image generated successfully',
-        });
-      }
-    }
-
-    return NextResponse.json(
-      { error: 'No image data in response' },
-      { status: 500 }
-    );
-  } catch (error: any) {
-    console.error('Generation error:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to generate image' },
-      { status: 500 }
-    );
-  }
-}
