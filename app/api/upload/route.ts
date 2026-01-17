@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      imageUrl: `/cdn/${filename}`,
+      imageUrl: `/api/cdn/${filename}`,
       message: 'Image uploaded successfully',
     });
   } catch (error: any) {

@@ -63,7 +63,11 @@ export default function AdminPage() {
         display_order: template.display_order,
         is_active: template.is_active,
       });
-      setImagePreview(template.image_url);
+      // Convert old /cdn/ URLs to /api/cdn/ URLs for preview
+      const previewUrl = template.image_url.startsWith('/cdn/') 
+        ? template.image_url.replace('/cdn/', '/api/cdn/')
+        : template.image_url;
+      setImagePreview(previewUrl);
       setEditingTemplate(template);
     } else {
       setFormData({
