@@ -144,7 +144,7 @@ export default async function Home({
     );
   }
   
-  // Default view with category rows
+  // Default view with category rows and masonry grid
   return (
     <div className="min-h-screen bg-black">
       {/* Animated Background */}
@@ -163,7 +163,7 @@ export default async function Home({
 
         {/* Hero Section */}
         <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
-          <div className="text-center mb-12">
+          <div className="text-center mb-8">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white mb-4">
               For you
             </h1>
@@ -172,7 +172,7 @@ export default async function Home({
         </section>
 
         {/* Category Rows */}
-        <div className="container mx-auto px-4 sm:px-6 pb-12">
+        <div className="container mx-auto px-4 sm:px-6 pb-8">
           {/* Change Outfit Category */}
           {outfitTemplates.length > 0 && (
             <CategoryRow
@@ -181,15 +181,27 @@ export default async function Home({
               templates={outfitTemplates}
             />
           )}
-
-          {/* All Templates Category */}
-          {templates.length > 0 && (
-            <CategoryRow
-              categoryName="All Templates"
-              templates={templates}
-            />
-          )}
         </div>
+
+        {/* All Templates - Masonry Grid */}
+        <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
+          <h2 className="text-2xl sm:text-3xl font-black text-white mb-6">All Templates</h2>
+          
+          <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4">
+            {templates.map((category) => (
+              <div key={category.id} className="break-inside-avoid">
+                <CategoryCard
+                  id={category.id}
+                  title={category.title}
+                  slug={category.slug}
+                  description={category.description}
+                  image={category.image}
+                  comingSoon={category.comingSoon}
+                />
+              </div>
+            ))}
+          </div>
+        </section>
 
         <Footer />
       </div>

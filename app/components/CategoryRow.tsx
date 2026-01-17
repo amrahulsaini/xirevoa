@@ -38,17 +38,6 @@ export default function CategoryRow({ categoryName, categoryImage, templates }: 
     <section className="mb-12">
       {/* Category Header */}
       <div className="flex items-center gap-4 mb-6">
-        {categoryImage && (
-          <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-yellow-500/20">
-            <Image
-              src={categoryImage}
-              alt={categoryName}
-              width={48}
-              height={48}
-              className="w-full h-full object-cover"
-            />
-          </div>
-        )}
         <h2 className="text-2xl sm:text-3xl font-black text-white">{categoryName}</h2>
       </div>
 
@@ -80,29 +69,25 @@ export default function CategoryRow({ categoryName, categoryImage, templates }: 
             <Link
               key={template.id}
               href={`/${template.slug}`}
-              className="flex-none w-48 group/card"
+              className="flex-none w-40 sm:w-48 group/card"
             >
               <div className="bg-zinc-900 rounded-xl overflow-hidden border border-zinc-800 hover:border-yellow-500/50 transition-all hover:shadow-lg hover:shadow-yellow-500/20">
-                {/* Template Image */}
-                <div className="relative aspect-[3/4] overflow-hidden">
+                {/* Template Image - From Top */}
+                <div className="relative aspect-[2/3] overflow-hidden">
                   <Image
                     src={template.image}
                     alt={template.title}
                     width={192}
-                    height={256}
-                    className="w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-300"
+                    height={288}
+                    className="w-full h-full object-cover object-top group-hover/card:scale-105 transition-transform duration-300"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
                 </div>
 
                 {/* Template Info */}
                 <div className="p-3">
-                  <h3 className="font-bold text-white text-sm mb-1 truncate group-hover/card:text-yellow-400 transition-colors">
+                  <h3 className="font-bold text-white text-sm truncate group-hover/card:text-yellow-400 transition-colors">
                     {template.title}
                   </h3>
-                  <p className="text-xs text-zinc-500 line-clamp-2">
-                    {template.description}
-                  </p>
                 </div>
               </div>
             </Link>
