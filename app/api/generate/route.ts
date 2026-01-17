@@ -102,33 +102,25 @@ export async function POST(request: NextRequest) {
         const outfitImageBuffer = fs.readFileSync(outfitPath);
         const outfitBase64 = outfitImageBuffer.toString('base64');
         
-        // For face swap: First show user face, then outfit image
+        // For face swap: Explicitly label each image
         contentParts.push(
-          { text: `You are an expert image editor. I need you to create a single composite image by merging these two images:
+          { text: `You are an expert image editor. Create a photorealistic composite image by merging the face from the FIRST image with the body/outfit from the SECOND image.
 
-IMAGE 1 (User photo): Extract only the face, head, and facial features from this image.
-IMAGE 2 (Outfit reference): This shows the target outfit, pose, and body.
-
-YOUR TASK: Create a photorealistic image where:
-- The face from Image 1 is placed onto the body in Image 2
-- Match skin tone, lighting, and shadows perfectly
-- Keep the exact outfit, pose, background from Image 2
-- The final result should look like one natural photograph of the person from Image 1 wearing the outfit from Image 2
-- Make the face placement seamless with no visible edges or mismatches
-
-Generate only the final merged image, not a comparison or side-by-side.` },
+FIRST IMAGE (coming next): This is the user's face. Extract this person's face, head, and facial features.` },
           {
             inlineData: {
               mimeType: image.type,
               data: base64Image,
             },
           },
+          { text: `SECOND IMAGE (coming next): This is the outfit reference. Keep the body, outfit, pose, and background from this image.` },
           {
             inlineData: {
               mimeType: 'image/jpeg',
               data: outfitBase64,
             },
-          }
+          },
+          { text: `Now generate ONE final merged image where the face from the FIRST image is seamlessly placed onto the body in the SECOND image. Match skin tone, lighting, and shadows perfectly. Make it look like a natural single photograph.` }
         );
 
         console.log('Including both images for face swap - User face + Outfit template');
