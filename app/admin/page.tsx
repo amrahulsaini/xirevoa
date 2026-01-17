@@ -157,6 +157,17 @@ export default function AdminPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Validate required fields
+    if (!formData.title || !formData.description) {
+      alert('Please fill in title and description');
+      return;
+    }
+    
+    if (!formData.image_url) {
+      alert('Please upload an image');
+      return;
+    }
+    
     try {
       const method = editingTemplate ? 'PUT' : 'POST';
       const res = await fetch('/api/admin/templates', {
@@ -166,11 +177,16 @@ export default function AdminPage() {
       });
 
       if (res.ok) {
+        alert('Template saved successfully!');
         fetchTemplates();
         closeModal();
+      } else {
+        const errorData = await res.json();
+        alert(`Failed to save template: ${errorData.error || 'Unknown error'}`);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving template:', error);
+      alert(`Error: ${error.message}`);
     }
   };
 
