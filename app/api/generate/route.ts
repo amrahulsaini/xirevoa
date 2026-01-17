@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
         
         // For face swap: First show user face, then outfit image
         contentParts.push(
-          { text: `Generate a realistic photo where the person from the first image is wearing the exact outfit shown in the second image. Keep the person's face, skin tone, and features from image 1 exactly as they are. Only change their clothing to match the outfit in image 2. Preserve the pose, style, and details of the outfit from image 2. The background should be clean and professional. Make it look completely natural and realistic.` },
+          { text: aiPrompt },
           {
             inlineData: {
               mimeType: image.type,

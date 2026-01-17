@@ -31,7 +31,7 @@ export default function OutfitAdminPage() {
     description: '',
     outfit_image_url: '',
     category: 'change-outfit',
-    ai_prompt: 'Take the face from the user uploaded image and seamlessly place it onto the person wearing the outfit in the second image. Match the lighting, skin tone, and angle to make it look natural and realistic. Preserve all facial features from the user image while maintaining the outfit and pose from the template image.',
+    ai_prompt: 'Generate a realistic photo where the person from the first image is wearing the exact outfit shown in the second image. Keep the person\'s face, skin tone, and all facial features from image 1 exactly as they are. Only change their clothing to match the outfit in image 2. Preserve the pose, style, and all details of the outfit from image 2. Make it look completely natural and realistic.',
     display_order: 0,
     is_active: true,
   });
@@ -76,7 +76,7 @@ export default function OutfitAdminPage() {
         description: '',
         outfit_image_url: '',
         category: 'change-outfit',
-        ai_prompt: 'Take the face from the user uploaded image and seamlessly place it onto the person wearing the outfit in the second image. Match the lighting, skin tone, and angle to make it look natural and realistic. Preserve all facial features from the user image while maintaining the outfit and pose from the template image.',
+        ai_prompt: 'Generate a realistic photo where the person from the first image is wearing the exact outfit shown in the second image. Keep the person\'s face, skin tone, and all facial features from image 1 exactly as they are. Only change their clothing to match the outfit in image 2. Preserve the pose, style, and all details of the outfit from image 2. Make it look completely natural and realistic.',
         display_order: outfits.length + 1,
         is_active: true,
       });
