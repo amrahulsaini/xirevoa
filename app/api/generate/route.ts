@@ -104,7 +104,19 @@ export async function POST(request: NextRequest) {
         
         // For face swap: First show user face, then outfit image
         contentParts.push(
-          { text: aiPrompt },
+          { text: `You are an expert image editor. I need you to create a single composite image by merging these two images:
+
+IMAGE 1 (User photo): Extract only the face, head, and facial features from this image.
+IMAGE 2 (Outfit reference): This shows the target outfit, pose, and body.
+
+YOUR TASK: Create a photorealistic image where:
+- The face from Image 1 is placed onto the body in Image 2
+- Match skin tone, lighting, and shadows perfectly
+- Keep the exact outfit, pose, background from Image 2
+- The final result should look like one natural photograph of the person from Image 1 wearing the outfit from Image 2
+- Make the face placement seamless with no visible edges or mismatches
+
+Generate only the final merged image, not a comparison or side-by-side.` },
           {
             inlineData: {
               mimeType: image.type,
