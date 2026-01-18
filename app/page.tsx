@@ -34,8 +34,8 @@ async function getTemplates(searchQuery?: string): Promise<Category[]> {
     const params: any[] = [];
     
     if (searchQuery) {
-      query += ' AND (title LIKE ? OR tags LIKE ?)';
-      params.push(`%${searchQuery}%`, `%${searchQuery}%`);
+      query += ' AND (title LIKE ? OR tags LIKE ? OR description LIKE ?)';
+      params.push(`%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`);
     }
     
     query += ' ORDER BY display_order ASC';
@@ -97,32 +97,81 @@ export default async function Home({
           <div className="h-16 sm:h-20"></div>
 
           <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
-            <div className="mb-6">
-              <p className="text-zinc-400">
-                Search results for: <span className="text-yellow-400 font-semibold">{searchParams.search}</span>
-              </p>
-              <p className="text-zinc-500 text-sm mt-1">{templates.length} templates found</p>
+            {/* Search Header */}
+            <div className="mb-8">
+              <div className="flex items-center justify-between flex-wrap gap-4 mb-4">
+                <div>
+                  <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">
+                    Search Results
+                  </h2>
+                  <p className="text-zinc-400">
+                    Showing results for: <span className="text-yellow-400 font-semibold">"{searchParams.search}"</span>
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="bg-zinc-800/50 border border-zinc-700 rounded-lg px-4 py-2">
+                    <span className="text-yellow-400 font-bold text-lg">{templates.length}</span>
+                    <span className="text-zinc-400 text-sm ml-2">found</span>
+                  </div>
+                  <a 
+                    href="/" 
+                    className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-lg text-zinc-400 hover:text-yellow-400 transition-colors text-sm font-medium"
+                  >
+                    Clear Search
+                  </a>
+                </div>
+              </div>
             </div>
             
-            <div className="columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-3 space-y-3">
-              {templates.map((category) => (
-                <div key={category.id} className="break-inside-avoid">
-                  <CategoryCard
-                    id={category.id}
-                    title={category.title}
-                    slug={category.slug}
-                    description={category.description}
-                    image={category.image}
-                    comingSoon={category.comingSoon}
-                  />
-                </div>
-              ))}
-            </div>
-
-            {templates.length === 0 && (
+            {/* Search Results Grid */}
+            {templates.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+                {templates.map((category) => (
+                  <div key={category.id} className="group">
+                    <CategoryCard
+                      id={category.id}
+                      title={category.title}
+                      slug={category.slug}
+                      description={category.description}
+                      image={category.image}
+                      comingSoon={category.comingSoon}
+                    />
+                    {/* Show tags if available */}
+                    {category.tags && (
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {category.tags.split(',').slice(0, 3).map((tag, idx) => (
+                          <span 
+                            key={idx}
+                            className="text-xs px-2 py-1 bg-zinc-800/50 border border-zinc-700 rounded text-zinc-400"
+                          >
+                            #{tag.trim()}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
               <div className="text-center py-20">
-                <p className="text-zinc-400 text-lg">No templates found</p>
-                <a href="/" className="text-yellow-400 hover:underline mt-2 inline-block">Clear search</a>
+                <div className="inline-flex items-center justify-center w-20 h-20 bg-zinc-800/50 border-2 border-zinc-700 rounded-full mb-6">
+                  <svg className="w-10 h-10 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">No Templates Found</h3>
+                <p className="text-zinc-400 mb-6">
+                  We couldn't find any templates matching "{searchParams.search}"
+                </p>
+                <a 
+                  href="/" 
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-yellow-500 hover:bg-yellow-600 text-black font-bold rounded-lg transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                  </svg>
+                  Browse All Templates
+                </a>
               </div>
             )}
           </section>
