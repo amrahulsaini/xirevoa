@@ -70,6 +70,9 @@ export default async function Home({
   // Fetch 80s templates (IDs 33, 34)
   const eightyTemplates = templates.filter(t => [33, 34].includes(t.id));
   
+  // Fetch cinematic universe templates (IDs 28, 16, 35, 36, 10)
+  const cinematicTemplates = templates.filter(t => [28, 16, 35, 36, 10].includes(t.id));
+  
   // If searching, show grid view
   if (searchParams.search) {
     return (
@@ -202,6 +205,39 @@ export default async function Home({
                         </h2>
                         <p className="text-xs text-zinc-400">
                           Transform into your future self
+                        </p>
+                      </div>
+
+                      {/* Arrow */}
+                      <div className="text-yellow-400 group-hover/card:translate-x-1 transition-transform">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </div>
+                  </a>
+                )}
+
+                {/* Cinematic Universe Banner */}
+                {cinematicTemplates.length > 0 && (
+                  <a
+                    href="/cinematic-universe"
+                    className="flex-shrink-0 w-96 group/card bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-900 rounded-xl p-6 border border-zinc-700 hover:border-yellow-500/50 transition-all hover:shadow-lg hover:shadow-yellow-500/20 overflow-hidden relative snap-start"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity"></div>
+                    <div className="flex items-center gap-4 relative z-10">
+                      {/* Single Preview Image */}
+                      <div className="relative w-24 h-24 rounded-lg overflow-hidden border-2 border-zinc-700 group-hover/card:border-yellow-500/50 transition-all flex-shrink-0">
+                        <img src={cinematicTemplates[0].image} alt="" className="w-full h-full object-cover object-top" />
+                      </div>
+                      
+                      {/* Text Content */}
+                      <div className="flex-1 min-w-0">
+                        <h2 className="text-base font-bold text-white group-hover/card:text-yellow-400 transition-colors">
+                          🎬 Cinematic Universe
+                        </h2>
+                        <p className="text-xs text-zinc-400">
+                          Epic movie scenes & iconic moments
                         </p>
                       </div>
 
