@@ -170,89 +170,16 @@ FIRST IMAGE (coming next): This is the user's face. Extract this person's face, 
       );
     }
 
-    // Convert uploaded image to base64
-    console.log('Sending request to Gemini');
-    console.log('Number of images:', contentParts.filter(p => p.inlineData).length);
-    
-
-    // Build multi-part contents (uses the same pattern you shared: upload + createPartFromUri + inlineData)
-    let contents: any;
-
-    if (isOutfit && templateImagePath) {
-      // Outfit mode: we upload the outfit template image and attach the user's face as inline data.
-      // This makes the ordering/meaning unambiguous.
-      const outfitDiskPath = path.join(
-        process.cwd(),
-        'public',
-        templateImagePath
-          .replace('/api/cdn/', 'cdn/')
-          .replace('/api/generated/', 'generated/')
-      );
-
-      let uploadedOutfit: { uri: string; mimeType: string } | null = null;
-      try {
-        const ext = path.extname(outfitDiskPath).toLowerCase();
-        const mimeType =
-          ext === '.png'
-            ? 'image/png'
-            : ext === '.webp'
-              ? 'image/webp'
-              : 'image/jpeg';
-
-        const uploadedFile = await ai.files.upload({
-          file: outfitDiskPath,
-          config: { mimeType },
-        });
-        if (uploadedFile && typeof uploadedFile.uri === 'string' && typeof uploadedFile.mimeType === 'string') {
-          uploadedOutfit = { uri: uploadedFile.uri, mimeType: uploadedFile.mimeType };
-        } else {
-          throw new Error('Upload did not return valid uri and mimeType');
-        }
-      } catch (error) {
-        console.error('Error uploading outfit image to GenAI Files API:', error);
-      }
-
-      // If upload failed, fall back to inline for outfit image.
-      if (!uploadedOutfit) {
-        const outfitBuf = fs.readFileSync(outfitDiskPath);
-        const outfitBase64 = outfitBuf.toString('base64');
-        contents = createUserContent([
-          'FIRST IMAGE (User): face photo (use this face).',
-          { inlineData: { mimeType: image.type, data: base64Image } },
-          'SECOND IMAGE (Template): outfit/body reference (keep this outfit, pose, background).',
-          { inlineData: { mimeType: 'image/jpeg', data: outfitBase64 } },
-          `INSTRUCTION: ${aiPrompt}`,
-        ]);
-      } else {
-        contents = createUserContent([
-          'FIRST IMAGE (User): face photo (use this face).',
-          { inlineData: { mimeType: image.type, data: base64Image } },
-          'SECOND IMAGE (Template): outfit/body reference (keep this outfit, pose, background).',
-          createPartFromUri(uploadedOutfit.uri, uploadedOutfit.mimeType),
-          `INSTRUCTION: ${aiPrompt}`,
-        ]);
-      }
-
-      console.log('Outfit mode: sending 2 images (user + outfit)');
-      console.log('=== OUTFIT MODE CONTENT STRUCTURE ===');
-      console.log('Contents type:', typeof contents);
-    } else {
-      // Regular templates: single user image + prompt
-      contents = createUserContent([
-        aiPrompt,
-        { inlineData: { mimeType: image.type, data: base64Image } },
-      ]);
-      console.log('=== REGULAR MODE: Single image ===');
-    }
-
-    // Generate image with Google GenAI
+    // Generate image with Google GenAI using contentParts
     console.log('=== SENDING TO GEMINI ===');
     console.log('Model: gemini-2.5-flash-image');
     console.log('Is Outfit Mode:', isOutfit);
+    console.log('Number of content parts:', contentParts.length);
+    console.log('Number of images:', contentParts.filter((p: any) => p.inlineData).length);
 
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash-image',
-      contents,
+      contents: createUserContent(contentParts),
     });
 
     console.log('=== GEMINI RESPONSE RECEIVED ===');
