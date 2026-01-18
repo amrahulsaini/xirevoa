@@ -21,6 +21,13 @@ export async function POST(request: NextRequest) {
     const customPrompt = formData.get('prompt') as string;
     const isOutfit = formData.get('isOutfit') === 'true';
 
+    console.log('=== GENERATE REQUEST START ===');
+    console.log('Template ID:', templateId);
+    console.log('Is Outfit:', isOutfit);
+    console.log('Custom Prompt:', customPrompt);
+    console.log('Image name:', image?.name);
+    console.log('Image type:', image?.type);
+
     if (!image || !templateId) {
       return NextResponse.json(
         { error: 'Image and template ID are required' },
@@ -133,6 +140,10 @@ FIRST IMAGE (coming next): This is the user's face. Extract this person's face, 
         );
 
         console.log('Including both images for face swap - User face + Template outfit image');
+        console.log('=== 2-IMAGE MODE ===');
+        console.log('User image size (base64):', base64Image.length, 'characters');
+        console.log('Template image size (base64):', templateBase64.length, 'characters');
+        console.log('Template image path:', templateImagePath);
       } catch (error) {
         console.error('Error reading outfit image:', error);
         // Fallback to single image
@@ -223,23 +234,32 @@ FIRST IMAGE (coming next): This is the user's face. Extract this person's face, 
       }
 
       console.log('Outfit mode: sending 2 images (user + outfit)');
+      console.log('=== OUTFIT MODE CONTENT STRUCTURE ===');
+      console.log('Contents type:', typeof contents);
     } else {
       // Regular templates: single user image + prompt
       contents = createUserContent([
         aiPrompt,
         { inlineData: { mimeType: image.type, data: base64Image } },
       ]);
+      console.log('=== REGULAR MODE: Single image ===');
     }
 
     // Generate image with Google GenAI
-    console.log('Sending request to Gemini');
+    console.log('=== SENDING TO GEMINI ===');
+    console.log('Model: gemini-2.5-flash-image');
+    console.log('Is Outfit Mode:', isOutfit);
 
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash-image',
       contents,
     });
 
-    console.log('Gemini response received');
+    console.log('=== GEMINI RESPONSE RECEIVED ===');
+    console.log('Candidates count:', response.candidates?.length || 0);
+    if (response.candidates?.[0]) {
+      console.log('First candidate parts:', response.candidates[0].content?.parts?.length || 0);
+    }
 
     if (!response.candidates || response.candidates.length === 0) {
       return NextResponse.json(
@@ -272,6 +292,7 @@ FIRST IMAGE (coming next): This is the user's face. Extract this person's face, 
 
         console.log(`Image saved to: ${filepath}`);
         console.log(`File size: ${generatedBuffer.length} bytes`);
+        console.log('=== GENERATION SUCCESS ===');
 
         return NextResponse.json({
           success: true,
