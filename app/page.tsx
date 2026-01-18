@@ -66,8 +66,8 @@ export default async function Home({
   // Fetch hairstyle templates (IDs 23-27)
   const hairstyleTemplates = templates.filter(t => [23, 24, 25, 26, 27].includes(t.id));
   
-  // Fetch 80s template (ID 33)
-  const eightyTemplate = templates.find(t => t.id === 33);
+  // Fetch 80s templates (IDs 33, 34)
+  const eightyTemplates = templates.filter(t => [33, 34].includes(t.id));
   
   // If searching, show grid view
   if (searchParams.search) {
@@ -173,16 +173,16 @@ export default async function Home({
           )}
 
           {/* 80s Banner */}
-          {eightyTemplate && (
+          {eightyTemplates.length > 0 && (
             <a
-              href={`/${eightyTemplate.slug}`}
+              href={`/${eightyTemplates[0].slug}`}
               className="block group bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-900 rounded-xl p-4 border border-zinc-700 hover:border-yellow-500/50 transition-all hover:shadow-lg hover:shadow-yellow-500/20 overflow-hidden relative"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
               <div className="flex items-center gap-4 relative z-10">
                 {/* Single Preview Image */}
                 <div className="relative w-16 h-16 rounded-lg overflow-hidden border-2 border-zinc-700 group-hover:border-yellow-500/50 transition-all flex-shrink-0">
-                  <img src={eightyTemplate.image} alt="" className="w-full h-full object-cover object-top" />
+                  <img src={eightyTemplates[0].image} alt="" className="w-full h-full object-cover object-top" />
                 </div>
                 
                 {/* Text Content */}
