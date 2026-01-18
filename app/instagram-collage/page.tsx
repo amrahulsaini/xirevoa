@@ -102,8 +102,7 @@ export default async function InstagramCollagePage() {
               Create stunning collage layouts perfect for Instagram stories and social media posts. Multiple photo styles in one frame!
             </p>
           </div>
-        </section>
-
+      
         <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
           <div className="columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-3 space-y-3">
             {instagramTemplates.map((template) => (

@@ -53,8 +53,8 @@ export async function POST(request: NextRequest) {
       }
 
       const template = rows[0];
-      // Using hardcoded simplified prompt only for testing
-      aiPrompt = 'Create a photorealistic image showing the person from the first image wearing similar clothing and styling as shown in the second reference image. Match skin tones and lighting naturally.';
+      // Use database prompt only
+      aiPrompt = template.ai_prompt || 'Create a photorealistic image showing the person from the first image wearing similar clothing and styling as shown in the second reference image. Match skin tones and lighting naturally.';
       templateImagePath = rows[0].image_url;
       
       console.log('Using outfit template:', template.title);
