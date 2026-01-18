@@ -186,9 +186,11 @@ FIRST IMAGE (coming next): This is the user's face. Extract this person's face, 
     console.log('Candidates count:', response.candidates?.length || 0);
     if (response.candidates?.[0]) {
       console.log('First candidate parts:', response.candidates[0].content?.parts?.length || 0);
+      console.log('Full candidate:', JSON.stringify(response.candidates[0], null, 2));
     }
 
     if (!response.candidates || response.candidates.length === 0) {
+      console.error('No candidates in response');
       return NextResponse.json(
         { error: 'No response from AI model' },
         { status: 500 }
@@ -196,9 +198,22 @@ FIRST IMAGE (coming next): This is the user's face. Extract this person's face, 
     }
 
     const candidate = response.candidates[0];
-    if (!candidate.content || !candidate.content.parts) {
+    
+    // Check if there's a finishReason indicating why generation stopped
+    if (candidate.finishReason && candidate.finishReason !== 'STOP') {
+      console.error('Generation stopped with reason:', candidate.finishReason);
+      console.error('Safety ratings:', JSON.stringify(candidate.safetyRatings, null, 2));
       return NextResponse.json(
-        { error: 'Invalid response structure from AI model' },
+        { error: `Generation blocked: ${candidate.finishReason}. The content may have been flagged by safety filters.` },
+        { status: 500 }
+      );
+    }
+    
+    if (!candidate.content || !candidate.content.parts || candidate.content.parts.length === 0) {
+      console.error('No content parts in response');
+      console.error('Candidate content:', JSON.stringify(candidate.content, null, 2));
+      return NextResponse.json(
+        { error: 'Invalid response structure from AI model. Check server logs for details.' },
         { status: 500 }
       );
     }
