@@ -314,45 +314,52 @@ export default async function Home({
               </p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {girlsHairstyleTemplates.map((template) => (
-                <a
-                  key={template.id}
-                  href={`/${template.slug}`}
-                  className="group relative bg-gradient-to-br from-pink-900/30 via-purple-900/30 to-pink-900/30 rounded-2xl overflow-hidden border-2 border-pink-500/30 hover:border-pink-400/60 transition-all hover:scale-105 hover:shadow-2xl hover:shadow-pink-500/30"
-                >
-                  {/* Image */}
-                  <div className="aspect-[3/4] overflow-hidden">
-                    <img 
-                      src={template.image} 
-                      alt={template.title}
-                      className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-500"
-                    />
+            <div className="max-w-xl mx-auto">
+              <a
+                href="/change-your-hairstyle-girls"
+                className="group relative block bg-gradient-to-br from-pink-900/40 via-purple-900/40 to-pink-900/40 rounded-3xl overflow-hidden border-2 border-pink-500/40 hover:border-pink-400/80 transition-all hover:scale-105 hover:shadow-2xl hover:shadow-pink-500/50"
+              >
+                {/* Image Grid - Show multiple templates in preview */}
+                <div className="aspect-[4/5] overflow-hidden relative">
+                  <div className="grid grid-cols-2 gap-1 h-full">
+                    {girlsHairstyleTemplates.slice(0, 4).map((template, index) => (
+                      <div key={template.id} className="overflow-hidden">
+                        <img 
+                          src={template.image} 
+                          alt=""
+                          className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-500"
+                        />
+                      </div>
+                    ))}
                   </div>
                   
                   {/* Gradient Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
                   
-                  {/* Content */}
-                  <div className="absolute bottom-0 left-0 right-0 p-4">
-                    <div className="bg-black/50 backdrop-blur-md rounded-xl p-3 border border-pink-500/30">
-                      <h3 className="text-white font-bold text-sm mb-1 group-hover:text-pink-300 transition-colors">
-                        {template.title}
+                  {/* Center Content */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6">
+                    <div className="bg-black/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-pink-500/50 max-w-sm">
+                      <div className="mb-4">
+                        <div className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-sm font-bold px-4 py-2 rounded-full inline-block shadow-lg">
+                          💖 {girlsHairstyleTemplates.length} Hairstyles
+                        </div>
+                      </div>
+                      <h3 className="text-white font-black text-2xl mb-2 group-hover:text-pink-300 transition-colors">
+                        Change Your Hairstyle
                       </h3>
-                      <p className="text-pink-200/70 text-xs line-clamp-2">
-                        {template.description}
+                      <p className="text-pink-200/90 text-sm mb-4">
+                        Try stunning hairstyles while keeping your beautiful face resemblance
                       </p>
+                      <div className="flex items-center justify-center gap-2 text-pink-400 font-bold group-hover:gap-3 transition-all">
+                        <span>Explore Now</span>
+                        <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
                     </div>
                   </div>
-                  
-                  {/* Badge */}
-                  <div className="absolute top-3 right-3">
-                    <div className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-                      💖 Girls
-                    </div>
-                  </div>
-                </a>
-              ))}
+                </div>
+              </a>
             </div>
           </section>
         )}
