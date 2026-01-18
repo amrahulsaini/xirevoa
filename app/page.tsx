@@ -63,6 +63,9 @@ export default async function Home({
 }) {
   const templates = await getTemplates(searchParams.search);
   
+  // Fetch hairstyle templates (IDs 23-27)
+  const hairstyleTemplates = templates.filter(t => [23, 24, 25, 26, 27].includes(t.id));
+  
   // If searching, show grid view
   if (searchParams.search) {
     return (
@@ -130,6 +133,42 @@ export default async function Home({
 
         {/* Spacer for fixed header */}
         <div className="h-16 sm:h-20"></div>
+
+        {/* Hairstyle Section */}
+        {hairstyleTemplates.length > 0 && (
+          <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
+            <h2 className="text-2xl sm:text-3xl font-black text-white mb-6">Choose Your Favourite Hairstyle</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {hairstyleTemplates.map((template) => (
+                <a
+                  key={template.id}
+                  href={`/${template.slug}`}
+                  className="group bg-zinc-900 rounded-xl p-4 border border-zinc-800 hover:border-yellow-500/50 transition-all hover:shadow-lg hover:shadow-yellow-500/20 flex items-center gap-4"
+                >
+                  {/* Profile Picture */}
+                  <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 border border-zinc-700">
+                    <img
+                      src={template.image}
+                      alt={template.title}
+                      className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+
+                  {/* Template Info */}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-bold text-white text-base mb-1 group-hover:text-yellow-400 transition-colors">
+                      {template.title}
+                    </h3>
+                    <p className="text-sm text-zinc-500 line-clamp-2">
+                      {template.description}
+                    </p>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* All Templates Grid */}
         <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
