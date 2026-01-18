@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Upload, Wand2, Download, RefreshCw } from "lucide-react";
+import { Upload, Wand2, Download, RefreshCw, Maximize2, X } from "lucide-react";
 import Image from "next/image";
 
 interface TemplateGeneratorProps {
@@ -21,6 +21,7 @@ export default function TemplateGenerator({ template, isOutfit = false }: Templa
   const [generating, setGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
+  const [showFullScreen, setShowFullScreen] = useState(false);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -117,7 +118,7 @@ export default function TemplateGenerator({ template, isOutfit = false }: Templa
   };
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="max-w-4xl mx-auto">
       {/* Template Info */}
       <div className="text-center mb-8">
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-4">
@@ -126,35 +127,48 @@ export default function TemplateGenerator({ template, isOutfit = false }: Templa
         <p className="text-zinc-400 text-lg max-w-2xl mx-auto">{template.description}</p>
       </div>
 
-      {/* Generator Grid */}
-      <div className="grid md:grid-cols-2 gap-6 mb-8">
-        {/* Upload Section - Hidden during generation */}
-        {!generating && (
+      {/* Single Column Layout */}
+      <div className="space-y-6">
+        {/* Upload Section */}
+        {!generatedImage && !generating && (
           <div className="bg-zinc-900 rounded-2xl p-6 border border-zinc-800">
             <h3 className="text-xl font-bold text-yellow-400 mb-4">Upload Your Photo</h3>
             
             {userImagePreview ? (
-              <div className="relative mb-4">
-                <div className="aspect-square rounded-lg overflow-hidden border border-zinc-700">
-                  <img src={userImagePreview} alt="Your photo" className="w-full h-full object-cover" />
+              <div className="flex items-start gap-4">
+                <div className="relative w-32 h-32 flex-shrink-0">
+                  <div className="w-full h-full rounded-lg overflow-hidden border border-zinc-700">
+                    <img src={userImagePreview} alt="Your photo" className="w-full h-full object-cover" />
+                  </div>
+                  <button
+                    onClick={() => {
+                      setUserImage(null);
+                      setUserImagePreview(null);
+                    }}
+                    className="absolute -top-2 -right-2 bg-red-600 text-white w-6 h-6 rounded-full text-xs hover:bg-red-700 flex items-center justify-center"
+                  >
+                    ×
+                  </button>
                 </div>
-                <button
-                  onClick={() => {
-                    setUserImage(null);
-                    setUserImagePreview(null);
-                  }}
-                  className="absolute top-2 right-2 bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
-                >
-                  Remove
-                </button>
+                <div className="flex-1">
+                  <p className="text-zinc-400 text-sm mb-4">Your photo is ready to transform!</p>
+                  <button
+                    onClick={handleGenerate}
+                    disabled={!userImage || generating}
+                    className="w-full px-6 py-3 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold rounded-xl hover:shadow-lg hover:shadow-yellow-500/50 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
+                  >
+                    <Wand2 className="w-5 h-5" />
+                    Generate Magic ✨
+                  </button>
+                </div>
               </div>
             ) : (
-              <label className="flex flex-col items-center justify-center w-full aspect-square border-2 border-dashed border-zinc-700 rounded-lg cursor-pointer hover:border-yellow-400 transition-colors">
+              <label className="flex flex-col items-center justify-center w-full py-16 border-2 border-dashed border-zinc-700 rounded-lg cursor-pointer hover:border-yellow-400 transition-colors">
                 <Upload className="w-12 h-12 text-zinc-600 mb-4" />
                 <span className="text-zinc-500 text-center px-4">
                   Click to upload your photo
                   <br />
-                  <span className="text-xs">Max 10MB</span>
+                  <span className="text-xs">Max 10MB • JPG, PNG, WEBP</span>
                 </span>
                 <input
                   type="file"
@@ -164,23 +178,42 @@ export default function TemplateGenerator({ template, isOutfit = false }: Templa
                 />
               </label>
             )}
-
-            <button
-              onClick={handleGenerate}
-              disabled={!userImage || generating}
-              className="w-full mt-4 px-6 py-4 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold rounded-xl hover:shadow-lg hover:shadow-yellow-500/50 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
-            >
-              <Wand2 className="w-5 h-5" />
-              Generate Image
-            </button>
           </div>
         )}
 
-        {/* Result Section - Full width during generation */}
-        <div className={`bg-zinc-900 rounded-2xl p-6 border border-zinc-800 ${generating ? 'md:col-span-2' : ''}`}>
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-xl font-bold text-yellow-400">Generated Result</h3>
-            {generatedImage && !generating && (
+        {/* Generating State */}
+        {generating && (
+          <div className="bg-zinc-900 rounded-2xl p-8 border border-zinc-800">
+            <div className="flex flex-col items-center justify-center">
+              <div className="relative w-32 h-32 mb-6">
+                {userImagePreview && (
+                  <img 
+                    src={userImagePreview} 
+                    alt="Processing" 
+                    className="w-full h-full object-cover rounded-lg blur-sm opacity-50" 
+                  />
+                )}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-16 h-16 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin"></div>
+                </div>
+              </div>
+              <p className="text-white font-bold text-xl mb-2">Creating Your Magic...</p>
+              <p className="text-yellow-400 font-bold text-2xl mb-4">{progress}%</p>
+              <div className="w-full max-w-md h-2 bg-zinc-700 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-yellow-400 to-yellow-500 transition-all duration-300"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Result Section */}
+        {generatedImage && !generating && (
+          <div className="bg-zinc-900 rounded-2xl p-6 border border-zinc-800">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold text-yellow-400">✨ You'll Love This!</h3>
               <button
                 onClick={handleReset}
                 className="flex items-center gap-2 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-yellow-400 rounded-lg transition-colors"
@@ -188,53 +221,61 @@ export default function TemplateGenerator({ template, isOutfit = false }: Templa
                 <RefreshCw className="w-4 h-4" />
                 Try Another
               </button>
-            )}
-          </div>
-          
-          <div className="aspect-square rounded-lg overflow-hidden border border-zinc-700 bg-zinc-800/50 flex items-center justify-center relative">
-            {generating ? (
-              <div className="relative w-full h-full">
-                {userImagePreview && (
-                  <img 
-                    src={userImagePreview} 
-                    alt="Processing" 
-                    className="w-full h-full object-cover blur-md opacity-50" 
-                  />
-                )}
-                <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60">
-                  <div className="w-16 h-16 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin mb-4"></div>
-                  <p className="text-white font-bold text-lg mb-2">Generating Magic...</p>
-                  <p className="text-yellow-400 font-bold text-xl">{progress}%</p>
-                  <div className="w-64 h-2 bg-zinc-700 rounded-full mt-4 overflow-hidden">
-                    <div 
-                      className="h-full bg-gradient-to-r from-yellow-400 to-yellow-500 transition-all duration-300"
-                      style={{ width: `${progress}%` }}
-                    />
-                  </div>
-                </div>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="relative rounded-xl overflow-hidden border-2 border-zinc-700 group">
+                <img src={generatedImage} alt="Generated" className="w-full h-auto" />
+                <button
+                  onClick={() => setShowFullScreen(true)}
+                  className="absolute top-4 right-4 bg-black/60 backdrop-blur-sm p-2 rounded-lg text-white hover:bg-black/80 transition-all opacity-0 group-hover:opacity-100"
+                >
+                  <Maximize2 className="w-5 h-5" />
+                </button>
               </div>
-            ) : generatedImage ? (
-              <img src={generatedImage} alt="Generated" className="w-full h-full object-cover" />
-            ) : (
-              <div className="text-center text-zinc-600">
-                <Wand2 className="w-12 h-12 mx-auto mb-2" />
-                <p>Your generated image will appear here</p>
-              </div>
-            )}
-          </div>
 
-          {generatedImage && !generating && (
-            <a
-              href={generatedImage}
-              download="xirevoa-generated.png"
-              className="w-full mt-4 px-6 py-4 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition-all flex items-center justify-center gap-2"
-            >
-              <Download className="w-5 h-5" />
-              Download Image
-            </a>
-          )}
-        </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowFullScreen(true)}
+                  className="flex-1 px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2"
+                >
+                  <Maximize2 className="w-5 h-5" />
+                  Full Screen Preview
+                </button>
+                <a
+                  href={generatedImage}
+                  download="xirevoa-generated.png"
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-green-500 text-white font-bold rounded-xl hover:shadow-lg hover:shadow-green-500/50 transition-all flex items-center justify-center gap-2"
+                >
+                  <Download className="w-5 h-5" />
+                  Download
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* Full Screen Modal */}
+      {showFullScreen && generatedImage && (
+        <div 
+          className="fixed inset-0 bg-black/95 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => setShowFullScreen(false)}
+        >
+          <button
+            onClick={() => setShowFullScreen(false)}
+            className="absolute top-4 right-4 bg-white/10 hover:bg-white/20 p-2 rounded-full text-white transition-all"
+          >
+            <X className="w-6 h-6" />
+          </button>
+          <img 
+            src={generatedImage} 
+            alt="Generated Full Screen" 
+            className="max-w-full max-h-full object-contain rounded-lg"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
     </div>
   );
 }
