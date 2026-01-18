@@ -3,6 +3,8 @@ import Header from '@/app/components/Header';
 import Footer from '@/app/components/Footer';
 import CategoryCard from '@/app/components/CategoryCard';
 
+export const dynamic = 'force-dynamic';
+
 // Fetch outfit templates
 async function getOutfitTemplates() {
   const connection = await pool.getConnection();
