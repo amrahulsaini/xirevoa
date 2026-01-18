@@ -1,11 +1,11 @@
-import { db } from '@/lib/db';
-import { Header } from '@/app/components/Header';
-import { Footer } from '@/app/components/Footer';
+import pool from '@/lib/db';
+import Header from '@/app/components/Header';
+import Footer from '@/app/components/Footer';
 import CategoryCard from '@/app/components/CategoryCard';
 
 // Fetch outfit templates
 async function getOutfitTemplates() {
-  const connection = await db();
+  const connection = await pool.getConnection();
   
   try {
     const [templates] = await connection.query<any[]>(
@@ -24,13 +24,13 @@ async function getOutfitTemplates() {
     console.error('Error fetching outfit templates:', error);
     return [];
   } finally {
-    await connection.end();
+    connection.release();
   }
 }
 
 // Fetch other categories for "Explore More" section
 async function getOtherCategories() {
-  const connection = await db();
+  const connection = await pool.getConnection();
   
   try {
     // Fetch templates for other categories
@@ -106,7 +106,7 @@ async function getOtherCategories() {
       girlsHairstyles: [],
     };
   } finally {
-    await connection.end();
+    connection.release();
   }
 }
 
