@@ -138,54 +138,23 @@ export default async function Home({
         {/* Spacer for fixed header */}
         <div className="h-16 sm:h-20"></div>
 
-        {/* Feature Points */}
+        {/* Feature Points - Compact Banner */}
         <section className="container mx-auto px-4 sm:px-6 pt-6 pb-4">
-          <div className="max-w-2xl mx-auto space-y-3">
-            {/* Feature 1 */}
-            <div className="group relative bg-gradient-to-r from-zinc-900 to-zinc-800 rounded-xl p-4 border border-zinc-700 hover:border-yellow-500/50 transition-all">
-              <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-xl"></div>
-              <div className="relative z-10 flex items-center gap-4">
-                <div className="w-2 h-2 bg-yellow-400 rounded-full flex-shrink-0"></div>
-                <div>
-                  <h3 className="text-base font-bold text-white group-hover:text-yellow-400 transition-colors">
-                    Just Upload Your Face
-                  </h3>
-                  <p className="text-sm text-zinc-400">
-                    Simply upload your photo and explore all template styles instantly
-                  </p>
-                </div>
+          <div className="bg-gradient-to-r from-zinc-900/50 to-zinc-800/50 rounded-xl p-4 border border-zinc-700/50 backdrop-blur-sm">
+            <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-sm">
+              <div className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 bg-yellow-400 rounded-full"></div>
+                <span className="text-zinc-300">Upload Your Face</span>
               </div>
-            </div>
-
-            {/* Feature 2 */}
-            <div className="group relative bg-gradient-to-r from-zinc-900 to-zinc-800 rounded-xl p-4 border border-zinc-700 hover:border-yellow-500/50 transition-all">
-              <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-xl"></div>
-              <div className="relative z-10 flex items-center gap-4">
-                <div className="w-2 h-2 bg-yellow-400 rounded-full flex-shrink-0"></div>
-                <div>
-                  <h3 className="text-base font-bold text-white group-hover:text-yellow-400 transition-colors">
-                    Gender Neutral Templates
-                  </h3>
-                  <p className="text-sm text-zinc-400">
-                    All templates work perfectly for everyone, no restrictions
-                  </p>
-                </div>
+              <div className="hidden sm:block w-px h-4 bg-zinc-700"></div>
+              <div className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 bg-yellow-400 rounded-full"></div>
+                <span className="text-zinc-300">Gender Neutral</span>
               </div>
-            </div>
-
-            {/* Feature 3 */}
-            <div className="group relative bg-gradient-to-r from-zinc-900 to-zinc-800 rounded-xl p-4 border border-zinc-700 hover:border-yellow-500/50 transition-all">
-              <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-xl"></div>
-              <div className="relative z-10 flex items-center gap-4">
-                <div className="w-2 h-2 bg-yellow-400 rounded-full flex-shrink-0"></div>
-                <div>
-                  <h3 className="text-base font-bold text-white group-hover:text-yellow-400 transition-colors">
-                    No Prompts Needed
-                  </h3>
-                  <p className="text-sm text-zinc-400">
-                    Zero hassle, zero prompts. Just your face and instant magic
-                  </p>
-                </div>
+              <div className="hidden sm:block w-px h-4 bg-zinc-700"></div>
+              <div className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 bg-yellow-400 rounded-full"></div>
+                <span className="text-zinc-300">No Prompts Needed</span>
               </div>
             </div>
           </div>
