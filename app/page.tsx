@@ -459,7 +459,34 @@ export default async function Home({
           <h2 className="text-2xl sm:text-3xl font-black text-white mb-6">All Templates</h2>
           
           <div className="columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-4 space-y-4">
-            {templates.map((category) => (
+            {templates.slice(0, 5).map((category) => (
+              <div key={category.id} className="break-inside-avoid">
+                <CategoryCard
+                  id={category.id}
+                  title={category.title}
+                  slug={category.slug}
+                  description={category.description}
+                  image={category.image}
+                  comingSoon={category.comingSoon}
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* Banner after first 5 templates */}
+          <div className="my-8 w-full">
+            <div className="relative w-full overflow-hidden rounded-2xl border-2 border-zinc-800 hover:border-yellow-500/50 transition-all">
+              <img 
+                src="/hero-banner.png" 
+                alt="Banner"
+                className="w-full h-auto object-contain"
+              />
+            </div>
+          </div>
+
+          {/* Remaining templates */}
+          <div className="columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-4 space-y-4">
+            {templates.slice(5).map((category) => (
               <div key={category.id} className="break-inside-avoid">
                 <CategoryCard
                   id={category.id}
