@@ -13,13 +13,36 @@ interface TemplateRow extends RowDataPacket {
 
 async function getRelatedTemplates(currentTemplateId: number, tags: string) {
   try {
-    // Get all templates sorted by display_order
+    const tagArray = tags.split(',').map(t => t.trim()).filter(t => t);
+    
+    // Get all templates
     const [rows] = await pool.query<TemplateRow[]>(
       'SELECT id, title, description, image_url, tags, coming_soon FROM templates WHERE is_active = TRUE AND id != ? ORDER BY display_order ASC',
       [currentTemplateId]
     );
     
-    return rows;
+    if (tagArray.length === 0) {
+      return rows;
+    }
+    
+    // Separate templates into related (matching tags) and others
+    const related: TemplateRow[] = [];
+    const others: TemplateRow[] = [];
+    
+    rows.forEach(row => {
+      const hasMatchingTag = tagArray.some(tag => 
+        row.tags?.toLowerCase().includes(tag.toLowerCase())
+      );
+      
+      if (hasMatchingTag) {
+        related.push(row);
+      } else {
+        others.push(row);
+      }
+    });
+    
+    // Return related first, then others (both already sorted by display_order)
+    return [...related, ...others];
   } catch (error) {
     console.error('Error fetching related templates:', error);
     return [];
