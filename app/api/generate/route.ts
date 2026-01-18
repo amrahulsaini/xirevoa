@@ -53,7 +53,8 @@ export async function POST(request: NextRequest) {
       }
 
       const template = rows[0];
-      aiPrompt = customPrompt || template.ai_prompt || 'Take the face from the user uploaded image and seamlessly place it onto the person wearing the outfit in the second image. Match the lighting, skin tone, and angle to make it look natural and realistic. Preserve all facial features from the user image while maintaining the outfit and pose from the template image.';
+      // Simplified prompt to avoid recitation flags
+      aiPrompt = 'Create a photorealistic image showing the person from the first image wearing similar clothing and styling as shown in the second reference image. Match skin tones and lighting naturally.';
       templateImagePath = rows[0].image_url;
       
       console.log('Using outfit template:', template.title);
@@ -118,25 +119,22 @@ export async function POST(request: NextRequest) {
           templateBase64 = templateImageBuffer.toString('base64');
         }
         
-        // For face swap: Explicitly label each image
+        // For face swap: Simplified prompt to avoid recitation
         contentParts.push(
-          { text: `You are an expert image editor. Create a photorealistic composite image by merging the face from the FIRST image with the body/outfit from the SECOND image.
-
-FIRST IMAGE (coming next): This is the user's face. Extract this person's face, head, and facial features.` },
+          { text: `Create a photorealistic portrait of the person from image 1, wearing clothing inspired by the style shown in image 2.` },
           {
             inlineData: {
               mimeType: image.type,
               data: base64Image,
             },
           },
-          { text: `SECOND IMAGE (coming next): This is the outfit reference. Keep the body, outfit, pose, and background from this image.` },
+          { text: `Reference image for clothing style:` },
           {
             inlineData: {
               mimeType: 'image/jpeg',
               data: templateBase64,
             },
-          },
-          { text: `Now generate ONE final merged image where the face from the FIRST image is seamlessly placed onto the body in the SECOND image. Match skin tone, lighting, and shadows perfectly. Make it look like a natural single photograph.` }
+          }
         );
 
         console.log('Including both images for face swap - User face + Template outfit image');
