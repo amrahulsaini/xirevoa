@@ -79,9 +79,6 @@ export default async function Home({
   // Fetch girls hairstyle templates (IDs 39, 40, 41, 42)
   const girlsHairstyleTemplates = templates.filter(t => [39, 40, 41, 42].includes(t.id));
   
-  // Fetch outfit templates (for now just ID 43)
-  const outfitTemplates = templates.filter(t => t.id === 43);
-  
   // If searching, show grid view
   if (searchParams.search) {
     return (
