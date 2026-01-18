@@ -301,20 +301,14 @@ export default async function Home({
         {girlsHairstyleTemplates.length > 0 && (
           <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
             <div className="text-center mb-8">
-              <div className="inline-block relative animate-pulse">
-                <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full blur-xl opacity-50"></div>
+              <div className="inline-block relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full blur-xl opacity-50 animate-pulse"></div>
                 <div className="relative px-8 py-3 bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 rounded-full border-2 border-white/20 shadow-2xl">
-                  <span className="text-white text-base sm:text-lg font-black tracking-wide drop-shadow-lg">
+                  <span className="text-white text-base sm:text-lg font-black tracking-wide drop-shadow-lg typing-animation">
                     ✨ EXCLUSIVELY FOR GIRLS ✨
                   </span>
                 </div>
               </div>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-black bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-3 mt-6">
-                Change Your Hairstyle
-              </h2>
-              <p className="text-zinc-400 max-w-2xl mx-auto">
-                Keep your beautiful face while trying stunning new hairstyles
-              </p>
             </div>
             
             <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-6">
