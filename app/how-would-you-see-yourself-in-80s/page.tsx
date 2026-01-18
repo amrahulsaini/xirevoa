@@ -16,6 +16,16 @@ interface Template extends RowDataPacket {
   coming_soon: boolean;
 }
 
+interface Category {
+  id: number;
+  title: string;
+  slug: string;
+  description: string;
+  image: string;
+  tags: string;
+  comingSoon?: boolean;
+}
+
 async function getEightyTemplates() {
   try {
     const [rows] = await pool.query<Template[]>(
@@ -36,8 +46,36 @@ async function getEightyTemplates() {
   }
 }
 
+async function getOtherCategories(): Promise<{hairstyles: Category[], cinematic: Category[], instagram: Category[]}> {
+  try {
+    const [rows] = await pool.query<Template[]>(
+      'SELECT id, title, description, image_url, tags, coming_soon FROM templates WHERE id IN (23, 24, 25, 26, 27, 28, 16, 35, 36, 10, 1, 8, 2, 9, 7) AND is_active = TRUE ORDER BY display_order ASC'
+    );
+    
+    const allTemplates = rows.map((row: Template) => ({
+      id: row.id,
+      title: row.title,
+      slug: row.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+      description: row.description,
+      image: row.image_url,
+      tags: row.tags || '',
+      comingSoon: row.coming_soon,
+    }));
+    
+    return {
+      hairstyles: allTemplates.filter(t => [23, 24, 25, 26, 27].includes(t.id)),
+      cinematic: allTemplates.filter(t => [28, 16, 35, 36, 10].includes(t.id)),
+      instagram: allTemplates.filter(t => [1, 8, 2, 9, 7].includes(t.id)),
+    };
+  } catch (error) {
+    console.error('Error fetching other categories:', error);
+    return { hairstyles: [], cinematic: [], instagram: [] };
+  }
+}
+
 export default async function EightyPage() {
   const templates = await getEightyTemplates();
+  const { hairstyles, cinematic, instagram } = await getOtherCategories();
 
   return (
     <div className="min-h-screen bg-black">
