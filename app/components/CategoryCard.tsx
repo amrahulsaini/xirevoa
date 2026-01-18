@@ -37,16 +37,16 @@ export default function CategoryCard({
         onClick={(e) => {
           if (comingSoon) e.preventDefault();
         }}
-        className="block group relative overflow-hidden rounded-2xl bg-zinc-900 cursor-pointer transform transition-all duration-300 hover:shadow-2xl hover:shadow-yellow-500/20 mb-4 border border-zinc-800/50 hover:border-yellow-500/50 min-h-[320px] sm:min-h-[380px]"
+        className="block group relative overflow-hidden rounded-2xl bg-zinc-900 cursor-pointer transform transition-all duration-300 hover:shadow-2xl hover:shadow-yellow-500/20 mb-4 border border-zinc-800/50 hover:border-yellow-500/50"
       >
         {/* Image Container - Natural aspect ratio */}
-        <div className="relative w-full overflow-hidden bg-zinc-900 h-full">
+        <div className="relative w-full overflow-hidden bg-zinc-900">
           <Image
             src={imgSrc}
             alt={title}
             width={600}
             height={800}
-            className="w-full h-auto object-contain"
+            className="w-full h-auto object-cover"
             onLoadingComplete={() => {}}
             onError={() => {
               setImgSrc(
@@ -76,13 +76,23 @@ export default function CategoryCard({
           </button>
 
           {/* Action Button - Bottom - Desktop on hover only */}
-          <div className="hidden md:block absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/90 via-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div className="hidden md:flex absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/90 via-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 justify-center items-center gap-2">
             <div
-              className={`block w-full px-5 py-3 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold rounded-xl transition-all duration-300 transform hover:scale-105 text-center ${
+              className={`flex items-center justify-center gap-2 px-5 py-3 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold rounded-xl transition-all duration-300 transform hover:scale-105 ${
                 comingSoon ? 'cursor-not-allowed opacity-60' : 'hover:shadow-lg hover:shadow-yellow-500/50'
               }`}
             >
-              {comingSoon ? "Coming Soon" : "Use This Template →"}
+              {comingSoon ? (
+                <span>Coming Soon</span>
+              ) : (
+                <>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>Generate</span>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -138,7 +148,7 @@ export default function CategoryCard({
                   {/* Use Template Button */}
                   <Link
                     href={comingSoon ? "#" : `/${slug}`}
-                    className={`block w-full px-6 py-4 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold rounded-xl transition-all duration-300 transform hover:scale-105 text-center ${
+                    className={`flex items-center justify-center gap-2 w-full px-6 py-4 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold rounded-xl transition-all duration-300 transform hover:scale-105 ${
                       comingSoon ? 'cursor-not-allowed opacity-60' : 'hover:shadow-lg hover:shadow-yellow-500/50'
                     }`}
                     onClick={(e) => {
@@ -149,7 +159,17 @@ export default function CategoryCard({
                       }
                     }}
                   >
-                    {comingSoon ? "Coming Soon" : "Use This Template →"}
+                    {comingSoon ? (
+                      <span>Coming Soon</span>
+                    ) : (
+                      <>
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>Generate</span>
+                      </>
+                    )}
                   </Link>
                 </div>
               </div>

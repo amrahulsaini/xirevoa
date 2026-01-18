@@ -137,74 +137,137 @@ export default async function Home({
         {/* Spacer for fixed header */}
         <div className="h-16 sm:h-20"></div>
 
+        {/* Feature Points */}
+        <section className="container mx-auto px-4 sm:px-6 pt-6 pb-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Feature 1 */}
+            <div className="group relative bg-gradient-to-br from-zinc-900 to-zinc-800 rounded-2xl p-6 border border-zinc-700 hover:border-yellow-500/50 transition-all hover:shadow-lg hover:shadow-yellow-500/20">
+              <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl"></div>
+              <div className="relative z-10">
+                <div className="w-12 h-12 bg-yellow-500/10 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <span className="text-2xl">👤</span>
+                </div>
+                <h3 className="text-lg font-bold text-white mb-2 group-hover:text-yellow-400 transition-colors">
+                  Just Upload Your Face
+                </h3>
+                <p className="text-sm text-zinc-400">
+                  Simply upload your photo and explore all template styles instantly
+                </p>
+              </div>
+            </div>
+
+            {/* Feature 2 */}
+            <div className="group relative bg-gradient-to-br from-zinc-900 to-zinc-800 rounded-2xl p-6 border border-zinc-700 hover:border-yellow-500/50 transition-all hover:shadow-lg hover:shadow-yellow-500/20">
+              <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl"></div>
+              <div className="relative z-10">
+                <div className="w-12 h-12 bg-yellow-500/10 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <span className="text-2xl">⚡</span>
+                </div>
+                <h3 className="text-lg font-bold text-white mb-2 group-hover:text-yellow-400 transition-colors">
+                  Gender Neutral Templates
+                </h3>
+                <p className="text-sm text-zinc-400">
+                  All templates work perfectly for everyone, no restrictions
+                </p>
+              </div>
+            </div>
+
+            {/* Feature 3 */}
+            <div className="group relative bg-gradient-to-br from-zinc-900 to-zinc-800 rounded-2xl p-6 border border-zinc-700 hover:border-yellow-500/50 transition-all hover:shadow-lg hover:shadow-yellow-500/20">
+              <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl"></div>
+              <div className="relative z-10">
+                <div className="w-12 h-12 bg-yellow-500/10 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <span className="text-2xl">🚀</span>
+                </div>
+                <h3 className="text-lg font-bold text-white mb-2 group-hover:text-yellow-400 transition-colors">
+                  No Prompts Needed
+                </h3>
+                <p className="text-sm text-zinc-400">
+                  Zero hassle, zero prompts. Just your face and instant magic
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Category Banners */}
         <section className="container mx-auto px-4 sm:px-6 pt-4 pb-2">
-          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory">
-            {/* Hairstyle Banner */}
-            {hairstyleTemplates.length > 0 && (
-              <a
-                href="/hairstyles"
-                className="flex-shrink-0 w-80 group bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-900 rounded-xl p-4 border border-zinc-700 hover:border-yellow-500/50 transition-all hover:shadow-lg hover:shadow-yellow-500/20 overflow-hidden relative snap-start"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <div className="flex items-center gap-4 relative z-10">
-                  {/* Single Preview Image */}
-                  <div className="relative w-16 h-16 rounded-lg overflow-hidden border-2 border-zinc-700 group-hover:border-yellow-500/50 transition-all flex-shrink-0">
-                    <img src={hairstyleTemplates[0].image} alt="" className="w-full h-full object-cover object-top" />
-                  </div>
-                  
-                  {/* Text Content */}
-                  <div className="flex-1 min-w-0">
-                    <h2 className="text-base font-bold text-white group-hover:text-yellow-400 transition-colors">
-                      ✨ Choose Your Favourite Hairstyle
-                    </h2>
-                    <p className="text-xs text-zinc-400">
-                      {hairstyleTemplates.length} amazing styles
-                    </p>
-                  </div>
+          <div className="relative">
+            {/* Auto-scroll wrapper - only shows gradient overlays if content overflows */}
+            <div className="relative group">
+              {/* Gradient overlays for scroll indication */}
+              <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-black via-black/80 to-transparent z-10 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-black via-black/80 to-transparent z-10 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              
+              {/* Scrollable container */}
+              <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory scroll-smooth">
+                {/* Hairstyle Banner */}
+                {hairstyleTemplates.length > 0 && (
+                  <a
+                    href="/hairstyles"
+                    className="flex-shrink-0 w-80 group/card bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-900 rounded-xl p-4 border border-zinc-700 hover:border-yellow-500/50 transition-all hover:shadow-lg hover:shadow-yellow-500/20 overflow-hidden relative snap-start"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity"></div>
+                    <div className="flex items-center gap-4 relative z-10">
+                      {/* Single Preview Image */}
+                      <div className="relative w-16 h-16 rounded-lg overflow-hidden border-2 border-zinc-700 group-hover/card:border-yellow-500/50 transition-all flex-shrink-0">
+                        <img src={hairstyleTemplates[0].image} alt="" className="w-full h-full object-cover object-top" />
+                      </div>
+                      
+                      {/* Text Content */}
+                      <div className="flex-1 min-w-0">
+                        <h2 className="text-base font-bold text-white group-hover/card:text-yellow-400 transition-colors">
+                          ✨ Choose Your Favourite Hairstyle
+                        </h2>
+                        <p className="text-xs text-zinc-400">
+                          {hairstyleTemplates.length} amazing styles
+                        </p>
+                      </div>
 
-                  {/* Arrow */}
-                  <div className="text-yellow-400 group-hover:translate-x-1 transition-transform">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </div>
-                </div>
-              </a>
-            )}
+                      {/* Arrow */}
+                      <div className="text-yellow-400 group-hover/card:translate-x-1 transition-transform">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </div>
+                  </a>
+                )}
 
-            {/* 80s Banner */}
-            {eightyTemplates.length > 0 && (
-              <a
-                href="/how-would-you-see-yourself-in-80s"
-                className="flex-shrink-0 w-80 group bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-900 rounded-xl p-4 border border-zinc-700 hover:border-yellow-500/50 transition-all hover:shadow-lg hover:shadow-yellow-500/20 overflow-hidden relative snap-start"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <div className="flex items-center gap-4 relative z-10">
-                  {/* Single Preview Image */}
-                  <div className="relative w-16 h-16 rounded-lg overflow-hidden border-2 border-zinc-700 group-hover:border-yellow-500/50 transition-all flex-shrink-0">
-                    <img src={eightyTemplates[0].image} alt="" className="w-full h-full object-cover object-top" />
-                  </div>
-                  
-                  {/* Text Content */}
-                  <div className="flex-1 min-w-0">
-                    <h2 className="text-base font-bold text-white group-hover:text-yellow-400 transition-colors">
-                      🕰️ See How You'd Look in Your 80s
-                    </h2>
-                    <p className="text-xs text-zinc-400">
-                      Transform into your future self
-                    </p>
-                  </div>
+                {/* 80s Banner */}
+                {eightyTemplates.length > 0 && (
+                  <a
+                    href="/how-would-you-see-yourself-in-80s"
+                    className="flex-shrink-0 w-80 group/card bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-900 rounded-xl p-4 border border-zinc-700 hover:border-yellow-500/50 transition-all hover:shadow-lg hover:shadow-yellow-500/20 overflow-hidden relative snap-start"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity"></div>
+                    <div className="flex items-center gap-4 relative z-10">
+                      {/* Single Preview Image */}
+                      <div className="relative w-16 h-16 rounded-lg overflow-hidden border-2 border-zinc-700 group-hover/card:border-yellow-500/50 transition-all flex-shrink-0">
+                        <img src={eightyTemplates[0].image} alt="" className="w-full h-full object-cover object-top" />
+                      </div>
+                      
+                      {/* Text Content */}
+                      <div className="flex-1 min-w-0">
+                        <h2 className="text-base font-bold text-white group-hover/card:text-yellow-400 transition-colors">
+                          🕰️ See How You'd Look in Your 80s
+                        </h2>
+                        <p className="text-xs text-zinc-400">
+                          Transform into your future self
+                        </p>
+                      </div>
 
-                  {/* Arrow */}
-                  <div className="text-yellow-400 group-hover:translate-x-1 transition-transform">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </div>
-                </div>
-              </a>
-            )}
+                      {/* Arrow */}
+                      <div className="text-yellow-400 group-hover/card:translate-x-1 transition-transform">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </div>
+                  </a>
+                )}
+              </div>
+            </div>
           </div>
         </section>
 
