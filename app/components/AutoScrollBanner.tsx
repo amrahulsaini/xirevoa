@@ -7,12 +7,17 @@ interface AutoScrollBannerProps {
 export default function AutoScrollBanner({ children }: AutoScrollBannerProps) {
   return (
     <div 
-      className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2"
+      className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide"
       style={{
-        scrollbarWidth: 'thin',
-        scrollbarColor: '#eab308 #27272a',
+        scrollbarWidth: 'none',
+        msOverflowStyle: 'none',
       }}
     >
+      <style jsx>{`
+        div::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
       {children}
     </div>
   );
