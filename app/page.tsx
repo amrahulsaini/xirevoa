@@ -134,40 +134,42 @@ export default async function Home({
         {/* Spacer for fixed header */}
         <div className="h-16 sm:h-20"></div>
 
-        {/* Hairstyle Section */}
+        {/* Hairstyle Banner */}
         {hairstyleTemplates.length > 0 && (
-          <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
-            <div className="max-w-md mx-auto">
-              <a
-                href="/hairstyles"
-                className="block group bg-zinc-900 rounded-2xl p-6 border border-zinc-800 hover:border-yellow-500/50 transition-all hover:shadow-xl hover:shadow-yellow-500/20"
-              >
-                {/* Card Content */}
-                <div className="flex items-center gap-6">
-                  {/* Profile Picture */}
-                  <div className="relative w-32 h-32 rounded-xl overflow-hidden flex-shrink-0 border-2 border-zinc-700 group-hover:border-yellow-500/50 transition-all">
-                    <img
-                      src={hairstyleTemplates[0]?.image}
-                      alt="Hairstyles"
-                      className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-500"
-                    />
-                  </div>
-
-                  {/* Template Info */}
-                  <div className="flex-1 min-w-0">
-                    <h2 className="text-xl font-black text-white mb-2 group-hover:text-yellow-400 transition-colors">
-                      Choose Your Favourite Hairstyle
-                    </h2>
-                    <p className="text-sm text-zinc-400 mb-3">
-                      Explore {hairstyleTemplates.length} amazing hairstyle options
-                    </p>
-                    <div className="flex items-center text-yellow-400 text-sm font-semibold">
-                      View All Styles →
+          <section className="container mx-auto px-4 sm:px-6 pt-4 pb-2">
+            <a
+              href="/hairstyles"
+              className="block group bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-900 rounded-xl p-4 border border-zinc-700 hover:border-yellow-500/50 transition-all hover:shadow-lg hover:shadow-yellow-500/20 overflow-hidden relative"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div className="flex items-center gap-4 relative z-10">
+                {/* Mini Preview Images */}
+                <div className="flex -space-x-3">
+                  {hairstyleTemplates.slice(0, 3).map((t, i) => (
+                    <div key={t.id} className="relative w-14 h-14 rounded-lg overflow-hidden border-2 border-zinc-700 group-hover:border-yellow-500/50 transition-all" style={{ zIndex: 3 - i }}>
+                      <img src={t.image} alt="" className="w-full h-full object-cover object-top" />
                     </div>
-                  </div>
+                  ))}
                 </div>
-              </a>
-            </div>
+                
+                {/* Text Content */}
+                <div className="flex-1 min-w-0">
+                  <h2 className="text-lg font-bold text-white group-hover:text-yellow-400 transition-colors">
+                    ✨ Choose Your Favourite Hairstyle
+                  </h2>
+                  <p className="text-xs text-zinc-400">
+                    {hairstyleTemplates.length} amazing styles waiting for you
+                  </p>
+                </div>
+
+                {/* Arrow */}
+                <div className="text-yellow-400 group-hover:translate-x-1 transition-transform">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </div>
+            </a>
           </section>
         )}
 
