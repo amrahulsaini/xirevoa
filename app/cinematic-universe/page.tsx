@@ -93,7 +93,6 @@ export default async function CinematicUniversePage() {
         {/* Spacer for fixed header */}
         <div className="h-16 sm:h-20"></div>
 
-        {/* Hero Section */
         <section className="container mx-auto px-4 sm:px-6 pt-8 pb-4">
           <div className="max-w-3xl">
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-4">
@@ -105,7 +104,6 @@ export default async function CinematicUniversePage() {
           </div>
         </section>
 
-        {/* Templates Grid */}
         <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
           <div className="columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-3 space-y-3">
             {cinematicTemplates.map((template) => (
