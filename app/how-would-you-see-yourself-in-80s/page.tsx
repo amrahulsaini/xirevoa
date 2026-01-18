@@ -1,6 +1,7 @@
 import CategoryCard from "../components/CategoryCard";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import AutoScrollBanner from "@/app/components/AutoScrollBanner";
 import pool from "@/lib/db";
 import { RowDataPacket } from "mysql2";
 
