@@ -10,13 +10,7 @@ interface Template extends RowDataPacket {
   id: number;
   title: string;
   ai_prompt: string | null;
-}
-
-interface OutfitTemplate extends RowDataPacket {
-  id: number;
-  name: string;
-  ai_prompt: string | null;
-  outfit_image_url: string;
+  image_url: string;
 }
 
 export async function POST(request: NextRequest) {
@@ -35,12 +29,12 @@ export async function POST(request: NextRequest) {
     }
 
     let aiPrompt = 'Generate an AI-enhanced image';
-    let outfitImagePath: string | null = null;
+    let templateImagePath: string | null = null;
 
     if (isOutfit) {
-      // Fetch outfit template
-      const [rows] = await pool.query<OutfitTemplate[]>(
-        'SELECT id, name, ai_prompt, outfit_image_url FROM outfit_templates WHERE id = ?',
+      // Fetch outfit template from regular templates table
+      const [rows] = await pool.query<Template[]>(
+        'SELECT id, title, ai_prompt, image_url FROM templates WHERE id = ?',
         [templateId]
       );
 
@@ -51,12 +45,13 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      const outfit = rows[0];
-      aiPrompt = customPrompt || outfit.ai_prompt || 'Take the face from the user uploaded image and seamlessly place it onto the person wearing the outfit in the second image. Match the lighting, skin tone, and angle to make it look natural and realistic. Preserve all facial features from the user image while maintaining the outfit and pose from the template image.';
-      outfitImagePath = outfit.outfit_image_url;
+      const template = rows[0];
+      aiPrompt = customPrompt || template.ai_prompt || 'Take the face from the user uploaded image and seamlessly place it onto the person wearing the outfit in the second image. Match the lighting, skin tone, and angle to make it look natural and realistic. Preserve all facial features from the user image while maintaining the outfit and pose from the template image.';
+      templateImagePath = rows[0].image_url;
       
-      console.log('Using outfit template:', outfit.name);
-      console.log('AI Prompt from database:', outfit.ai_prompt);
+      console.log('Using outfit template:', template.title);
+      console.log('Template image URL:', templateImagePath);
+      console.log('AI Prompt from database:', template.ai_prompt);
       console.log('Custom prompt provided:', customPrompt);
       console.log('Final prompt being used:', aiPrompt);
     } else {
@@ -96,12 +91,25 @@ export async function POST(request: NextRequest) {
     const contentParts: any[] = [];
 
     // If outfit template, structure differently for face swap
-    if (isOutfit && outfitImagePath) {
+    if (isOutfit && templateImagePath) {
       try {
-        // Read outfit image from public directory
-        const outfitPath = path.join(process.cwd(), 'public', outfitImagePath.replace('/api/', ''));
-        const outfitImageBuffer = fs.readFileSync(outfitPath);
-        const outfitBase64 = outfitImageBuffer.toString('base64');
+        // Read template image from public directory or fetch from URL
+        let templateBase64: string;
+        
+        if (templateImagePath.startsWith('http://') || templateImagePath.startsWith('https://')) {
+          // Fetch from URL
+          console.log('Fetching template image from URL:', templateImagePath);
+          const response = await fetch(templateImagePath);
+          const arrayBuffer = await response.arrayBuffer();
+          const templateBuffer = Buffer.from(arrayBuffer);
+          templateBase64 = templateBuffer.toString('base64');
+        } else {
+          // Read from public directory
+          const templatePath = path.join(process.cwd(), 'public', templateImagePath.replace('/api/', ''));
+          console.log('Reading template image from path:', templatePath);
+          const templateImageBuffer = fs.readFileSync(templatePath);
+          templateBase64 = templateImageBuffer.toString('base64');
+        }
         
         // For face swap: Explicitly label each image
         contentParts.push(
@@ -118,13 +126,13 @@ FIRST IMAGE (coming next): This is the user's face. Extract this person's face, 
           {
             inlineData: {
               mimeType: 'image/jpeg',
-              data: outfitBase64,
+              data: templateBase64,
             },
           },
           { text: `Now generate ONE final merged image where the face from the FIRST image is seamlessly placed onto the body in the SECOND image. Match skin tone, lighting, and shadows perfectly. Make it look like a natural single photograph.` }
         );
 
-        console.log('Including both images for face swap - User face + Outfit template');
+        console.log('Including both images for face swap - User face + Template outfit image');
       } catch (error) {
         console.error('Error reading outfit image:', error);
         // Fallback to single image

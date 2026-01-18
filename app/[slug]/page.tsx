@@ -17,18 +17,12 @@ interface TemplateData extends RowDataPacket {
   tags: string | null;
 }
 
-interface OutfitTemplateData extends RowDataPacket {
-  id: number;
-  name: string;
-  description: string;
-  outfit_image_url: string;
-  ai_prompt: string | null;
-  category: string;
-}
-
 async function getTemplateBySlug(slug: string) {
   try {
-    // Check regular templates first
+    // List of outfit template IDs
+    const OUTFIT_TEMPLATE_IDS = [43];
+    
+    // Check regular templates
     const [rows] = await pool.query<TemplateData[]>(
       'SELECT id, title, description, image_url, ai_prompt, tags FROM templates WHERE is_active = TRUE'
     );
@@ -46,29 +40,7 @@ async function getTemplateBySlug(slug: string) {
         image: template.image_url,
         aiPrompt: template.ai_prompt || '',
         tags: template.tags || '',
-        isOutfit: false,
-      };
-    }
-    
-    // Check outfit templates
-    const [outfitRows] = await pool.query<OutfitTemplateData[]>(
-      'SELECT id, name, description, outfit_image_url, ai_prompt, category FROM outfit_templates WHERE is_active = TRUE'
-    );
-    
-    const outfitTemplate = outfitRows.find(row => {
-      const templateSlug = row.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-      return templateSlug === slug;
-    });
-    
-    if (outfitTemplate) {
-      return {
-        id: outfitTemplate.id,
-        title: outfitTemplate.name,
-        description: outfitTemplate.description,
-        image: outfitTemplate.outfit_image_url,
-        aiPrompt: outfitTemplate.ai_prompt || '',
-        tags: outfitTemplate.category || '',
-        isOutfit: true,
+        isOutfit: OUTFIT_TEMPLATE_IDS.includes(template.id), // Check if this is an outfit template
       };
     }
     
