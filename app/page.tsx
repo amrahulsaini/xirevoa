@@ -79,6 +79,9 @@ export default async function Home({
   // Fetch girls hairstyle templates (IDs 39, 40, 41, 42)
   const girlsHairstyleTemplates = templates.filter(t => [39, 40, 41, 42].includes(t.id));
   
+  // Fetch outfit templates (IDs 43, 44, 45, 46, 47, etc.) - you'll add these
+  const outfitTemplates = templates.filter(t => [43, 44, 45, 46, 47].includes(t.id));
+  
   // If searching, show grid view
   if (searchParams.search) {
     return (
@@ -314,7 +317,8 @@ export default async function Home({
               </p>
             </div>
             
-            <div className="max-w-xl mx-auto">
+            <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-6">
+              {/* Hairstyles Card */}
               <a
                 href="/change-your-hairstyle-girls"
                 className="group relative block bg-gradient-to-br from-pink-900/40 via-purple-900/40 to-pink-900/40 rounded-3xl overflow-hidden border-2 border-pink-500/40 hover:border-pink-400/80 transition-all hover:scale-105 hover:shadow-2xl hover:shadow-pink-500/50"
@@ -352,6 +356,53 @@ export default async function Home({
                       </p>
                       <div className="flex items-center justify-center gap-2 text-pink-400 font-bold group-hover:gap-3 transition-all">
                         <span>Explore Now</span>
+                        <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </a>
+
+              {/* Iconic Outfits Card */}
+              <a
+                href="/view-your-iconic-outfit"
+                className="group relative block bg-gradient-to-br from-purple-900/40 via-pink-900/40 to-purple-900/40 rounded-3xl overflow-hidden border-2 border-purple-500/40 hover:border-purple-400/80 transition-all hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/50"
+              >
+                <div className="aspect-[4/5] overflow-hidden relative">
+                  {/* Placeholder for outfit grid - will show actual outfits when you add templates */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-600/20 to-pink-600/20 flex items-center justify-center">
+                    <div className="text-center space-y-4">
+                      <div className="text-8xl animate-bounce">👗</div>
+                      <div className="text-white font-black text-xl">
+                        Outfit Templates
+                      </div>
+                      <div className="text-purple-200 text-sm px-8">
+                        Add outfit photos (IDs 43-47) to see them here
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
+                  
+                  {/* Center Content */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6">
+                    <div className="bg-black/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-purple-500/50 max-w-sm">
+                      <div className="mb-4">
+                        <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-bold px-4 py-2 rounded-full inline-block shadow-lg">
+                          ✨ NEW FEATURE
+                        </div>
+                      </div>
+                      <h3 className="text-white font-black text-2xl mb-2 group-hover:text-purple-300 transition-colors">
+                        View Your Iconic Outfit
+                      </h3>
+                      <p className="text-purple-200/90 text-sm mb-4">
+                        Upload your photo and see yourself wearing iconic outfits
+                      </p>
+                      <div className="flex items-center justify-center gap-2 text-purple-400 font-bold group-hover:gap-3 transition-all">
+                        <span>Try It Now</span>
                         <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
