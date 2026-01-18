@@ -76,6 +76,9 @@ export default async function Home({
   // Fetch instagram collage templates (IDs 1, 8, 2, 9, 7)
   const instagramTemplates = templates.filter(t => [1, 8, 2, 9, 7].includes(t.id));
   
+  // Fetch girls hairstyle templates (IDs 39, 40, 41, 42)
+  const girlsHairstyleTemplates = templates.filter(t => [39, 40, 41, 42].includes(t.id));
+  
   // If searching, show grid view
   if (searchParams.search) {
     return (
@@ -279,6 +282,39 @@ export default async function Home({
 
                       {/* Arrow */}
                       <div className="text-yellow-400 group-hover/card:translate-x-1 transition-transform">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </div>
+                  </a>
+                )}
+
+                {/* Girls Hairstyle Banner */}
+                {girlsHairstyleTemplates.length > 0 && (
+                  <a
+                    href="/change-your-hairstyle-girls"
+                    className="flex-shrink-0 w-96 group/card bg-gradient-to-r from-pink-900/50 via-purple-900/50 to-pink-900/50 rounded-xl p-6 border-2 border-pink-500/30 hover:border-pink-400/60 transition-all hover:shadow-lg hover:shadow-pink-500/30 overflow-hidden relative snap-start"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-pink-500/10 to-purple-500/10 opacity-0 group-hover/card:opacity-100 transition-opacity"></div>
+                    <div className="flex items-center gap-4 relative z-10">
+                      {/* Single Preview Image */}
+                      <div className="relative w-24 h-24 rounded-lg overflow-hidden border-2 border-pink-500/40 group-hover/card:border-pink-400/70 transition-all flex-shrink-0 shadow-lg">
+                        <img src={girlsHairstyleTemplates[0].image} alt="" className="w-full h-full object-cover object-top" />
+                      </div>
+                      
+                      {/* Text Content */}
+                      <div className="flex-1 min-w-0">
+                        <h2 className="text-base font-bold text-white group-hover/card:text-pink-300 transition-colors">
+                          💇‍♀️ Change Your Hairstyle Girls
+                        </h2>
+                        <p className="text-xs text-pink-200/70">
+                          Exclusively for girls • Keep your face
+                        </p>
+                      </div>
+
+                      {/* Arrow */}
+                      <div className="text-pink-400 group-hover/card:translate-x-1 transition-transform">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
