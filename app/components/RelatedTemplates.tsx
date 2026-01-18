@@ -63,7 +63,7 @@ export default async function RelatedTemplates({
   }
 
   return (
-    <div>
+    <div className="w-full px-4 sm:px-6">
       <h2 className="text-2xl sm:text-3xl font-black text-white mb-6">
         Related Templates
       </h2>

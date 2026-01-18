@@ -3,6 +3,7 @@ import CategoryRow from "./components/CategoryRow";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import AutoScrollBanner from "./components/AutoScrollBanner";
+import WelcomeBanner from "./components/WelcomeBanner";
 import pool from "@/lib/db";
 import { RowDataPacket } from "mysql2";
 
@@ -134,31 +135,10 @@ export default async function Home({
       {/* Content */}
       <div className="relative z-10">
         <Header />
+        <WelcomeBanner />
 
         {/* Spacer for fixed header */}
         <div className="h-16 sm:h-20"></div>
-
-        {/* Feature Points - Compact Banner */}
-        <section className="container mx-auto px-4 sm:px-6 pt-6 pb-4">
-          <div className="bg-gradient-to-r from-zinc-900/50 to-zinc-800/50 rounded-xl p-4 border border-zinc-700/50 backdrop-blur-sm">
-            <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-sm">
-              <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 bg-yellow-400 rounded-full"></div>
-                <span className="text-zinc-300">Upload Your Face</span>
-              </div>
-              <div className="hidden sm:block w-px h-4 bg-zinc-700"></div>
-              <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 bg-yellow-400 rounded-full"></div>
-                <span className="text-zinc-300">Gender Neutral</span>
-              </div>
-              <div className="hidden sm:block w-px h-4 bg-zinc-700"></div>
-              <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 bg-yellow-400 rounded-full"></div>
-                <span className="text-zinc-300">No Prompts Needed</span>
-              </div>
-            </div>
-          </div>
-        </section>
 
         {/* Category Banners */}
         <section className="container mx-auto px-4 sm:px-6 pt-4 pb-2">
