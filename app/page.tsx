@@ -448,8 +448,6 @@ export default async function Home({
                     </>
                   )}
                 </div>
-                  </div>
-                </div>
               </a>
             </div>
           </section>
