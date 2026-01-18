@@ -9,7 +9,7 @@ async function getOutfitTemplates() {
   
   try {
     const [templates] = await connection.query<any[]>(
-      'SELECT * FROM templates WHERE id = 43'
+      'SELECT * FROM templates WHERE id IN (43, 44, 45, 46) ORDER BY FIELD(id, 43, 44, 45, 46)'
     );
     
     return templates.map((t: any) => ({

@@ -79,8 +79,8 @@ export default async function Home({
   // Fetch girls hairstyle templates (IDs 39, 40, 41, 42)
   const girlsHairstyleTemplates = templates.filter(t => [39, 40, 41, 42].includes(t.id));
   
-  // Fetch outfit template (ID 43)
-  const outfitTemplate = templates.find(t => t.id === 43);
+  // Fetch outfit templates (IDs 43, 44, 45, 46)
+  const outfitTemplates = templates.filter(t => [43, 44, 45, 46].includes(t.id));
   
   // If searching, show grid view
   if (searchParams.search) {
@@ -371,14 +371,21 @@ export default async function Home({
                 className="group relative block bg-gradient-to-br from-purple-900/40 via-pink-900/40 to-purple-900/40 rounded-3xl overflow-hidden border-2 border-purple-500/40 hover:border-purple-400/80 transition-all hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/50"
               >
                 <div className="aspect-[4/5] overflow-hidden relative">
-                  {/* Show outfit template if available, otherwise placeholder */}
-                  {outfitTemplate ? (
+                  {/* Show outfit templates if available, otherwise placeholder */}
+                  {outfitTemplates.length > 0 ? (
                     <>
-                      <img 
-                        src={outfitTemplate.image} 
-                        alt="Outfit Template"
-                        className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-500"
-                      />
+                      {/* Grid of 4 outfit images */}
+                      <div className="grid grid-cols-2 gap-1 h-full">
+                        {outfitTemplates.slice(0, 4).map((template) => (
+                          <div key={template.id} className="overflow-hidden">
+                            <img 
+                              src={template.image} 
+                              alt=""
+                              className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-500"
+                            />
+                          </div>
+                        ))}
+                      </div>
                       
                       {/* Gradient Overlay */}
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
@@ -388,7 +395,7 @@ export default async function Home({
                         <div className="bg-black/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-purple-500/50 max-w-sm">
                           <div className="mb-4">
                             <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-bold px-4 py-2 rounded-full inline-block shadow-lg">
-                              ✨ NEW FEATURE
+                              ✨ {outfitTemplates.length} Outfits
                             </div>
                           </div>
                           <h3 className="text-white font-black text-2xl mb-2 group-hover:text-purple-300 transition-colors">
