@@ -88,7 +88,7 @@ export default async function Home({
               <p className="text-zinc-500 text-sm mt-1">{templates.length} templates found</p>
             </div>
             
-            <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4">
+            <div className="columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-3 space-y-3">
               {templates.map((category) => (
                 <div key={category.id} className="break-inside-avoid">
                   <CategoryCard
@@ -174,7 +174,7 @@ export default async function Home({
         <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
           <h2 className="text-2xl sm:text-3xl font-black text-white mb-6">All Templates</h2>
           
-          <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4">
+          <div className="columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-3 space-y-3">
             {templates.map((category) => (
               <div key={category.id} className="break-inside-avoid">
                 <CategoryCard

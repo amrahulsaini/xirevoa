@@ -58,18 +58,18 @@ export default function CategoryCard({
             </div>
           ) : null}
 
-          {/* Info Icon - Top Left */}
+          {/* Info Icon - Top Left - Hidden on mobile */}
           <button 
             onClick={(e) => {
               e.preventDefault();
               setShowInfoModal(true);
             }}
-            className="absolute top-3 left-3 w-9 h-9 bg-black/60 backdrop-blur-md rounded-full flex items-center justify-center border border-yellow-500/30 hover:bg-yellow-500/20 hover:border-yellow-500 transition-all group/info opacity-0 group-hover:opacity-100">
+            className="hidden md:flex absolute top-3 left-3 w-9 h-9 bg-black/60 backdrop-blur-md rounded-full items-center justify-center border border-yellow-500/30 hover:bg-yellow-500/20 hover:border-yellow-500 transition-all group/info opacity-0 group-hover:opacity-100">
             <Info className="w-4 h-4 text-yellow-400 group-hover/info:text-yellow-300" />
           </button>
 
-          {/* Action Button - Bottom */}
-          <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/90 via-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          {/* Action Button - Bottom - Hidden on mobile */}
+          <div className="hidden md:block absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/90 via-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <Link
               href={comingSoon ? "#" : `/${slug}`}
               className={`block w-full px-5 py-3 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold rounded-xl transition-all duration-300 transform hover:scale-105 text-center ${
