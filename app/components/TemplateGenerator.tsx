@@ -266,7 +266,7 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
 
       {/* Related Templates Section */}
       {relatedTemplatesSlot && (
-        <div className="-mx-4 sm:-mx-6">
+        <div className="-mx-4 sm:-mx-6 mt-8">
           {relatedTemplatesSlot}
         </div>
       )}
