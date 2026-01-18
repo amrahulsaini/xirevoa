@@ -167,13 +167,13 @@ FIRST IMAGE (coming next): This is the user's face. Extract this person's face, 
     // Build multi-part contents (uses the same pattern you shared: upload + createPartFromUri + inlineData)
     let contents: any;
 
-    if (isOutfit && outfitImagePath) {
+    if (isOutfit && templateImagePath) {
       // Outfit mode: we upload the outfit template image and attach the user's face as inline data.
       // This makes the ordering/meaning unambiguous.
       const outfitDiskPath = path.join(
         process.cwd(),
         'public',
-        outfitImagePath
+        templateImagePath
           .replace('/api/cdn/', 'cdn/')
           .replace('/api/generated/', 'generated/')
       );
