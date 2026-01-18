@@ -43,10 +43,12 @@ export default function AutoScrollBanner({ children }: AutoScrollBannerProps) {
       {showLeftArrow && (
         <button
           onClick={(e) => scroll('left', e)}
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-black/80 hover:bg-yellow-500/20 border border-yellow-500/50 rounded-full p-3 transition-all opacity-0 group-hover:opacity-100"
+          className="absolute left-2 top-1/2 -translate-y-1/2 z-50 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-400 hover:to-yellow-500 text-black rounded-full p-3 shadow-xl hover:shadow-2xl hover:shadow-yellow-500/50 transition-all opacity-90 group-hover:opacity-100 hover:scale-110"
+          aria-label="Scroll left"
+          type="button"
         >
-          <svg className="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
         </button>
       )}
@@ -73,7 +75,9 @@ export default function AutoScrollBanner({ children }: AutoScrollBannerProps) {
       {showRightArrow && (
         <button
           onClick={(e) => scroll('right', e)}
-          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-black/80 hover:bg-yellow-500/20 border border-yellow-500/50 rounded-full p-3 transition-all opacity-0 group-hover:opacity-100"
+          className="absolute right-2 top-1/2 -translate-y-1/2 z-50 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-400 hover:to-yellow-500 text-black rounded-full p-3 shadow-xl hover:shadow-2xl hover:shadow-yellow-500/50 transition-all opacity-90 group-hover:opacity-100 hover:scale-110"
+          aria-label="Scroll right"
+          type="button"
         >
           <svg className="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
