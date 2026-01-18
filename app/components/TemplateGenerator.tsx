@@ -140,7 +140,6 @@ export default function TemplateGenerator({ template, isOutfit = false }: Templa
                 className="w-full h-full object-cover"
               />
             </div>
-            <p className="text-sm text-zinc-400 mt-4">{template.description}</p>
           </div>
         </div>
 
