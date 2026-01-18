@@ -37,10 +37,10 @@ export default function CategoryCard({
         onClick={(e) => {
           if (comingSoon) e.preventDefault();
         }}
-        className="block group relative overflow-hidden rounded-2xl bg-zinc-900 cursor-pointer transform transition-all duration-300 hover:shadow-2xl hover:shadow-yellow-500/20 mb-4 border border-zinc-800/50 hover:border-yellow-500/50"
+        className="block group relative overflow-hidden rounded-2xl bg-zinc-900 cursor-pointer transform transition-all duration-300 hover:shadow-2xl hover:shadow-yellow-500/20 mb-4 border border-zinc-800/50 hover:border-yellow-500/50 min-h-[320px] sm:min-h-[380px]"
       >
         {/* Image Container - Natural aspect ratio */}
-        <div className="relative w-full overflow-hidden bg-zinc-900">
+        <div className="relative w-full overflow-hidden bg-zinc-900 h-full">
           <Image
             src={imgSrc}
             alt={title}
@@ -64,21 +64,21 @@ export default function CategoryCard({
             </div>
           ) : null}
 
-          {/* Info Icon - Top Left - Desktop only */}
+          {/* Info Icon - Top Left - Always visible */}
           <button 
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               setShowInfoModal(true);
             }}
-            className="hidden md:flex absolute top-3 left-3 w-9 h-9 bg-black/60 backdrop-blur-md rounded-full items-center justify-center border border-yellow-500/30 hover:bg-yellow-500/20 hover:border-yellow-500 transition-all group/info opacity-0 group-hover:opacity-100">
+            className="flex absolute top-3 left-3 w-9 h-9 bg-black/60 backdrop-blur-md rounded-full items-center justify-center border border-yellow-500/30 hover:bg-yellow-500/20 hover:border-yellow-500 transition-all group/info">
             <Info className="w-4 h-4 text-yellow-400 group-hover/info:text-yellow-300" />
           </button>
 
-          {/* Action Button - Bottom - Desktop only */}
-          <div className="hidden md:block absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/90 via-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          {/* Action Button - Bottom - Always visible */}
+          <div className="block absolute inset-x-0 bottom-0 p-3 sm:p-4 bg-gradient-to-t from-black/90 via-black/60 to-transparent transition-opacity duration-300">
             <div
-              className={`block w-full px-5 py-3 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold rounded-xl transition-all duration-300 transform hover:scale-105 text-center ${
+              className={`block w-full px-4 py-2.5 sm:px-5 sm:py-3 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold rounded-xl transition-all duration-300 transform hover:scale-105 text-center text-sm sm:text-base ${
                 comingSoon ? 'cursor-not-allowed opacity-60' : 'hover:shadow-lg hover:shadow-yellow-500/50'
               }`}
             >
