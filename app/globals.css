@@ -27,6 +27,38 @@ body {
   font-family: 'Inter', var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
 
+/* Custom Scrollbar Design */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #eab308 0%, #ca8a04 100%);
+  border-radius: 10px;
+  border: 2px solid #0a0a0a;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #fbbf24 0%, #eab308 100%);
+  box-shadow: 0 0 10px rgba(234, 179, 8, 0.5);
+}
+
+::-webkit-scrollbar-corner {
+  background: #0a0a0a;
+}
+
+/* Firefox Scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #eab308 #0a0a0a;
+}
+
 /* Hide scrollbar but keep functionality */
 .scrollbar-hide {
   -ms-overflow-style: none;
