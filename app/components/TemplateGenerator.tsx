@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Upload, Wand2, Download, RefreshCw, Maximize2, X } from "lucide-react";
 import Image from "next/image";
-import RelatedTemplates from "./RelatedTemplates";
 
 interface TemplateGeneratorProps {
   template: {
@@ -15,9 +14,10 @@ interface TemplateGeneratorProps {
   };
   isOutfit?: boolean;
   tags?: string;
+  relatedTemplatesSlot?: React.ReactNode;
 }
 
-export default function TemplateGenerator({ template, isOutfit = false, tags = '' }: TemplateGeneratorProps) {
+export default function TemplateGenerator({ template, isOutfit = false, tags = '', relatedTemplatesSlot }: TemplateGeneratorProps) {
   const [userImage, setUserImage] = useState<File | null>(null);
   const [userImagePreview, setUserImagePreview] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
@@ -277,9 +277,11 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
           </div>
 
           {/* Related Templates - Desktop Only */}
-          <div className="hidden lg:block">
-            <RelatedTemplates currentTemplateId={template.id} tags={tags} />
-          </div>
+          {relatedTemplatesSlot && (
+            <div className="hidden lg:block">
+              {relatedTemplatesSlot}
+            </div>
+          )}
         </div>
       </div>
 
