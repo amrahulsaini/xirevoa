@@ -118,7 +118,7 @@ export default function TemplateGenerator({ template, isOutfit = false }: Templa
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-7xl mx-auto">
       {/* Template Info */}
       <div className="text-center mb-8">
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-4">
@@ -127,8 +127,25 @@ export default function TemplateGenerator({ template, isOutfit = false }: Templa
         <p className="text-zinc-400 text-lg max-w-2xl mx-auto">{template.description}</p>
       </div>
 
-      {/* Single Column Layout */}
-      <div className="space-y-6">
+      {/* Two Column Layout */}
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* Left: Template Card */}
+        <div className="lg:w-80 flex-shrink-0">
+          <div className="bg-zinc-900 rounded-2xl p-6 border border-zinc-800 lg:sticky lg:top-24">
+            <h3 className="text-lg font-bold text-yellow-400 mb-4">Template Preview</h3>
+            <div className="relative aspect-square rounded-xl overflow-hidden border-2 border-zinc-700">
+              <img 
+                src={template.image} 
+                alt={template.title} 
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <p className="text-sm text-zinc-400 mt-4">{template.description}</p>
+          </div>
+        </div>
+
+        {/* Right: Generation Interface */}
+        <div className="flex-1 space-y-6">
         {/* Upload Section */}
         {!generatedImage && !generating && (
           <div className="bg-zinc-900 rounded-2xl p-6 border border-zinc-800">
@@ -254,6 +271,7 @@ export default function TemplateGenerator({ template, isOutfit = false }: Templa
             </div>
           </div>
         )}
+        </div>
       </div>
 
       {/* Full Screen Modal */}

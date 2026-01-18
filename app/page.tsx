@@ -134,63 +134,60 @@ export default async function Home({
         {/* Spacer for fixed header */}
         <div className="h-16 sm:h-20"></div>
 
-        {/* Main Content Section */}
-        <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
-          <div className="flex flex-col lg:flex-row gap-6">
-            {/* Left: Hairstyle Card */}
-            {hairstyleTemplates.length > 0 && (
-              <div className="lg:w-80 flex-shrink-0">
-                <a
-                  href="/hairstyles"
-                  className="block group bg-zinc-900 rounded-2xl p-6 border border-zinc-800 hover:border-yellow-500/50 transition-all hover:shadow-xl hover:shadow-yellow-500/20 lg:sticky lg:top-24"
-                >
-                  {/* Card Content */}
-                  <div className="flex flex-col gap-4">
-                    {/* Profile Picture */}
-                    <div className="relative w-full aspect-square rounded-xl overflow-hidden border-2 border-zinc-700 group-hover:border-yellow-500/50 transition-all">
-                      <img
-                        src={hairstyleTemplates[0]?.image}
-                        alt="Hairstyles"
-                        className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-500"
-                      />
-                    </div>
-
-                    {/* Template Info */}
-                    <div>
-                      <h2 className="text-xl font-black text-white mb-2 group-hover:text-yellow-400 transition-colors">
-                        Choose Your Favourite Hairstyle
-                      </h2>
-                      <p className="text-sm text-zinc-400 mb-3">
-                        Explore {hairstyleTemplates.length} amazing hairstyle options
-                      </p>
-                      <div className="flex items-center text-yellow-400 text-sm font-semibold">
-                        View All Styles →
-                      </div>
-                    </div>
-                  </div>
-                </a>
-              </div>
-            )}
-
-            {/* Right: All Templates Grid */}
-            <div className="flex-1">
-              <h2 className="text-2xl sm:text-3xl font-black text-white mb-6">All Templates</h2>
-              
-              <div className="columns-2 md:columns-3 lg:columns-3 xl:columns-4 gap-3 space-y-3">
-                {templates.map((category) => (
-                  <div key={category.id} className="break-inside-avoid">
-                    <CategoryCard
-                      id={category.id}
-                      title={category.title}
-                      slug={category.slug}
-                      description={category.description}
-                      image={category.image}
-                      comingSoon={category.comingSoon}
+        {/* Hairstyle Section */}
+        {hairstyleTemplates.length > 0 && (
+          <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
+            <div className="max-w-md mx-auto">
+              <a
+                href="/hairstyles"
+                className="block group bg-zinc-900 rounded-2xl p-6 border border-zinc-800 hover:border-yellow-500/50 transition-all hover:shadow-xl hover:shadow-yellow-500/20"
+              >
+                {/* Card Content */}
+                <div className="flex items-center gap-6">
+                  {/* Profile Picture */}
+                  <div className="relative w-32 h-32 rounded-xl overflow-hidden flex-shrink-0 border-2 border-zinc-700 group-hover:border-yellow-500/50 transition-all">
+                    <img
+                      src={hairstyleTemplates[0]?.image}
+                      alt="Hairstyles"
+                      className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-500"
                     />
                   </div>
-                ))}
-              </div>
+
+                  {/* Template Info */}
+                  <div className="flex-1 min-w-0">
+                    <h2 className="text-xl font-black text-white mb-2 group-hover:text-yellow-400 transition-colors">
+                      Choose Your Favourite Hairstyle
+                    </h2>
+                    <p className="text-sm text-zinc-400 mb-3">
+                      Explore {hairstyleTemplates.length} amazing hairstyle options
+                    </p>
+                    <div className="flex items-center text-yellow-400 text-sm font-semibold">
+                      View All Styles →
+                    </div>
+                  </div>
+                </div>
+              </a>
             </div>
+          </section>
+        )}
+
+        {/* All Templates Grid */}
+        <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
+          <h2 className="text-2xl sm:text-3xl font-black text-white mb-6">All Templates</h2>
+          
+          <div className="columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-3 space-y-3">
+            {templates.map((category) => (
+              <div key={category.id} className="break-inside-avoid">
+                <CategoryCard
+                  id={category.id}
+                  title={category.title}
+                  slug={category.slug}
+                  description={category.description}
+                  image={category.image}
+                  comingSoon={category.comingSoon}
+                />
+              </div>
+            ))}
           </div>
         </section>
 
