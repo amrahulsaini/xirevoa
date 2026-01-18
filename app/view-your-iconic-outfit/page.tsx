@@ -15,7 +15,7 @@ async function getOutfitTemplates() {
     return templates.map((t: any) => ({
       id: t.id,
       title: t.title,
-      slug: t.slug,
+      slug: t.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
       description: t.description,
       image: t.image_url,
       comingSoon: false,
@@ -58,7 +58,7 @@ async function getOtherCategories() {
       hairstyles: hairstyles.map((t: any) => ({
         id: t.id,
         title: t.title,
-        slug: t.slug,
+        slug: t.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
         description: t.description,
         image: t.image_url,
         comingSoon: false,
@@ -66,7 +66,7 @@ async function getOtherCategories() {
       eighties: eighties.map((t: any) => ({
         id: t.id,
         title: t.title,
-        slug: t.slug,
+        slug: t.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
         description: t.description,
         image: t.image_url,
         comingSoon: false,
@@ -74,7 +74,7 @@ async function getOtherCategories() {
       cinematic: cinematic.map((t: any) => ({
         id: t.id,
         title: t.title,
-        slug: t.slug,
+        slug: t.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
         description: t.description,
         image: t.image_url,
         comingSoon: false,
@@ -82,7 +82,7 @@ async function getOtherCategories() {
       instagram: instagram.map((t: any) => ({
         id: t.id,
         title: t.title,
-        slug: t.slug,
+        slug: t.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
         description: t.description,
         image: t.image_url,
         comingSoon: false,
@@ -90,7 +90,7 @@ async function getOtherCategories() {
       girlsHairstyles: girlsHairstyles.map((t: any) => ({
         id: t.id,
         title: t.title,
-        slug: t.slug,
+        slug: t.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
         description: t.description,
         image: t.image_url,
         comingSoon: false,
