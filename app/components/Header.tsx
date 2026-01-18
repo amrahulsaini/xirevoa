@@ -2,13 +2,16 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Coins, User, Menu, Search, X, Home, Image as ImageIcon, DollarSign, Sparkles } from "lucide-react";
+import { Coins, User, Menu, Search, X, Home, Image as ImageIcon, DollarSign, Sparkles, LogOut, Settings } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useSession, signOut } from "next-auth/react";
 
 export default function Header() {
+  const { data: session, status } = useSession();
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   // Close sidebar when clicking outside
   useEffect(() => {
@@ -17,11 +20,16 @@ export default function Header() {
       if (showSidebar && !target.closest('.sidebar') && !target.closest('.menu-btn')) {
         setShowSidebar(false);
       }
+      if (showUserMenu && !target.closest('.user-menu') && !target.closest('.user-btn')) {
+        setShowUserMenu(false);
+      }
     };
 
-    if (showSidebar) {
+    if (showSidebar || showUserMenu) {
       document.addEventListener('click', handleClickOutside);
-      document.body.style.overflow = 'hidden';
+      if (showSidebar) {
+        document.body.style.overflow = 'hidden';
+      }
     } else {
       document.body.style.overflow = 'unset';
     }
@@ -30,7 +38,7 @@ export default function Header() {
       document.removeEventListener('click', handleClickOutside);
       document.body.style.overflow = 'unset';
     };
-  }, [showSidebar]);
+  }, [showSidebar, showUserMenu]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,16 +92,66 @@ export default function Header() {
                 <Search className="w-5 h-5 sm:w-6 sm:h-6 text-zinc-400" />
               </button>
 
-              {/* Coins */}
-              <button className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors border border-yellow-500/20">
-                <Coins className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400 fill-yellow-400/20" />
-                <span className="text-sm font-bold text-yellow-400">250</span>
-              </button>
+              {/* Coins - Show only if logged in */}
+              {session && (
+                <button className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors border border-yellow-500/20">
+                  <Coins className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400 fill-yellow-400/20" />
+                  <span className="text-sm font-bold text-yellow-400">{(session.user as any)?.coins || 250}</span>
+                </button>
+              )}
 
               {/* Profile */}
-              <button className="w-9 h-9 sm:w-10 sm:h-10 bg-zinc-800 hover:bg-zinc-700 rounded-lg flex items-center justify-center transition-colors">
-                <User className="w-5 h-5 sm:w-6 sm:h-6 text-zinc-400" />
-              </button>
+              {session ? (
+                <div className="relative">
+                  <button 
+                    onClick={() => setShowUserMenu(!showUserMenu)}
+                    className="user-btn w-9 h-9 sm:w-10 sm:h-10 bg-zinc-800 hover:bg-zinc-700 rounded-full flex items-center justify-center transition-colors overflow-hidden border-2 border-yellow-500/20"
+                  >
+                    {session.user?.image ? (
+                      <img src={session.user.image} alt={session.user.name || 'User'} className="w-full h-full object-cover" />
+                    ) : (
+                      <User className="w-5 h-5 sm:w-6 sm:h-6 text-zinc-400" />
+                    )}
+                  </button>
+
+                  {/* User Dropdown Menu */}
+                  {showUserMenu && (
+                    <div className="user-menu absolute right-0 mt-2 w-64 bg-zinc-900 border-2 border-zinc-800 rounded-xl shadow-xl overflow-hidden z-50">
+                      <div className="p-4 border-b border-zinc-800 bg-zinc-800/50">
+                        <p className="text-white font-semibold truncate">{session.user?.name}</p>
+                        <p className="text-zinc-400 text-sm truncate">{session.user?.email}</p>
+                      </div>
+                      <div className="p-2">
+                        <Link 
+                          href="/profile"
+                          className="flex items-center gap-3 px-4 py-3 rounded-lg text-zinc-400 hover:text-yellow-400 hover:bg-zinc-800 transition-all"
+                          onClick={() => setShowUserMenu(false)}
+                        >
+                          <Settings className="w-5 h-5" />
+                          <span>Settings</span>
+                        </Link>
+                        <button
+                          onClick={() => {
+                            setShowUserMenu(false);
+                            signOut({ callbackUrl: "/" });
+                          }}
+                          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all"
+                        >
+                          <LogOut className="w-5 h-5" />
+                          <span>Sign Out</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Link
+                  href="/auth/login"
+                  className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-black font-bold rounded-lg transition-colors text-sm"
+                >
+                  Login
+                </Link>
+              )}
 
               {/* Menu Button */}
               <button 
