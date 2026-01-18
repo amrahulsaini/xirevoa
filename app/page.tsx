@@ -3,7 +3,6 @@ import CategoryRow from "./components/CategoryRow";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import AutoScrollBanner from "./components/AutoScrollBanner";
-import WelcomeBanner from "./components/WelcomeBanner";
 import pool from "@/lib/db";
 import { RowDataPacket } from "mysql2";
 
@@ -135,7 +134,6 @@ export default async function Home({
       {/* Content */}
       <div className="relative z-10">
         <Header />
-        <WelcomeBanner />
 
         {/* Spacer for fixed header */}
         <div className="h-16 sm:h-20"></div>
