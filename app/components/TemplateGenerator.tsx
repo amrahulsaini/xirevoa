@@ -131,8 +131,9 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
 
       {/* Two Column Layout */}
       <div className="flex flex-col lg:flex-row gap-6">
-        {/* Left: Template Card */}
-        <div className="lg:w-80 flex-shrink-0">
+        {/* Left: Template Card and Related Templates */}
+        <div className="lg:w-80 flex-shrink-0 space-y-6">
+          {/* Template Preview */}
           <div className="bg-zinc-900 rounded-2xl p-6 border border-zinc-800 lg:sticky lg:top-24">
             <h3 className="text-lg font-bold text-yellow-400 mb-4">Template Preview</h3>
             <div className="relative aspect-square rounded-xl overflow-hidden border-2 border-zinc-700">
@@ -143,9 +144,16 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
               />
             </div>
           </div>
+
+          {/* Related Templates - Desktop Only */}
+          {relatedTemplatesSlot && (
+            <div className="hidden lg:block">
+              {relatedTemplatesSlot}
+            </div>
+          )}
         </div>
 
-        {/* Right: Generation Interface and Related Templates */}
+        {/* Right: Generation Interface */}
         <div className="flex-1 space-y-6">
           {/* Generation Interface */}
           <div>
@@ -155,41 +163,38 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
             <h3 className="text-xl font-bold text-yellow-400 mb-4">Upload Your Photo</h3>
             
             {userImagePreview ? (
-              <div className="flex items-start gap-4">
-                <div className="relative w-32 h-32 flex-shrink-0">
-                  <div className="w-full h-full rounded-lg overflow-hidden border border-zinc-700">
-                    <img src={userImagePreview} alt="Your photo" className="w-full h-full object-cover" />
-                  </div>
+              <div className="space-y-4">
+                <div className="relative aspect-square rounded-xl overflow-hidden border-2 border-zinc-700 max-w-md mx-auto lg:mx-0">
+                  <img src={userImagePreview} alt="Your photo" className="w-full h-full object-cover" />
                   <button
                     onClick={() => {
                       setUserImage(null);
                       setUserImagePreview(null);
                     }}
-                    className="absolute -top-2 -right-2 bg-red-600 text-white w-6 h-6 rounded-full text-xs hover:bg-red-700 flex items-center justify-center"
+                    className="absolute top-2 right-2 bg-red-600 text-white w-8 h-8 rounded-full text-sm hover:bg-red-700 flex items-center justify-center"
                   >
                     ×
                   </button>
                 </div>
-                <div className="flex-1">
-                  <p className="text-zinc-400 text-sm mb-4">Your photo is ready to transform!</p>
-                  <button
-                    onClick={handleGenerate}
-                    disabled={!userImage || generating}
-                    className="w-full px-6 py-3 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold rounded-xl hover:shadow-lg hover:shadow-yellow-500/50 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
-                  >
-                    <Wand2 className="w-5 h-5" />
-                    Generate Magic ✨
-                  </button>
-                </div>
+                <button
+                  onClick={handleGenerate}
+                  disabled={!userImage || generating}
+                  className="w-full max-w-md mx-auto lg:mx-0 px-6 py-3 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold rounded-xl hover:shadow-lg hover:shadow-yellow-500/50 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
+                >
+                  <Wand2 className="w-5 h-5" />
+                  Generate Magic ✨
+                </button>
               </div>
             ) : (
-              <label className="flex flex-col items-center justify-center w-full py-16 border-2 border-dashed border-zinc-700 rounded-lg cursor-pointer hover:border-yellow-400 transition-colors">
-                <Upload className="w-12 h-12 text-zinc-600 mb-4" />
-                <span className="text-zinc-500 text-center px-4">
-                  Click to upload your photo
-                  <br />
-                  <span className="text-xs">Max 10MB • JPG, PNG, WEBP</span>
-                </span>
+              <label className="block aspect-square max-w-md mx-auto lg:mx-0 border-2 border-dashed border-zinc-700 rounded-xl cursor-pointer hover:border-yellow-400 transition-colors">
+                <div className="h-full flex flex-col items-center justify-center p-8">
+                  <Upload className="w-12 h-12 text-zinc-600 mb-4" />
+                  <span className="text-zinc-500 text-center">
+                    Click to upload your photo
+                    <br />
+                    <span className="text-xs">Max 10MB • JPG, PNG, WEBP</span>
+                  </span>
+                </div>
                 <input
                   type="file"
                   className="hidden"
@@ -204,7 +209,7 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
         {/* Generating State */}
         {generating && (
           <div className="bg-zinc-900 rounded-2xl p-8 border border-zinc-800">
-            <div className="flex flex-col items-center justify-center">
+            <div className="flex flex-col items-center justify-center aspect-square max-w-md mx-auto lg:mx-0">
               <div className="relative w-32 h-32 mb-6">
                 {userImagePreview && (
                   <img 
@@ -219,7 +224,7 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
               </div>
               <p className="text-white font-bold text-xl mb-2">Creating Your Magic...</p>
               <p className="text-yellow-400 font-bold text-2xl mb-4">{progress}%</p>
-              <div className="w-full max-w-md h-2 bg-zinc-700 rounded-full overflow-hidden">
+              <div className="w-full max-w-xs h-2 bg-zinc-700 rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-gradient-to-r from-yellow-400 to-yellow-500 transition-all duration-300"
                   style={{ width: `${progress}%` }}
@@ -276,9 +281,9 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
         )}
           </div>
 
-          {/* Related Templates - Desktop Only */}
+          {/* Related Templates - Mobile Only (at bottom) */}
           {relatedTemplatesSlot && (
-            <div className="hidden lg:block">
+            <div className="lg:hidden">
               {relatedTemplatesSlot}
             </div>
           )}
