@@ -2,6 +2,7 @@ import CategoryCard from "./components/CategoryCard";
 import CategoryRow from "./components/CategoryRow";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import AutoScrollBanner from "./components/AutoScrollBanner";
 import pool from "@/lib/db";
 import { RowDataPacket } from "mysql2";
 
@@ -139,52 +140,52 @@ export default async function Home({
 
         {/* Feature Points */}
         <section className="container mx-auto px-4 sm:px-6 pt-6 pb-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="max-w-2xl mx-auto space-y-3">
             {/* Feature 1 */}
-            <div className="group relative bg-gradient-to-br from-zinc-900 to-zinc-800 rounded-2xl p-6 border border-zinc-700 hover:border-yellow-500/50 transition-all hover:shadow-lg hover:shadow-yellow-500/20">
-              <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl"></div>
-              <div className="relative z-10">
-                <div className="w-12 h-12 bg-yellow-500/10 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <span className="text-2xl">👤</span>
+            <div className="group relative bg-gradient-to-r from-zinc-900 to-zinc-800 rounded-xl p-4 border border-zinc-700 hover:border-yellow-500/50 transition-all">
+              <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-xl"></div>
+              <div className="relative z-10 flex items-center gap-4">
+                <div className="w-2 h-2 bg-yellow-400 rounded-full flex-shrink-0"></div>
+                <div>
+                  <h3 className="text-base font-bold text-white group-hover:text-yellow-400 transition-colors">
+                    Just Upload Your Face
+                  </h3>
+                  <p className="text-sm text-zinc-400">
+                    Simply upload your photo and explore all template styles instantly
+                  </p>
                 </div>
-                <h3 className="text-lg font-bold text-white mb-2 group-hover:text-yellow-400 transition-colors">
-                  Just Upload Your Face
-                </h3>
-                <p className="text-sm text-zinc-400">
-                  Simply upload your photo and explore all template styles instantly
-                </p>
               </div>
             </div>
 
             {/* Feature 2 */}
-            <div className="group relative bg-gradient-to-br from-zinc-900 to-zinc-800 rounded-2xl p-6 border border-zinc-700 hover:border-yellow-500/50 transition-all hover:shadow-lg hover:shadow-yellow-500/20">
-              <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl"></div>
-              <div className="relative z-10">
-                <div className="w-12 h-12 bg-yellow-500/10 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <span className="text-2xl">⚡</span>
+            <div className="group relative bg-gradient-to-r from-zinc-900 to-zinc-800 rounded-xl p-4 border border-zinc-700 hover:border-yellow-500/50 transition-all">
+              <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-xl"></div>
+              <div className="relative z-10 flex items-center gap-4">
+                <div className="w-2 h-2 bg-yellow-400 rounded-full flex-shrink-0"></div>
+                <div>
+                  <h3 className="text-base font-bold text-white group-hover:text-yellow-400 transition-colors">
+                    Gender Neutral Templates
+                  </h3>
+                  <p className="text-sm text-zinc-400">
+                    All templates work perfectly for everyone, no restrictions
+                  </p>
                 </div>
-                <h3 className="text-lg font-bold text-white mb-2 group-hover:text-yellow-400 transition-colors">
-                  Gender Neutral Templates
-                </h3>
-                <p className="text-sm text-zinc-400">
-                  All templates work perfectly for everyone, no restrictions
-                </p>
               </div>
             </div>
 
             {/* Feature 3 */}
-            <div className="group relative bg-gradient-to-br from-zinc-900 to-zinc-800 rounded-2xl p-6 border border-zinc-700 hover:border-yellow-500/50 transition-all hover:shadow-lg hover:shadow-yellow-500/20">
-              <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl"></div>
-              <div className="relative z-10">
-                <div className="w-12 h-12 bg-yellow-500/10 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <span className="text-2xl">🚀</span>
+            <div className="group relative bg-gradient-to-r from-zinc-900 to-zinc-800 rounded-xl p-4 border border-zinc-700 hover:border-yellow-500/50 transition-all">
+              <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-xl"></div>
+              <div className="relative z-10 flex items-center gap-4">
+                <div className="w-2 h-2 bg-yellow-400 rounded-full flex-shrink-0"></div>
+                <div>
+                  <h3 className="text-base font-bold text-white group-hover:text-yellow-400 transition-colors">
+                    No Prompts Needed
+                  </h3>
+                  <p className="text-sm text-zinc-400">
+                    Zero hassle, zero prompts. Just your face and instant magic
+                  </p>
                 </div>
-                <h3 className="text-lg font-bold text-white mb-2 group-hover:text-yellow-400 transition-colors">
-                  No Prompts Needed
-                </h3>
-                <p className="text-sm text-zinc-400">
-                  Zero hassle, zero prompts. Just your face and instant magic
-                </p>
               </div>
             </div>
           </div>
@@ -193,24 +194,24 @@ export default async function Home({
         {/* Category Banners */}
         <section className="container mx-auto px-4 sm:px-6 pt-4 pb-2">
           <div className="relative">
-            {/* Auto-scroll wrapper - only shows gradient overlays if content overflows */}
+            {/* Auto-scroll wrapper */}
             <div className="relative group">
               {/* Gradient overlays for scroll indication */}
               <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-black via-black/80 to-transparent z-10 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"></div>
               <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-black via-black/80 to-transparent z-10 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"></div>
               
-              {/* Scrollable container */}
-              <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory scroll-smooth">
+              {/* Auto-Scrollable container */}
+              <AutoScrollBanner>
                 {/* Hairstyle Banner */}
                 {hairstyleTemplates.length > 0 && (
                   <a
                     href="/hairstyles"
-                    className="flex-shrink-0 w-80 group/card bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-900 rounded-xl p-4 border border-zinc-700 hover:border-yellow-500/50 transition-all hover:shadow-lg hover:shadow-yellow-500/20 overflow-hidden relative snap-start"
+                    className="flex-shrink-0 w-96 group/card bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-900 rounded-xl p-6 border border-zinc-700 hover:border-yellow-500/50 transition-all hover:shadow-lg hover:shadow-yellow-500/20 overflow-hidden relative snap-start"
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity"></div>
                     <div className="flex items-center gap-4 relative z-10">
                       {/* Single Preview Image */}
-                      <div className="relative w-16 h-16 rounded-lg overflow-hidden border-2 border-zinc-700 group-hover/card:border-yellow-500/50 transition-all flex-shrink-0">
+                      <div className="relative w-24 h-24 rounded-lg overflow-hidden border-2 border-zinc-700 group-hover/card:border-yellow-500/50 transition-all flex-shrink-0">
                         <img src={hairstyleTemplates[0].image} alt="" className="w-full h-full object-cover object-top" />
                       </div>
                       
@@ -238,12 +239,12 @@ export default async function Home({
                 {eightyTemplates.length > 0 && (
                   <a
                     href="/how-would-you-see-yourself-in-80s"
-                    className="flex-shrink-0 w-80 group/card bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-900 rounded-xl p-4 border border-zinc-700 hover:border-yellow-500/50 transition-all hover:shadow-lg hover:shadow-yellow-500/20 overflow-hidden relative snap-start"
+                    className="flex-shrink-0 w-96 group/card bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-900 rounded-xl p-6 border border-zinc-700 hover:border-yellow-500/50 transition-all hover:shadow-lg hover:shadow-yellow-500/20 overflow-hidden relative snap-start"
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity"></div>
                     <div className="flex items-center gap-4 relative z-10">
                       {/* Single Preview Image */}
-                      <div className="relative w-16 h-16 rounded-lg overflow-hidden border-2 border-zinc-700 group-hover/card:border-yellow-500/50 transition-all flex-shrink-0">
+                      <div className="relative w-24 h-24 rounded-lg overflow-hidden border-2 border-zinc-700 group-hover/card:border-yellow-500/50 transition-all flex-shrink-0">
                         <img src={eightyTemplates[0].image} alt="" className="w-full h-full object-cover object-top" />
                       </div>
                       
@@ -266,7 +267,7 @@ export default async function Home({
                     </div>
                   </a>
                 )}
-              </div>
+              </AutoScrollBanner>
             </div>
           </div>
         </section>
