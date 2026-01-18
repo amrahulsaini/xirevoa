@@ -137,35 +137,36 @@ export default async function Home({
         {/* Hairstyle Section */}
         {hairstyleTemplates.length > 0 && (
           <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
-            <h2 className="text-2xl sm:text-3xl font-black text-white mb-6">Choose Your Favourite Hairstyle</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {hairstyleTemplates.map((template) => (
-                <a
-                  key={template.id}
-                  href={`/${template.slug}`}
-                  className="group bg-zinc-900 rounded-xl p-4 border border-zinc-800 hover:border-yellow-500/50 transition-all hover:shadow-lg hover:shadow-yellow-500/20 flex items-center gap-4"
-                >
+            <div className="max-w-md mx-auto">
+              <a
+                href="/hairstyles"
+                className="block group bg-zinc-900 rounded-2xl p-6 border border-zinc-800 hover:border-yellow-500/50 transition-all hover:shadow-xl hover:shadow-yellow-500/20"
+              >
+                {/* Card Content */}
+                <div className="flex items-center gap-6">
                   {/* Profile Picture */}
-                  <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 border border-zinc-700">
+                  <div className="relative w-32 h-32 rounded-xl overflow-hidden flex-shrink-0 border-2 border-zinc-700 group-hover:border-yellow-500/50 transition-all">
                     <img
-                      src={template.image}
-                      alt={template.title}
-                      className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
+                      src={hairstyleTemplates[0]?.image}
+                      alt="Hairstyles"
+                      className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-500"
                     />
                   </div>
 
                   {/* Template Info */}
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-white text-base mb-1 group-hover:text-yellow-400 transition-colors">
-                      {template.title}
-                    </h3>
-                    <p className="text-sm text-zinc-500 line-clamp-2">
-                      {template.description}
+                    <h2 className="text-xl font-black text-white mb-2 group-hover:text-yellow-400 transition-colors">
+                      Choose Your Favourite Hairstyle
+                    </h2>
+                    <p className="text-sm text-zinc-400 mb-3">
+                      Explore {hairstyleTemplates.length} amazing hairstyle options
                     </p>
+                    <div className="flex items-center text-yellow-400 text-sm font-semibold">
+                      View All Styles →
+                    </div>
                   </div>
-                </a>
-              ))}
+                </div>
+              </a>
             </div>
           </section>
         )}
