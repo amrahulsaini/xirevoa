@@ -241,7 +241,7 @@ export default function TemplateGenerator({ template, isOutfit = false }: Templa
             </div>
             
             <div className="space-y-4">
-              <div className="relative rounded-xl overflow-hidden border-2 border-zinc-700 group">
+              <div className="relative rounded-xl overflow-hidden border-2 border-zinc-700 group max-w-md mx-auto">
                 <img src={generatedImage} alt="Generated" className="w-full h-auto" />
                 <button
                   onClick={() => setShowFullScreen(true)}
@@ -251,7 +251,7 @@ export default function TemplateGenerator({ template, isOutfit = false }: Templa
                 </button>
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex gap-3 max-w-md mx-auto">
                 <button
                   onClick={() => setShowFullScreen(true)}
                   className="flex-1 px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2"
