@@ -217,6 +217,76 @@ export default async function EightyPage() {
           )}
         </section>
 
+        {/* Other Categories */}
+        {hairstyles.length > 0 && (
+          <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 border-t border-zinc-800">
+            <div className="mb-6">
+              <h2 className="text-2xl sm:text-3xl font-black text-white mb-2">Choose Your Favourite Hairstyle</h2>
+              <p className="text-zinc-400">Explore our amazing hairstyle options</p>
+            </div>
+            <div className="columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-4 space-y-4">
+              {hairstyles.map((template) => (
+                <div key={template.id} className="break-inside-avoid">
+                  <CategoryCard
+                    id={template.id}
+                    title={template.title}
+                    slug={template.slug}
+                    description={template.description}
+                    image={template.image}
+                    comingSoon={template.comingSoon}
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {cinematic.length > 0 && (
+          <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 border-t border-zinc-800">
+            <div className="mb-6">
+              <h2 className="text-2xl sm:text-3xl font-black text-white mb-2">🎬 Cinematic Universe</h2>
+              <p className="text-zinc-400">Epic movie scenes & iconic moments</p>
+            </div>
+            <div className="columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-4 space-y-4">
+              {cinematic.map((template) => (
+                <div key={template.id} className="break-inside-avoid">
+                  <CategoryCard
+                    id={template.id}
+                    title={template.title}
+                    slug={template.slug}
+                    description={template.description}
+                    image={template.image}
+                    comingSoon={template.comingSoon}
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {instagram.length > 0 && (
+          <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 border-t border-zinc-800">
+            <div className="mb-6">
+              <h2 className="text-2xl sm:text-3xl font-black text-white mb-2">📸 Instagram Collage Stories</h2>
+              <p className="text-zinc-400">Perfect layouts for social media</p>
+            </div>
+            <div className="columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-4 space-y-4">
+              {instagram.map((template) => (
+                <div key={template.id} className="break-inside-avoid">
+                  <CategoryCard
+                    id={template.id}
+                    title={template.title}
+                    slug={template.slug}
+                    description={template.description}
+                    image={template.image}
+                    comingSoon={template.comingSoon}
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
         <Footer />
       </div>
     </div>
