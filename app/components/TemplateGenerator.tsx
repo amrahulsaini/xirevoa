@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Upload, Wand2, Download, RefreshCw, Maximize2, X } from "lucide-react";
 import Image from "next/image";
+import RelatedTemplates from "./RelatedTemplates";
 
 interface TemplateGeneratorProps {
   template: {
@@ -13,9 +14,10 @@ interface TemplateGeneratorProps {
     aiPrompt: string;
   };
   isOutfit?: boolean;
+  tags?: string;
 }
 
-export default function TemplateGenerator({ template, isOutfit = false }: TemplateGeneratorProps) {
+export default function TemplateGenerator({ template, isOutfit = false, tags = '' }: TemplateGeneratorProps) {
   const [userImage, setUserImage] = useState<File | null>(null);
   const [userImagePreview, setUserImagePreview] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
@@ -143,8 +145,10 @@ export default function TemplateGenerator({ template, isOutfit = false }: Templa
           </div>
         </div>
 
-        {/* Right: Generation Interface */}
+        {/* Right: Generation Interface and Related Templates */}
         <div className="flex-1 space-y-6">
+          {/* Generation Interface */}
+          <div>
         {/* Upload Section */}
         {!generatedImage && !generating && (
           <div className="bg-zinc-900 rounded-2xl p-6 border border-zinc-800">
@@ -270,6 +274,12 @@ export default function TemplateGenerator({ template, isOutfit = false }: Templa
             </div>
           </div>
         )}
+          </div>
+
+          {/* Related Templates - Desktop Only */}
+          <div className="hidden lg:block">
+            <RelatedTemplates currentTemplateId={template.id} tags={tags} />
+          </div>
         </div>
       </div>
 

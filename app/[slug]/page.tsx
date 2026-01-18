@@ -109,12 +109,7 @@ export default async function TemplatePage({
 
         {/* Template Generator Section */}
         <section className="container mx-auto px-4 sm:px-6 py-8">
-          <TemplateGenerator template={template} isOutfit={template.isOutfit} />
-        </section>
-
-        {/* Related Templates */}
-        <section className="container mx-auto px-4 sm:px-6 py-8">
-          <RelatedTemplates currentTemplateId={template.id} tags={template.tags} />
+          <TemplateGenerator template={template} isOutfit={template.isOutfit} tags={template.tags} />
         </section>
 
         <Footer />
