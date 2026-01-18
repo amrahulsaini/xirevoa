@@ -113,6 +113,32 @@ export default async function EightyPage() {
                     </div>
                   </a>
                 )}
+
+                {/* Instagram Collage Banner */}
+                {instagram.length > 0 && (
+                  <a
+                    href="/instagram-collage"
+                    className="flex-shrink-0 w-96 group/card bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-900 rounded-xl p-6 border border-zinc-700 hover:border-yellow-500/50 transition-all hover:shadow-lg hover:shadow-yellow-500/20 overflow-hidden relative snap-start"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity"></div>
+                    <div className="flex items-center gap-4 relative z-10">
+                      <div className="relative w-24 h-24 rounded-lg overflow-hidden border-2 border-zinc-700 group-hover/card:border-yellow-500/50 transition-all flex-shrink-0">
+                        <img src={instagram[0].image} alt="" className="w-full h-full object-cover object-top" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h2 className="text-base font-bold text-white group-hover/card:text-yellow-400 transition-colors">
+                          📸 Instagram Collage Stories
+                        </h2>
+                        <p className="text-xs text-zinc-400">Perfect layouts for social media</p>
+                      </div>
+                      <div className="text-yellow-400 group-hover/card:translate-x-1 transition-transform">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </div>
+                  </a>
+                )}
               </AutoScrollBanner>
             </div>
           </div>
