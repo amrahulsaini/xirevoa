@@ -37,7 +37,7 @@ export default function CategoryCard({
         onClick={(e) => {
           if (comingSoon) e.preventDefault();
         }}
-        className="block group relative overflow-hidden rounded-2xl bg-zinc-900 cursor-pointer transform transition-all duration-300 hover:shadow-2xl hover:shadow-yellow-500/20 mb-4 border border-zinc-800/50 hover:border-yellow-500/50"
+        className="block group relative overflow-hidden rounded-2xl bg-zinc-900 cursor-pointer transform transition-all duration-300 hover:shadow-2xl hover:shadow-yellow-500/20 mb-3 border border-zinc-800/50 hover:border-yellow-500/50"
       >
         {/* Image Container - Natural aspect ratio */}
         <div className="relative w-full overflow-hidden bg-zinc-900">
