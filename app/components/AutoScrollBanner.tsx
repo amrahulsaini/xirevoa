@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface AutoScrollBannerProps {
   children: React.ReactNode;
@@ -8,56 +8,87 @@ interface AutoScrollBannerProps {
 
 export default function AutoScrollBanner({ children }: AutoScrollBannerProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [isUserScrolling, setIsUserScrolling] = useState(false);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const scrollContainer = scrollRef.current;
     if (!scrollContainer) return;
 
-    let scrollInterval: NodeJS.Timeout;
-    let isPaused = false;
+    let animationFrameId: number;
+    let scrollSpeed = 0.5; // Slower, smoother speed
 
-    const startAutoScroll = () => {
-      scrollInterval = setInterval(() => {
-        if (!isPaused && scrollContainer) {
-          const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
-          
-          if (scrollContainer.scrollLeft >= maxScroll) {
-            // Reset to beginning
-            scrollContainer.scrollTo({ left: 0, behavior: "smooth" });
-          } else {
-            // Scroll forward
-            scrollContainer.scrollBy({ left: 1, behavior: "auto" });
-          }
+    const autoScroll = () => {
+      if (!isUserScrolling && scrollContainer) {
+        const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+        
+        // Check if we've reached the end (with small threshold)
+        if (scrollContainer.scrollLeft >= maxScroll - 5) {
+          // Pause at end before resetting
+          setTimeout(() => {
+            if (!isUserScrolling) {
+              scrollContainer.scrollLeft = 0;
+            }
+          }, 2000); // 2 second pause at end
+        } else {
+          scrollContainer.scrollLeft += scrollSpeed;
         }
-      }, 30);
+      }
+      
+      animationFrameId = requestAnimationFrame(autoScroll);
     };
 
     // Only enable auto-scroll if content overflows
     const hasOverflow = scrollContainer.scrollWidth > scrollContainer.clientWidth;
     if (hasOverflow) {
-      startAutoScroll();
+      animationFrameId = requestAnimationFrame(autoScroll);
     }
 
+    // Detect manual scrolling
+    const handleScroll = () => {
+      setIsUserScrolling(true);
+      
+      // Clear existing timeout
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+      
+      // Resume auto-scroll after user stops scrolling for 3 seconds
+      scrollTimeoutRef.current = setTimeout(() => {
+        setIsUserScrolling(false);
+      }, 3000);
+    };
+
     const handleMouseEnter = () => {
-      isPaused = true;
+      setIsUserScrolling(true);
     };
 
     const handleMouseLeave = () => {
-      isPaused = false;
+      // Resume auto-scroll after leaving
+      setTimeout(() => setIsUserScrolling(false), 500);
     };
 
+    scrollContainer.addEventListener("scroll", handleScroll);
     scrollContainer.addEventListener("mouseenter", handleMouseEnter);
     scrollContainer.addEventListener("mouseleave", handleMouseLeave);
+    scrollContainer.addEventListener("touchstart", handleMouseEnter);
+    scrollContainer.addEventListener("touchend", handleMouseLeave);
 
     return () => {
-      clearInterval(scrollInterval);
+      cancelAnimationFrame(animationFrameId);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+      scrollContainer.removeEventListener("scroll", handleScroll);
       scrollContainer.removeEventListener("mouseenter", handleMouseEnter);
       scrollContainer.removeEventListener("mouseleave", handleMouseLeave);
+      scrollContainer.removeEventListener("touchstart", handleMouseEnter);
+      scrollContainer.removeEventListener("touchend", handleMouseLeave);
     };
-  }, []);
+  }, [isUserScrolling]);
 
   return (
-    <div ref={scrollRef} className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide scroll-smooth">
+    <div ref={scrollRef} className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
       {children}
     </div>
   );
