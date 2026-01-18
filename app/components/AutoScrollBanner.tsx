@@ -25,7 +25,9 @@ export default function AutoScrollBanner({ children }: AutoScrollBannerProps) {
     return () => window.removeEventListener('resize', checkScroll);
   }, []);
 
-  const scroll = (direction: 'left' | 'right') => {
+  const scroll = (direction: 'left' | 'right', e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (scrollRef.current) {
       const scrollAmount = 400;
       scrollRef.current.scrollBy({
@@ -40,7 +42,7 @@ export default function AutoScrollBanner({ children }: AutoScrollBannerProps) {
       {/* Left Arrow */}
       {showLeftArrow && (
         <button
-          onClick={() => scroll('left')}
+          onClick={(e) => scroll('left', e)}
           className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-black/80 hover:bg-yellow-500/20 border border-yellow-500/50 rounded-full p-3 transition-all opacity-0 group-hover:opacity-100"
         >
           <svg className="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -70,7 +72,7 @@ export default function AutoScrollBanner({ children }: AutoScrollBannerProps) {
       {/* Right Arrow */}
       {showRightArrow && (
         <button
-          onClick={() => scroll('right')}
+          onClick={(e) => scroll('right', e)}
           className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-black/80 hover:bg-yellow-500/20 border border-yellow-500/50 rounded-full p-3 transition-all opacity-0 group-hover:opacity-100"
         >
           <svg className="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
