@@ -11,7 +11,8 @@ const transporter = nodemailer.createTransport({
 });
 
 export async function sendVerificationEmail(email: string, token: string, username: string) {
-  const verificationUrl = `${process.env.NEXTAUTH_URL}/api/auth/verify?token=${token}`;
+  const baseUrl = process.env.NEXTAUTH_URL || 'https://xirevoa.com';
+  const verificationUrl = `${baseUrl}/api/auth/verify?token=${token}`.replace(/^http:/, 'https:');
 
   const mailOptions = {
     from: `"Xirevoa AI" <${process.env.EMAIL_FROM}>`,
@@ -74,7 +75,8 @@ export async function sendVerificationEmail(email: string, token: string, userna
 }
 
 export async function sendPasswordResetEmail(email: string, token: string, username: string) {
-  const resetUrl = `${process.env.NEXTAUTH_URL}/auth/reset-password?token=${token}`;
+  const baseUrl = process.env.NEXTAUTH_URL || 'https://xirevoa.com';
+  const resetUrl = `${baseUrl}/auth/reset-password?token=${token}`.replace(/^http:/, 'https:');
 
   const mailOptions = {
     from: `"Xirevoa AI" <${process.env.EMAIL_FROM}>`,
