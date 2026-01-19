@@ -86,8 +86,14 @@ export default async function TemplatePage({
               template={template} 
               isOutfit={template.isOutfit} 
               tags={template.tags}
-              relatedTemplatesSlot={<RelatedTemplates currentTemplateId={template.id} tags={template.tags} />}
             />
+          </div>
+        </section>
+
+        {/* Related Templates Section - Full Width */}
+        <section className="w-full py-12">
+          <div className="container mx-auto px-4 sm:px-6">
+            <RelatedTemplates currentTemplateId={template.id} tags={template.tags} />
           </div>
         </section>
 

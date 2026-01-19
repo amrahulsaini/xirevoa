@@ -16,10 +16,9 @@ interface TemplateGeneratorProps {
   };
   isOutfit?: boolean;
   tags?: string;
-  relatedTemplatesSlot?: React.ReactNode;
 }
 
-export default function TemplateGenerator({ template, isOutfit = false, tags = '', relatedTemplatesSlot }: TemplateGeneratorProps) {
+export default function TemplateGenerator({ template, isOutfit = false, tags = '' }: TemplateGeneratorProps) {
   const { data: session } = useSession();
   const [userImage, setUserImage] = useState<File | null>(null);
   const [userImagePreview, setUserImagePreview] = useState<string | null>(null);
@@ -277,13 +276,6 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
           )}
         </div>
       </div>
-
-      {/* Related Templates Section */}
-      {relatedTemplatesSlot && (
-        <div className="w-screen relative left-1/2 right-1/2 -mx-[50vw] mt-12">
-          {relatedTemplatesSlot}
-        </div>
-      )}
 
       {/* Full Screen Modal */}
       {showFullScreen && generatedImage && (
