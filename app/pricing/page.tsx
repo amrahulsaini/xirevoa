@@ -67,17 +67,12 @@ export default function PricingPage() {
       <Header />
       
       {/* Hero Section */}
-      <div className="relative overflow-hidden">
+      <div className="relative overflow-hidden pt-20">
         <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/10 via-purple-500/10 to-blue-500/10"></div>
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
           <div className="text-center space-y-6">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-400/10 border border-yellow-400/20 rounded-full">
-              <TrendingUp className="w-4 h-4 text-yellow-400" />
-              <span className="text-sm font-medium text-yellow-400">Flexible Pricing Plans</span>
-            </div>
-            
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-tight">
               Choose Your
               <br />
@@ -194,35 +189,6 @@ export default function PricingPage() {
             <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6 text-center">
               <div className="text-3xl font-bold text-blue-400 mb-2">0%</div>
               <div className="text-sm text-gray-400">No Hidden Fees</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* FAQ Section */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
-        <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8 sm:p-12">
-          <h2 className="text-3xl font-bold text-white mb-8 text-center">Frequently Asked Questions</h2>
-          
-          <div className="space-y-6">
-            <div>
-              <h4 className="text-lg font-semibold text-white mb-2">Do XP Points expire?</h4>
-              <p className="text-gray-400">No! Your XP Points never expire. Use them whenever you want, at your own pace.</p>
-            </div>
-            
-            <div>
-              <h4 className="text-lg font-semibold text-white mb-2">Can I get a refund?</h4>
-              <p className="text-gray-400">Due to the digital nature of our service, all purchases are final. However, we offer a satisfaction guarantee.</p>
-            </div>
-            
-            <div>
-              <h4 className="text-lg font-semibold text-white mb-2">How many images can I generate?</h4>
-              <p className="text-gray-400">Each generation costs 3 XP. So with 100 XP, you can generate approximately 33 images, 300 XP gives you ~100 images, and 500 XP allows ~166 images.</p>
-            </div>
-            
-            <div>
-              <h4 className="text-lg font-semibold text-white mb-2">What payment methods do you accept?</h4>
-              <p className="text-gray-400">We'll support UPI, Credit/Debit Cards, Net Banking, and popular payment wallets once the payment system is integrated.</p>
             </div>
           </div>
         </div>

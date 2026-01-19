@@ -78,7 +78,7 @@ export default function Header() {
                 <h1 className="text-xl sm:text-2xl font-black bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 bg-clip-text text-transparent">
                   Xirevoa AI
                 </h1>
-                <p className="text-xs text-zinc-500">Transform Your Reality</p>
+                <p className="text-xs text-zinc-500">Showcase yourself in creative templates</p>
               </div>
             </Link>
 

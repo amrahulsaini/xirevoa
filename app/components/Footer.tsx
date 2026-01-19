@@ -30,9 +30,17 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-bold mb-4">Legal</h4>
             <ul className="space-y-2">
-              <li><a href="#" className="text-zinc-400 hover:text-yellow-400 transition-colors">Privacy</a></li>
-              <li><a href="#" className="text-zinc-400 hover:text-yellow-400 transition-colors">Terms</a></li>
-              <li><a href="#" className="text-zinc-400 hover:text-yellow-400 transition-colors">Contact</a></li>
+              <li><a href="/privacy" className="text-zinc-400 hover:text-yellow-400 transition-colors">Privacy</a></li>
+              <li><a href="/terms" className="text-zinc-400 hover:text-yellow-400 transition-colors">Terms</a></li>
+              <li><a href="/contact" className="text-zinc-400 hover:text-yellow-400 transition-colors">Contact</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="text-white font-bold mb-4">Support</h4>
+            <ul className="space-y-2">
+              <li><a href="/faq" className="text-zinc-400 hover:text-yellow-400 transition-colors">FAQ</a></li>
+              <li><a href="/refund" className="text-zinc-400 hover:text-yellow-400 transition-colors">Refund Policy</a></li>
+              <li><a href="/contact" className="text-zinc-400 hover:text-yellow-400 transition-colors">Help Center</a></li>
             </ul>
           </div>
         </div>
