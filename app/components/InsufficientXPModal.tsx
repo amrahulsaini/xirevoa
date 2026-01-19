@@ -70,7 +70,7 @@ export default function InsufficientXPModal({ isOpen, onClose, requiredXP, curre
           <div className="p-6 space-y-6">
             <p className="text-zinc-300 text-center">
               Please log in to your account to start generating AI images. 
-              New users get <span className="text-yellow-400 font-bold">10 free XP</span> to try it out!
+              New users get <span className="text-yellow-400 font-bold">20 free XP</span> to try it out!
             </p>
 
             <div className="space-y-3">
