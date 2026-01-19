@@ -26,11 +26,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check XP balance
+    // Get user's preferred model and check XP balance
     const userId = session.user.id;
     const connection = await pool.getConnection();
     
     try {
+      // Get user settings and XP in one query
       const [users] = await connection.query<RowDataPacket[]>(
         'SELECT xpoints FROM users WHERE id = ?',
         [userId]
@@ -43,8 +44,30 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      // Get user's preferred model settings
+      const [settingsRows] = await connection.query<RowDataPacket[]>(
+        'SELECT preferred_model FROM user_settings WHERE user_id = ?',
+        [userId]
+      );
+
+      const preferredModel = settingsRows.length > 0 ? settingsRows[0].preferred_model : 'gemini-2.5-flash-image';
+
+      // Get model XP cost
+      const [modelRows] = await connection.query<RowDataPacket[]>(
+        'SELECT xp_cost, model_name, is_active FROM ai_models WHERE model_id = ?',
+        [preferredModel]
+      );
+
+      if (modelRows.length === 0 || !modelRows[0].is_active) {
+        return NextResponse.json(
+          { error: 'Selected model is not available' },
+          { status: 400 }
+        );
+      }
+
       const currentXP = users[0].xpoints;
-      const XP_COST = 3;
+      const XP_COST = modelRows[0].xp_cost;
+      const modelName = modelRows[0].model_name;
 
       if (currentXP < XP_COST) {
         return NextResponse.json(
@@ -59,7 +82,7 @@ export async function POST(request: NextRequest) {
         [XP_COST, userId]
       );
 
-      console.log(`Deducted ${XP_COST} XP from user ${userId}. New balance: ${currentXP - XP_COST}`);
+      console.log(`Deducted ${XP_COST} XP from user ${userId} for ${modelName}. New balance: ${currentXP - XP_COST}`);
     } finally {
       connection.release();
     }
@@ -217,13 +240,15 @@ export async function POST(request: NextRequest) {
 
     // Generate image with Google GenAI using contentParts
     console.log('=== SENDING TO GEMINI ===');
-    console.log('Model: gemini-2.5-flash-image');
+    console.log('Model:', preferredModel);
+    console.log('Model Name:', modelName);
+    console.log('XP Cost:', XP_COST);
     console.log('Is Outfit Mode:', isOutfit);
     console.log('Number of content parts:', contentParts.length);
     console.log('Number of images:', contentParts.filter((p: any) => p.inlineData).length);
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash-image',
+      model: preferredModel,
       contents: createUserContent(contentParts),
     });
 
@@ -297,8 +322,8 @@ export async function POST(request: NextRequest) {
           await saveConnection.query(
             `INSERT INTO generations 
             (user_id, template_id, template_title, original_image_url, generated_image_url, xp_cost, is_outfit) 
-            VALUES (?, ?, ?, ?, ?, 3, ?)`,
-            [userId, templateId, templateTitle, 'uploaded', generatedImageUrl, isOutfit]
+            VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            [userId, templateId, templateTitle, 'uploaded', generatedImageUrl, XP_COST, isOutfit]
           );
 
           console.log('Generation record saved to database');
