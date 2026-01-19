@@ -107,7 +107,7 @@ export const authOptions: NextAuthOptions = {
 
             // Create new user
             await connection.query(
-              `INSERT INTO users (username, email, provider, provider_id, profile_picture, email_verified, coins) 
+              `INSERT INTO users (username, email, provider, provider_id, profile_picture, email_verified, xpoints) 
                VALUES (?, ?, 'google', ?, ?, TRUE, 20)`,
               [username, user.email, account.providerAccountId, user.image]
             );
