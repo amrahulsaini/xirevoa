@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import pool from "@/lib/db";
 import { RowDataPacket } from "mysql2";
 import Header from "../components/Header";
+import Footer from "../components/Footer";
 import GalleryClient from "../components/GalleryClient";
 
 interface Generation extends RowDataPacket {
@@ -96,6 +97,8 @@ export default async function GalleryPage() {
         {/* Gallery Grid */}
         <GalleryClient generations={generations} />
       </div>
+
+      <Footer />
     </div>
   );
 }

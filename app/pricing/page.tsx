@@ -1,4 +1,5 @@
 import Header from "../components/Header";
+import Footer from "../components/Footer";
 import { Check, Zap, Crown, Sparkles, TrendingUp } from "lucide-react";
 
 export default function PricingPage() {
@@ -226,6 +227,8 @@ export default function PricingPage() {
           </div>
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 }

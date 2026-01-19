@@ -6,25 +6,25 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-bold mb-4">Product</h4>
             <ul className="space-y-2">
-              <li><a href="#" className="text-zinc-400 hover:text-yellow-400 transition-colors">Features</a></li>
-              <li><a href="#" className="text-zinc-400 hover:text-yellow-400 transition-colors">Pricing</a></li>
-              <li><a href="#" className="text-zinc-400 hover:text-yellow-400 transition-colors">Gallery</a></li>
+              <li><a href="/features" className="text-zinc-400 hover:text-yellow-400 transition-colors">Features</a></li>
+              <li><a href="/pricing" className="text-zinc-400 hover:text-yellow-400 transition-colors">Pricing</a></li>
+              <li><a href="/gallery" className="text-zinc-400 hover:text-yellow-400 transition-colors">Gallery</a></li>
             </ul>
           </div>
           <div>
-            <h4 className="text-white font-bold mb-4">Company</h4>
+            <h4 className="text-white font-bold mb-4">Templates</h4>
             <ul className="space-y-2">
-              <li><a href="#" className="text-zinc-400 hover:text-yellow-400 transition-colors">About</a></li>
-              <li><a href="#" className="text-zinc-400 hover:text-yellow-400 transition-colors">Blog</a></li>
-              <li><a href="#" className="text-zinc-400 hover:text-yellow-400 transition-colors">Careers</a></li>
+              <li><a href="/hairstyles" className="text-zinc-400 hover:text-yellow-400 transition-colors">Hairstyles</a></li>
+              <li><a href="/cinematic-universe" className="text-zinc-400 hover:text-yellow-400 transition-colors">Cinematic</a></li>
+              <li><a href="/view-your-iconic-outfit" className="text-zinc-400 hover:text-yellow-400 transition-colors">Outfits</a></li>
             </ul>
           </div>
           <div>
             <h4 className="text-white font-bold mb-4">Resources</h4>
             <ul className="space-y-2">
-              <li><a href="#" className="text-zinc-400 hover:text-yellow-400 transition-colors">Help</a></li>
-              <li><a href="#" className="text-zinc-400 hover:text-yellow-400 transition-colors">Guides</a></li>
-              <li><a href="#" className="text-zinc-400 hover:text-yellow-400 transition-colors">API</a></li>
+              <li><a href="/" className="text-zinc-400 hover:text-yellow-400 transition-colors">Home</a></li>
+              <li><a href="/features" className="text-zinc-400 hover:text-yellow-400 transition-colors">How It Works</a></li>
+              <li><a href="/pricing" className="text-zinc-400 hover:text-yellow-400 transition-colors">Plans</a></li>
             </ul>
           </div>
           <div>
@@ -32,7 +32,7 @@ export default function Footer() {
             <ul className="space-y-2">
               <li><a href="#" className="text-zinc-400 hover:text-yellow-400 transition-colors">Privacy</a></li>
               <li><a href="#" className="text-zinc-400 hover:text-yellow-400 transition-colors">Terms</a></li>
-              <li><a href="#" className="text-zinc-400 hover:text-yellow-400 transition-colors">License</a></li>
+              <li><a href="#" className="text-zinc-400 hover:text-yellow-400 transition-colors">Contact</a></li>
             </ul>
           </div>
         </div>

@@ -1,4 +1,5 @@
 import Header from "../components/Header";
+import Footer from "../components/Footer";
 import { Sparkles, Droplet, Image as ImageIcon, Layers, Zap, Shield } from "lucide-react";
 
 export default function FeaturesPage() {
@@ -155,6 +156,8 @@ export default function FeaturesPage() {
           </div>
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 }
