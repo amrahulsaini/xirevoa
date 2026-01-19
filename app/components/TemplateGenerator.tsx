@@ -118,7 +118,7 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
   };
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-7xl mx-auto overflow-x-hidden">
       {/* Template Info */}
       <div className="text-center mb-8">
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-4">

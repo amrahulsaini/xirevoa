@@ -30,7 +30,7 @@ export default function FAQPage() {
         },
         {
           q: "How much do XP Points cost?",
-          a: "We offer three packages: Starter (100 XP for ₹99), Professional (300 XP for ₹249), and Creator Pro (500 XP for ₹400). Payment integration coming soon!"
+          a: "We offer three packages: Starter (100 XP for ₹99), Professional (300 XP for ₹249), and Creator Pro (500 XP for ₹400)."
         },
         {
           q: "Do XP Points expire?",

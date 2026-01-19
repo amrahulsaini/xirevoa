@@ -63,7 +63,7 @@ export default async function RelatedTemplates({
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full overflow-x-hidden">
       <h2 className="text-2xl sm:text-3xl font-black text-white mb-6 px-4 sm:px-6">
         Related Templates
       </h2>
