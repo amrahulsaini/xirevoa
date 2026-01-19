@@ -76,7 +76,7 @@ export default async function SettingsPage() {
     redirect('/auth/login');
   }
 
-  const userId = session.user.id;
+  const userId = Number(session.user.id);
   const userSettings = await getUserSettings(userId);
   const models = await getModels();
 
