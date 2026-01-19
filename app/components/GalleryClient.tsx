@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { Download, Maximize2, X, Calendar, Zap, Image as ImageIcon, Trash2 } from "lucide-react";
 
 interface Generation {
@@ -81,11 +80,10 @@ export default function GalleryClient({ generations }: { generations: Generation
           >
             {/* Image */}
             <div className="relative aspect-square overflow-hidden bg-zinc-800">
-              <Image
+              <img
                 src={generation.generated_image_url}
                 alt={generation.template_title}
-                fill
-                className="object-cover transition-transform duration-300 group-hover:scale-110"
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
               />
               
               {/* Overlay on hover */}
@@ -158,13 +156,11 @@ export default function GalleryClient({ generations }: { generations: Generation
           <div className="relative max-w-6xl w-full max-h-[90vh] flex flex-col lg:flex-row gap-6" onClick={(e) => e.stopPropagation()}>
             {/* Image */}
             <div className="flex-1 relative rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800">
-              <div className="relative aspect-square lg:aspect-auto lg:h-full">
-                <Image
+              <div className="relative w-full h-full min-h-[400px]">
+                <img
                   src={selectedImage.generated_image_url}
                   alt={selectedImage.template_title}
-                  fill
-                  className="object-contain"
-                  priority
+                  className="w-full h-full object-contain"
                 />
               </div>
             </div>
@@ -201,9 +197,15 @@ export default function GalleryClient({ generations }: { generations: Generation
 
                 <div className="flex items-center gap-3 text-sm">
                   <ImageIcon className="w-5 h-5 text-blue-400" />
-                  <div>
-                    <div className="text-gray-400">Template ID</div>
-                    <div className="text-white font-medium">#{selectedImage.template_id}</div>
+                  <div className="flex-1">
+                    <div className="text-gray-400">Template Used</div>
+                    <a 
+                      href={`/${selectedImage.template_title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`}
+                      className="text-yellow-400 hover:text-yellow-300 font-medium underline"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {selectedImage.template_title}
+                    </a>
                   </div>
                 </div>
               </div>
@@ -220,11 +222,10 @@ export default function GalleryClient({ generations }: { generations: Generation
               <div className="pt-4 border-t border-zinc-800">
                 <div className="text-sm text-gray-400 mb-3">Original Photo</div>
                 <div className="relative aspect-square rounded-xl overflow-hidden border border-zinc-800">
-                  <Image
+                  <img
                     src={selectedImage.original_image_url}
                     alt="Original"
-                    fill
-                    className="object-cover"
+                    className="w-full h-full object-cover"
                   />
                 </div>
               </div>
