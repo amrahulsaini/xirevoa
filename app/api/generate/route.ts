@@ -30,6 +30,10 @@ export async function POST(request: NextRequest) {
     const userId = session.user.id;
     const connection = await pool.getConnection();
     
+    let preferredModel = 'gemini-2.5-flash-image';
+    let XP_COST = 3;
+    let modelName = 'Gemini 2.5 Flash';
+    
     try {
       // Get user settings and XP in one query
       const [users] = await connection.query<RowDataPacket[]>(
@@ -50,7 +54,7 @@ export async function POST(request: NextRequest) {
         [userId]
       );
 
-      const preferredModel = settingsRows.length > 0 ? settingsRows[0].preferred_model : 'gemini-2.5-flash-image';
+      preferredModel = settingsRows.length > 0 ? settingsRows[0].preferred_model : 'gemini-2.5-flash-image';
 
       // Get model XP cost
       const [modelRows] = await connection.query<RowDataPacket[]>(
@@ -66,8 +70,8 @@ export async function POST(request: NextRequest) {
       }
 
       const currentXP = users[0].xpoints;
-      const XP_COST = modelRows[0].xp_cost;
-      const modelName = modelRows[0].model_name;
+      XP_COST = modelRows[0].xp_cost;
+      modelName = modelRows[0].model_name;
 
       if (currentXP < XP_COST) {
         return NextResponse.json(
