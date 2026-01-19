@@ -112,10 +112,13 @@ export const authOptions: NextAuthOptions = {
               [username, user.email, account.providerAccountId, user.image]
             );
           } else {
-            // Update profile picture if changed
+            // User exists (created with email/password before)
+            // Link Google account by updating profile picture, provider info, and verify email
             await connection.query(
-              "UPDATE users SET profile_picture = ? WHERE email = ?",
-              [user.image, user.email]
+              `UPDATE users 
+               SET profile_picture = ?, provider = 'google', provider_id = ?, email_verified = TRUE 
+               WHERE email = ?`,
+              [user.image, account.providerAccountId, user.email]
             );
           }
         } finally {

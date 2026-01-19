@@ -1,17 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  useEffect(() => {
+    const verified = searchParams.get("verified");
+    if (verified === "success") {
+      setShowSuccess(true);
+      // Auto-hide after 5 seconds
+      const timer = setTimeout(() => setShowSuccess(false), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,6 +87,26 @@ export default function LoginPage() {
         <div className="bg-zinc-900 border-2 border-zinc-800 rounded-2xl p-8 shadow-xl">
           <h2 className="text-2xl font-bold text-white mb-2">Welcome Back!</h2>
           <p className="text-zinc-400 mb-6">Sign in to continue creating amazing AI transformations</p>
+
+          {/* Success Message */}
+          {showSuccess && (
+            <div className="bg-green-500/10 border-2 border-green-500/50 rounded-lg p-6 mb-6 animate-in fade-in slide-in-from-top-2 duration-500">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-12 h-12 bg-green-500/20 border-2 border-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                  <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-green-400 font-bold text-lg">🎉 Congratulations!</h3>
+                  <p className="text-green-300 text-sm">Your email has been verified successfully!</p>
+                </div>
+              </div>
+              <p className="text-zinc-400 text-sm">
+                You can now sign in to your account and start creating amazing AI transformations with your <span className="text-yellow-400 font-semibold">250 free coins</span>!
+              </p>
+            </div>
+          )}
 
           {/* Error Message */}
           {error && (
@@ -172,5 +205,17 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-zinc-400">Loading...</div>
+      </div>
+    }>
+      <LoginContent />
+    </Suspense>
   );
 }
