@@ -147,13 +147,9 @@ export default function Header() {
               ) : (
                 <Link
                   href="/auth/login"
-                  className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-black font-bold rounded-lg transition-colors text-sm"
-                >
-                  Login
-                </Link>
-              )}
-
-              {/* Menu Button */}
+                className="w-9 h-9 sm:w-10 sm:h-10 bg-zinc-800 hover:bg-zinc-700 rounded-full flex items-center justify-center transition-colors border-2 border-zinc-700 hover:border-yellow-500/50"
+              >
+                <User className="w-5 h-5 sm:w-6 sm:h-6 text-zinc-400" />
               <button 
                 onClick={() => setShowSidebar(!showSidebar)}
                 className="menu-btn w-9 h-9 sm:w-10 sm:h-10 bg-zinc-800 hover:bg-zinc-700 rounded-lg flex items-center justify-center transition-colors"
