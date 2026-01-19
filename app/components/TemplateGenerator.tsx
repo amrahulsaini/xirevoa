@@ -58,6 +58,15 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
       return;
     }
 
+    // CHECK XP FIRST BEFORE DOING ANYTHING
+    const currentXP = (session?.user as any)?.xpoints || 0;
+    const requiredXP = 3;
+    
+    if (currentXP < requiredXP) {
+      setShowXPModal(true);
+      return;
+    }
+
     setErrorMessage(null);
     setGenerating(true);
     setProgress(0);
@@ -90,12 +99,6 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
 
       if (!generateRes.ok) {
         const error = await generateRes.json();
-        // Check for insufficient XP
-        if (error.error?.includes('Insufficient XP') || error.error?.includes('insufficient')) {
-          const currentXP = (session?.user as any)?.xpoints || 0;
-          setShowXPModal(true);
-          throw new Error('insufficient_xp');
-        }
         throw new Error(error.error || 'Failed to generate image');
       }
 
@@ -105,9 +108,7 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
       setProgress(100);
     } catch (error: any) {
       console.error('Generation error:', error);
-      if (error.message !== 'insufficient_xp') {
-        setErrorMessage(error.message || 'Failed to generate image');
-      }
+      setErrorMessage(error.message || 'Failed to generate image');
       setGenerating(false);
       setProgress(0);
     } finally {
