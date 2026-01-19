@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { Upload, Wand2, Download, RefreshCw, Maximize2, X } from "lucide-react";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
+import InsufficientXPModal from "./InsufficientXPModal";
 
 interface TemplateGeneratorProps {
   template: {
@@ -18,27 +20,31 @@ interface TemplateGeneratorProps {
 }
 
 export default function TemplateGenerator({ template, isOutfit = false, tags = '', relatedTemplatesSlot }: TemplateGeneratorProps) {
+  const { data: session } = useSession();
   const [userImage, setUserImage] = useState<File | null>(null);
   const [userImagePreview, setUserImagePreview] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
   const [showFullScreen, setShowFullScreen] = useState(false);
+  const [showXPModal, setShowXPModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      alert('Please upload an image file');
+      setErrorMessage('Please upload an image file');
       return;
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      alert('Image size should be less than 10MB');
+      setErrorMessage('Image size should be less than 10MB');
       return;
     }
 
+    setErrorMessage(null);
     setUserImage(file);
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -49,10 +55,11 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
 
   const handleGenerate = async () => {
     if (!userImage) {
-      alert('Please upload your photo first');
+      setErrorMessage('Please upload your photo first');
       return;
     }
 
+    setErrorMessage(null);
     setGenerating(true);
     setProgress(0);
 
@@ -90,6 +97,12 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
 
       if (!generateRes.ok) {
         const error = await generateRes.json();
+        // Check for insufficient XP
+        if (error.error?.includes('Insufficient XP') || error.error?.includes('insufficient')) {
+          const currentXP = (session?.user as any)?.xpoints || 0;
+          setShowXPModal(true);
+          throw new Error('insufficient_xp');
+        }
         throw new Error(error.error || 'Failed to generate image');
       }
 
@@ -99,7 +112,9 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
       setProgress(100);
     } catch (error: any) {
       console.error('Generation error:', error);
-      alert(`Failed to generate: ${error.message}`);
+      if (error.message !== 'insufficient_xp') {
+        setErrorMessage(error.message || 'Failed to generate image');
+      }
       setGenerating(false);
       setProgress(0);
     } finally {
@@ -119,6 +134,13 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
 
   return (
     <div className="max-w-7xl mx-auto overflow-x-hidden">
+      {/* Error Message */}
+      {errorMessage && (
+        <div className="mb-6 bg-red-500/10 border border-red-500/30 rounded-xl p-4 text-center">
+          <p className="text-red-400 font-medium">{errorMessage}</p>
+        </div>
+      )}
+
       {/* Template Info */}
       <div className="text-center mb-8">
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-4">
@@ -289,6 +311,14 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
           />
         </div>
       )}
+
+      {/* Insufficient XP Modal */}
+      <InsufficientXPModal
+        isOpen={showXPModal}
+        onClose={() => setShowXPModal(false)}
+        requiredXP={3}
+        currentXP={(session?.user as any)?.xpoints || 0}
+      />
     </div>
   );
 }

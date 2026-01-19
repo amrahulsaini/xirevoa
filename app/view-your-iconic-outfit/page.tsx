@@ -127,7 +127,7 @@ export default async function ViewYourIconicOutfitPage() {
             <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full blur-xl opacity-50"></div>
             <div className="relative px-8 py-3 bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 rounded-full border-2 border-white/20 shadow-2xl">
               <span className="text-white text-base sm:text-lg font-black tracking-wide drop-shadow-lg">
-                ✨ EXCLUSIVELY FOR GIRLS ✨
+                EXCLUSIVELY FOR GIRLS
               </span>
             </div>
           </div>
@@ -135,30 +135,29 @@ export default async function ViewYourIconicOutfitPage() {
             View Your Iconic Outfit
           </h1>
           <p className="text-zinc-400 text-lg max-w-2xl mx-auto">
-            Choose an iconic outfit, upload your photo, and see yourself wearing it! ✨
+            Choose an iconic outfit, upload your photo, and see yourself wearing it!
           </p>
         </div>
 
         {/* Instructions Section */}
         <div className="max-w-4xl mx-auto mb-12">
           <div className="bg-gradient-to-r from-purple-900/30 to-pink-900/30 rounded-2xl p-6 border border-purple-500/30">
-            <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-              <span className="text-2xl">👗</span>
+            <h2 className="text-xl font-bold text-white mb-4">
               How It Works
             </h2>
             <div className="grid sm:grid-cols-3 gap-4 text-sm">
               <div className="bg-black/30 rounded-lg p-4 border border-purple-500/20">
-                <div className="text-3xl mb-2">1️⃣</div>
+                <div className="text-3xl mb-2 text-purple-400">1</div>
                 <div className="font-bold text-purple-300 mb-1">Choose Outfit</div>
                 <div className="text-zinc-400">Select your favorite iconic outfit below</div>
               </div>
               <div className="bg-black/30 rounded-lg p-4 border border-pink-500/20">
-                <div className="text-3xl mb-2">2️⃣</div>
+                <div className="text-3xl mb-2 text-pink-400">2</div>
                 <div className="font-bold text-pink-300 mb-1">Upload Photo</div>
                 <div className="text-zinc-400">Upload a clear photo of your face</div>
               </div>
               <div className="bg-black/30 rounded-lg p-4 border border-purple-500/20">
-                <div className="text-3xl mb-2">3️⃣</div>
+                <div className="text-3xl mb-2 text-purple-400">3</div>
                 <div className="font-bold text-purple-300 mb-1">See Result</div>
                 <div className="text-zinc-400">AI will show you wearing that outfit!</div>
               </div>
@@ -184,14 +183,13 @@ export default async function ViewYourIconicOutfitPage() {
           </div>
         ) : (
           <div className="text-center py-20">
-            <div className="text-8xl mb-6">👗</div>
             <h2 className="text-2xl font-bold text-white mb-4">Outfit Templates Coming Soon!</h2>
             <p className="text-zinc-400 mb-8 max-w-md mx-auto">
               You need to add outfit template images to the database with IDs 43-47. 
               These should show iconic outfits on models/mannequins.
             </p>
             <div className="bg-purple-900/20 border border-purple-500/30 rounded-xl p-6 max-w-2xl mx-auto text-left">
-              <h3 className="font-bold text-purple-300 mb-3 text-lg">📝 To Add Outfit Templates:</h3>
+              <h3 className="font-bold text-purple-300 mb-3 text-lg">To Add Outfit Templates:</h3>
               <ol className="space-y-2 text-sm text-zinc-300 list-decimal list-inside">
                 <li>Find or create images of iconic outfits (full body shots work best)</li>
                 <li>Upload images to your image hosting service</li>

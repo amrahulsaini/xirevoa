@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Zap, User, Menu, Search, X, Home, Image as ImageIcon, DollarSign, Sparkles, LogOut, Settings } from "lucide-react";
+import { Zap, User, Menu, Search, X, Home, Image as ImageIcon, DollarSign, Sparkles, LogOut, Settings, Palette, Shirt, Camera, Film } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
 
@@ -12,6 +12,11 @@ export default function Header() {
   const [showSearch, setShowSearch] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Close sidebar when clicking outside
   useEffect(() => {
@@ -50,9 +55,18 @@ export default function Header() {
 
   const menuItems = [
     { href: "/", label: "Home", icon: Home },
-    { href: "/", label: "Templates", icon: ImageIcon },
-    { href: "#pricing", label: "Pricing", icon: DollarSign },
-    { href: "#gallery", label: "Gallery", icon: Sparkles },
+    { href: "/features", label: "Features", icon: Sparkles },
+    { href: "/pricing", label: "Pricing", icon: DollarSign },
+    { href: "/gallery", label: "Gallery", icon: ImageIcon },
+  ];
+
+  const categoryItems = [
+    { href: "/hairstyles", label: "Hairstyles", icon: Palette },
+    { href: "/change-your-hairstyle-girls", label: "Girls Hairstyles", icon: Palette },
+    { href: "/view-your-iconic-outfit", label: "Iconic Outfits", icon: Shirt },
+    { href: "/cinematic-universe", label: "Cinematic", icon: Film },
+    { href: "/how-would-you-see-yourself-in-80s", label: "80s Style", icon: Camera },
+    { href: "/instagram-collage", label: "Instagram Collage", icon: ImageIcon },
   ];
 
   return (
@@ -103,7 +117,7 @@ export default function Header() {
               )}
 
               {/* Profile */}
-              {session ? (
+              {mounted && session ? (
                 <div className="relative">
                   <button 
                     onClick={() => setShowUserMenu(!showUserMenu)}
@@ -146,13 +160,15 @@ export default function Header() {
                     </div>
                   )}
                 </div>
-              ) : (
+              ) : mounted ? (
                 <Link
                   href="/auth/login"
                   className="w-9 h-9 sm:w-10 sm:h-10 bg-zinc-800 hover:bg-zinc-700 rounded-full flex items-center justify-center transition-colors border-2 border-zinc-700 hover:border-yellow-500/50"
                 >
                   <User className="w-5 h-5 sm:w-6 sm:h-6 text-zinc-400" />
                 </Link>
+              ) : (
+                <div className="w-9 h-9 sm:w-10 sm:h-10 bg-zinc-800 rounded-full animate-pulse" />
               )}
 
               {/* Menu Button */}
@@ -208,24 +224,52 @@ export default function Header() {
           </div>
 
           {/* Navigation Links */}
-          <nav className="flex-1 p-6">
-            <ul className="space-y-2">
-              {menuItems.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <li key={item.label}>
-                    <Link
-                      href={item.href}
-                      onClick={() => setShowSidebar(false)}
-                      className="flex items-center gap-3 px-4 py-3 rounded-lg text-zinc-400 hover:text-yellow-400 hover:bg-zinc-800 transition-all group"
-                    >
-                      <Icon className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                      <span className="font-medium">{item.label}</span>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
+          <nav className="flex-1 p-6 overflow-y-auto">
+            <div className="space-y-6">
+              {/* Main Menu */}
+              <div>
+                <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-3 px-4">Main Menu</h3>
+                <ul className="space-y-2">
+                  {menuItems.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <li key={item.label}>
+                        <Link
+                          href={item.href}
+                          onClick={() => setShowSidebar(false)}
+                          className="flex items-center gap-3 px-4 py-3 rounded-lg text-zinc-400 hover:text-yellow-400 hover:bg-zinc-800 transition-all group"
+                        >
+                          <Icon className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                          <span className="font-medium">{item.label}</span>
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+
+              {/* Categories */}
+              <div>
+                <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-3 px-4">Categories</h3>
+                <ul className="space-y-2">
+                  {categoryItems.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <li key={item.label}>
+                        <Link
+                          href={item.href}
+                          onClick={() => setShowSidebar(false)}
+                          className="flex items-center gap-3 px-4 py-3 rounded-lg text-zinc-400 hover:text-yellow-400 hover:bg-zinc-800 transition-all group"
+                        >
+                          <Icon className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                          <span className="font-medium">{item.label}</span>
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            </div>
           </nav>
 
           {/* Sidebar Footer */}
@@ -233,7 +277,8 @@ export default function Header() {
             <div className="bg-gradient-to-r from-yellow-500/10 to-yellow-600/10 border border-yellow-500/20 rounded-lg p-4">
               <p className="text-sm text-zinc-400 mb-2">Need help?</p>
               <Link 
-                href="#support" 
+                href="/contact" 
+                onClick={() => setShowSidebar(false)}
                 className="text-yellow-400 hover:text-yellow-300 font-medium text-sm"
               >
                 Contact Support →
