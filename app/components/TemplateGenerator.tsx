@@ -58,6 +58,12 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
       return;
     }
 
+    // Check if user is logged in
+    if (!session) {
+      setShowXPModal(true);
+      return;
+    }
+
     // CHECK XP FIRST BEFORE DOING ANYTHING
     const currentXP = (session?.user as any)?.xpoints || 0;
     const requiredXP = 3;
@@ -305,6 +311,7 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
         onClose={() => setShowXPModal(false)}
         requiredXP={3}
         currentXP={(session?.user as any)?.xpoints || 0}
+        isLoggedIn={!!session}
       />
     </div>
   );

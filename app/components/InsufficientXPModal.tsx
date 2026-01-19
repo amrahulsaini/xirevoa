@@ -1,17 +1,31 @@
 "use client";
 
-import { X, Zap, Check, Crown, Sparkles } from "lucide-react";
+import { X, Zap, Check, Crown, Sparkles, LogIn } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 interface InsufficientXPModalProps {
   isOpen: boolean;
   onClose: () => void;
   requiredXP: number;
   currentXP: number;
+  isLoggedIn?: boolean;
 }
 
-export default function InsufficientXPModal({ isOpen, onClose, requiredXP, currentXP }: InsufficientXPModalProps) {
+export default function InsufficientXPModal({ isOpen, onClose, requiredXP, currentXP, isLoggedIn = true }: InsufficientXPModalProps) {
   const router = useRouter();
+
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -19,6 +33,65 @@ export default function InsufficientXPModal({ isOpen, onClose, requiredXP, curre
     router.push('/pricing');
     onClose();
   };
+
+  const handleLogin = () => {
+    router.push('/auth/login');
+    onClose();
+  };
+
+  // If user is not logged in, show login prompt
+  if (!isLoggedIn) {
+    return (
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 animate-in fade-in duration-200">
+        <div 
+          className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+          onClick={onClose}
+        />
+        <div className="relative bg-gradient-to-br from-zinc-900 via-zinc-900 to-black border-2 border-zinc-800 rounded-2xl w-full max-w-md shadow-2xl animate-in zoom-in-95 duration-300">
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 z-10 p-2 bg-white/5 hover:bg-white/10 rounded-full transition-colors"
+          >
+            <X className="w-5 h-5 text-zinc-400" />
+          </button>
+
+          <div className="relative bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border-b border-zinc-800 p-6">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-yellow-500/20 rounded-full flex items-center justify-center">
+                <LogIn className="w-6 h-6 text-yellow-400" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-white">Login Required</h2>
+                <p className="text-sm text-zinc-400">Sign in to generate images</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-6 space-y-6">
+            <p className="text-zinc-300 text-center">
+              Please log in to your account to start generating AI images. 
+              New users get <span className="text-yellow-400 font-bold">10 free XP</span> to try it out!
+            </p>
+
+            <div className="space-y-3">
+              <button
+                onClick={handleLogin}
+                className="w-full py-3 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-black font-bold rounded-xl transition-all shadow-lg hover:shadow-yellow-500/50"
+              >
+                Login Now
+              </button>
+              <button
+                onClick={() => router.push('/auth/signup')}
+                className="w-full py-3 bg-zinc-800 hover:bg-zinc-700 text-white font-semibold rounded-xl transition-all border border-zinc-700"
+              >
+                Create Account
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const plans = [
     {
@@ -54,7 +127,7 @@ export default function InsufficientXPModal({ isOpen, onClose, requiredXP, curre
   ];
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 animate-in fade-in duration-200 overflow-y-auto">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 animate-in fade-in duration-200">
       {/* Backdrop */}
       <div 
         className="absolute inset-0 bg-black/80 backdrop-blur-sm"
@@ -62,7 +135,7 @@ export default function InsufficientXPModal({ isOpen, onClose, requiredXP, curre
       />
 
       {/* Modal - Responsive horizontal layout */}
-      <div className="relative bg-gradient-to-br from-zinc-900 via-zinc-900 to-black border-2 border-zinc-800 rounded-2xl w-full max-w-4xl overflow-y-auto max-h-[90vh] shadow-2xl animate-in zoom-in-95 duration-300 my-8">
+      <div className="relative bg-gradient-to-br from-zinc-900 via-zinc-900 to-black border-2 border-zinc-800 rounded-2xl w-full max-w-4xl shadow-2xl animate-in zoom-in-95 duration-300 max-h-[85vh] overflow-hidden flex flex-col">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -72,7 +145,7 @@ export default function InsufficientXPModal({ isOpen, onClose, requiredXP, curre
         </button>
 
         {/* Header */}
-        <div className="relative bg-gradient-to-r from-red-500/10 to-orange-500/10 border-b border-zinc-800 p-6">
+        <div className="relative bg-gradient-to-r from-red-500/10 to-orange-500/10 border-b border-zinc-800 p-4 sm:p-6 flex-shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-red-500/20 rounded-full flex items-center justify-center">
               <Zap className="w-6 h-6 text-red-400" />
@@ -84,8 +157,9 @@ export default function InsufficientXPModal({ isOpen, onClose, requiredXP, curre
           </div>
         </div>
 
-        {/* Content */}
-        <div className="p-6">
+        {/* Content - Scrollable */}
+        <div className="overflow-y-auto flex-1">
+        <div className="p-4 sm:p-6">
           {/* XP Status Banner */}
           <div className="bg-zinc-800/50 border border-zinc-700 rounded-xl p-4 mb-6">
             <div className="flex flex-wrap items-center justify-between gap-4">
@@ -201,6 +275,7 @@ export default function InsufficientXPModal({ isOpen, onClose, requiredXP, curre
               </div>
             </div>
           </div>
+        </div>
         </div>
       </div>
     </div>
