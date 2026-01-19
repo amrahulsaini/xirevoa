@@ -5,6 +5,8 @@ import * as os from 'os';
 import * as path from 'path';
 import pool from '@/lib/db';
 import { RowDataPacket } from 'mysql2';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
 interface Template extends RowDataPacket {
   id: number;
@@ -15,16 +17,62 @@ interface Template extends RowDataPacket {
 
 export async function POST(request: NextRequest) {
   try {
+    // Check authentication
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+      return NextResponse.json(
+        { error: 'You must be logged in to generate images' },
+        { status: 401 }
+      );
+    }
+
+    // Check XP balance
+    const userId = session.user.id;
+    const connection = await pool.getConnection();
+    
+    try {
+      const [users] = await connection.query<RowDataPacket[]>(
+        'SELECT xpoints FROM users WHERE id = ?',
+        [userId]
+      );
+
+      if (users.length === 0) {
+        return NextResponse.json(
+          { error: 'User not found' },
+          { status: 404 }
+        );
+      }
+
+      const currentXP = users[0].xpoints;
+      const XP_COST = 3;
+
+      if (currentXP < XP_COST) {
+        return NextResponse.json(
+          { error: `Insufficient XPoints. You need ${XP_COST} XP but only have ${currentXP} XP.` },
+          { status: 403 }
+        );
+      }
+
+      // Deduct XP
+      await connection.query(
+        'UPDATE users SET xpoints = xpoints - ? WHERE id = ?',
+        [XP_COST, userId]
+      );
+
+      console.log(`Deducted ${XP_COST} XP from user ${userId}. New balance: ${currentXP - XP_COST}`);
+    } finally {
+      connection.release();
+    }
+
     const formData = await request.formData();
     const image = formData.get('image') as File;
     const templateId = formData.get('templateId') as string;
-    const customPrompt = formData.get('prompt') as string;
     const isOutfit = formData.get('isOutfit') === 'true';
+    // Removed customPrompt - only use database prompts for security
 
     console.log('=== GENERATE REQUEST START ===');
     console.log('Template ID:', templateId);
     console.log('Is Outfit:', isOutfit);
-    console.log('Custom Prompt:', customPrompt);
     console.log('Image name:', image?.name);
     console.log('Image type:', image?.type);
 
@@ -60,7 +108,6 @@ export async function POST(request: NextRequest) {
       console.log('Using outfit template:', template.title);
       console.log('Template image URL:', templateImagePath);
       console.log('AI Prompt from database:', template.ai_prompt);
-      console.log('Custom prompt provided:', customPrompt);
       console.log('Final prompt being used:', aiPrompt);
     } else {
       // Fetch regular template
@@ -77,11 +124,11 @@ export async function POST(request: NextRequest) {
       }
 
       const template = rows[0];
-      aiPrompt = customPrompt || template.ai_prompt || 'Generate an AI-enhanced image';
+      // Only use database prompt for security - never accept custom prompts
+      aiPrompt = template.ai_prompt || 'Generate an AI-enhanced image';
       
       console.log('Using regular template:', template.title);
       console.log('AI Prompt from database:', template.ai_prompt);
-      console.log('Custom prompt provided:', customPrompt);
       console.log('Final prompt being used:', aiPrompt);
     }
 

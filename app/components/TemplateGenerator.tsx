@@ -79,9 +79,7 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
       generateFormData.append('image', userImage);
       generateFormData.append('templateId', template.id.toString());
       generateFormData.append('isOutfit', isOutfit.toString());
-      if (template.aiPrompt) {
-        generateFormData.append('prompt', template.aiPrompt);
-      }
+      // Don't send prompt - server will handle it securely
 
       const generateRes = await fetch('/api/generate', {
         method: 'POST',
