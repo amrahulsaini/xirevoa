@@ -14,9 +14,10 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
     const token = searchParams.get("token");
+    const baseUrl = process.env.NEXTAUTH_URL || "https://xirevoa.com";
 
     if (!token) {
-      return NextResponse.redirect(new URL("/auth/error?error=invalid_token", request.url));
+      return NextResponse.redirect(new URL("/auth/error?error=invalid_token", baseUrl));
     }
 
     const connection = await pool.getConnection();
@@ -29,13 +30,13 @@ export async function GET(request: NextRequest) {
       );
 
       if (users.length === 0) {
-        return NextResponse.redirect(new URL("/auth/error?error=invalid_token", request.url));
+        return NextResponse.redirect(new URL("/auth/error?error=invalid_token", baseUrl));
       }
 
       const user = users[0];
 
       if (user.email_verified) {
-        return NextResponse.redirect(new URL("/auth/login?verified=already", request.url));
+        return NextResponse.redirect(new URL("/auth/login?verified=already", baseUrl));
       }
 
       // Update user as verified
@@ -44,7 +45,7 @@ export async function GET(request: NextRequest) {
         [user.id]
       );
 
-      return NextResponse.redirect(new URL("/auth/login?verified=success", request.url));
+      return NextResponse.redirect(new URL("/auth/login?verified=success", baseUrl));
     } finally {
       connection.release();
     }
