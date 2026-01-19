@@ -62,7 +62,7 @@ export default function InsufficientXPModal({ isOpen, onClose, requiredXP, curre
       />
 
       {/* Modal - Responsive horizontal layout */}
-      <div className="relative bg-gradient-to-br from-zinc-900 via-zinc-900 to-black border-2 border-zinc-800 rounded-2xl w-full max-w-6xl overflow-y-auto max-h-[90vh] shadow-2xl animate-in zoom-in-95 duration-300 my-8">
+      <div className="relative bg-gradient-to-br from-zinc-900 via-zinc-900 to-black border-2 border-zinc-800 rounded-2xl w-full max-w-4xl overflow-y-auto max-h-[90vh] shadow-2xl animate-in zoom-in-95 duration-300 my-8">
         {/* Close Button */}
         <button
           onClick={onClose}
