@@ -64,14 +64,14 @@ export default async function RelatedTemplates({
 
   return (
     <div className="w-full overflow-x-hidden">
-      <h2 className="text-2xl sm:text-3xl font-black text-white mb-6">
+      <h2 className="text-2xl sm:text-3xl font-black text-white mb-6 px-4 sm:px-6">
         Related Templates
       </h2>
-      <div className="columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-4 space-y-4">
+      <div className="columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-1 space-y-1">
         {templates.map((template) => {
           const slug = template.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
           return (
-            <div key={template.id} className="break-inside-avoid mb-4">
+            <div key={template.id} className="break-inside-avoid mb-1">
               <CategoryCard
                 id={template.id}
                 title={template.title}
