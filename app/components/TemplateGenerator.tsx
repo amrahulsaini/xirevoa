@@ -64,36 +64,30 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
     setProgress(0);
 
     try {
-      // Upload user image
-      setProgress(20);
-      const formData = new FormData();
-      formData.append('file', userImage);
+      // Immediate start
+      setProgress(10);
 
-      const uploadRes = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!uploadRes.ok) {
-        throw new Error('Failed to upload image');
-      }
-
-      const { imageUrl } = await uploadRes.json();
-      setProgress(40);
-
-      // Generate AI image
+      // Generate AI image directly - skip separate upload step
       const generateFormData = new FormData();
       generateFormData.append('image', userImage);
       generateFormData.append('templateId', template.id.toString());
       generateFormData.append('isOutfit', isOutfit.toString());
-      // Don't send prompt - server will handle it securely
+
+      // Quick progress updates during generation
+      const progressInterval = setInterval(() => {
+        setProgress(prev => {
+          if (prev < 70) return prev + 10;
+          return prev;
+        });
+      }, 800);
 
       const generateRes = await fetch('/api/generate', {
         method: 'POST',
         body: generateFormData,
       });
 
-      setProgress(80);
+      clearInterval(progressInterval);
+      setProgress(90);
 
       if (!generateRes.ok) {
         const error = await generateRes.json();

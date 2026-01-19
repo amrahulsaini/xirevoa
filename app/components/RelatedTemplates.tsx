@@ -64,10 +64,10 @@ export default async function RelatedTemplates({
 
   return (
     <div className="w-full">
-      <h2 className="text-2xl sm:text-3xl font-black text-white mb-6 px-4 sm:px-6">
+      <h2 className="text-2xl sm:text-3xl font-black text-white mb-6">
         Related Templates
       </h2>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-0">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
         {templates.map((template) => {
           const slug = template.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
           return (
