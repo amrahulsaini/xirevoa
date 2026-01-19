@@ -74,8 +74,8 @@ export async function POST(request: NextRequest) {
 
       // Create user
       await connection.query(
-        `INSERT INTO users (username, email, password, verification_token, email_verified, coins) 
-         VALUES (?, ?, ?, ?, FALSE, 250)`,
+        `INSERT INTO users (username, email, password, verification_token, email_verified, xpoints) 
+         VALUES (?, ?, ?, ?, FALSE, 20)`,
         [username, email, hashedPassword, verificationToken]
       );
 

@@ -7,7 +7,7 @@ Your Xirevoa website now has a full authentication system with:
 - ✅ Email/Password Registration
 - ✅ Email Verification
 - ✅ Profile Picture Integration
-- ✅ Coin System (250 free coins on signup)
+- ✅ XPoints System (20 free XPoints on signup)
 - ✅ Session Management
 
 ## 📋 Required Setup Steps
@@ -99,7 +99,7 @@ Copy the output and paste it as `NEXTAUTH_SECRET` in `.env.local`
 1. **New User**: Clicks profile icon → "Login" button → Choose Google or Email signup
 2. **Google Users**: Instant login, username from email, Google profile picture
 3. **Email Users**: Signup → Verify email → Login
-4. **Logged In**: Shows profile picture, coins balance, Settings/Sign Out menu
+4. **Logged In**: Shows profile picture, XPoints balance, Settings/Sign Out menu
 
 ## 📧 Email Templates
 
@@ -111,7 +111,7 @@ Beautiful branded emails are sent for:
 
 - Sidebar menu (replaced header buttons)
 - User dropdown menu with profile info
-- Dynamic coin display
+- Dynamic XPoints display
 - Session-aware header (shows Login if not logged in)
 - Profile pictures (Google or default icon)
 
@@ -131,7 +131,7 @@ Beautiful branded emails are sent for:
 - **NEVER use regular Gmail password** - must use App Password
 - **Google OAuth redirect URIs** must match exactly (including http/https)
 - **Email verification links** expire after 24 hours
-- **Default coins**: All new users get 250 coins
+- **Default XPoints**: All new users get 20 XPoints
 
 ## 🔐 Security Features
 
@@ -146,8 +146,8 @@ Beautiful branded emails are sent for:
 You can now implement:
 - Forgot Password page
 - Profile settings page
-- Coin deduction on AI generation
-- Purchase more coins system
+- XPoints deduction on AI generation
+- Purchase more XPoints system
 - User dashboard
 
 ---

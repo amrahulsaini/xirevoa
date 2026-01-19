@@ -13,7 +13,7 @@ interface User extends RowDataPacket {
   profile_picture: string | null;
   provider: string;
   email_verified: boolean;
-  coins: number;
+  xpoints: number;
 }
 
 export const authOptions: NextAuthOptions = {
@@ -68,7 +68,7 @@ export const authOptions: NextAuthOptions = {
             email: user.email,
             name: user.username,
             image: user.profile_picture,
-            coins: user.coins,
+            xpoints: user.xpoints,
           };
         } finally {
           connection.release();
@@ -108,7 +108,7 @@ export const authOptions: NextAuthOptions = {
             // Create new user
             await connection.query(
               `INSERT INTO users (username, email, provider, provider_id, profile_picture, email_verified, coins) 
-               VALUES (?, ?, 'google', ?, ?, TRUE, 250)`,
+               VALUES (?, ?, 'google', ?, ?, TRUE, 20)`,
               [username, user.email, account.providerAccountId, user.image]
             );
           } else {
@@ -132,12 +132,12 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
       }
       
-      // Fetch latest user data including coins
+      // Fetch latest user data including xpoints
       if (token.email) {
         const connection = await pool.getConnection();
         try {
           const [users] = await connection.query<User[]>(
-            "SELECT id, username, email, profile_picture, coins FROM users WHERE email = ?",
+            "SELECT id, username, email, profile_picture, xpoints FROM users WHERE email = ?",
             [token.email]
           );
           
@@ -145,7 +145,7 @@ export const authOptions: NextAuthOptions = {
             token.id = users[0].id.toString();
             token.name = users[0].username;
             token.picture = users[0].profile_picture;
-            token.coins = users[0].coins;
+            token.xpoints = users[0].xpoints;
           }
         } finally {
           connection.release();
@@ -157,7 +157,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
-        session.user.coins = token.coins as number;
+        session.user.xpoints = token.xpoints as number;
       }
       return session;
     },

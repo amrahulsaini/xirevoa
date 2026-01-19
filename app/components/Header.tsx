@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Coins, User, Menu, Search, X, Home, Image as ImageIcon, DollarSign, Sparkles, LogOut, Settings } from "lucide-react";
+import { CircleDollarSign, User, Menu, Search, X, Home, Image as ImageIcon, DollarSign, Sparkles, LogOut, Settings } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
 
@@ -92,11 +92,11 @@ export default function Header() {
                 <Search className="w-5 h-5 sm:w-6 sm:h-6 text-zinc-400" />
               </button>
 
-              {/* Coins - Show only if logged in */}
+              {/* XPoints - Show only if logged in */}
               {session && (
-                <button className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors border border-yellow-500/20">
-                  <Coins className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400 fill-yellow-400/20" />
-                  <span className="text-sm font-bold text-yellow-400">{(session.user as any)?.coins || 250}</span>
+              <button className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors border border-yellow-500/20">
+                <CircleDollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" />
+                <span className="text-sm font-bold text-yellow-400">{(session.user as any)?.xpoints || 20}</span>
                 </button>
               )}
 

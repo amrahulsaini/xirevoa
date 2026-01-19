@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
   provider_id VARCHAR(255) NULL, -- Google user ID
   email_verified BOOLEAN DEFAULT FALSE,
   verification_token VARCHAR(255) NULL,
-  coins INT DEFAULT 250,
+  xpoints INT DEFAULT 20,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   INDEX idx_email (email),

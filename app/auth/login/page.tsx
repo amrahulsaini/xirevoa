@@ -103,7 +103,7 @@ function LoginContent() {
                 </div>
               </div>
               <p className="text-zinc-400 text-sm">
-                You can now sign in to your account and start creating amazing AI transformations with your <span className="text-yellow-400 font-semibold">250 free coins</span>!
+                You can now sign in to your account and start creating amazing AI transformations with your <span className="text-yellow-400 font-semibold">20 free XPoints</span>!
               </p>
             </div>
           )}

@@ -56,7 +56,7 @@ export async function sendVerificationEmail(email: string, token: string, userna
               </p>
               
               <p style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
-                <strong style="color: #fff;">Your welcome bonus: 250 coins 🪙</strong><br>
+                <strong style="color: #fff;">Your welcome bonus: 20 XPoints ⚡</strong><br>
                 Start creating immediately after verification!
               </p>
             </div>
