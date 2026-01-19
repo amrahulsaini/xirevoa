@@ -277,13 +277,43 @@ export async function POST(request: NextRequest) {
         const filepath = path.join(publicDir, filename);
         fs.writeFileSync(filepath, generatedBuffer);
 
+        const generatedImageUrl = `/api/generated/${filename}`;
+
         console.log(`Image saved to: ${filepath}`);
         console.log(`File size: ${generatedBuffer.length} bytes`);
+
+        // Save generation record to database
+        const saveConnection = await pool.getConnection();
+        try {
+          // Get template title
+          const [templates] = await saveConnection.query<Template[]>(
+            'SELECT title FROM templates WHERE id = ?',
+            [templateId]
+          );
+          
+          const templateTitle = templates.length > 0 ? templates[0].title : 'Unknown Template';
+
+          // Save generation record
+          await saveConnection.query(
+            `INSERT INTO generations 
+            (user_id, template_id, template_title, original_image_url, generated_image_url, xp_cost, is_outfit) 
+            VALUES (?, ?, ?, ?, ?, 3, ?)`,
+            [userId, templateId, templateTitle, 'uploaded', generatedImageUrl, isOutfit]
+          );
+
+          console.log('Generation record saved to database');
+        } catch (dbError) {
+          console.error('Failed to save generation record:', dbError);
+          // Don't fail the request if DB save fails
+        } finally {
+          saveConnection.release();
+        }
+
         console.log('=== GENERATION SUCCESS ===');
 
         return NextResponse.json({
           success: true,
-          imageUrl: `/api/generated/${filename}`,
+          imageUrl: generatedImageUrl,
           message: 'Image generated successfully',
         });
       }
