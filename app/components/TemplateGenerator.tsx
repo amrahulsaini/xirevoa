@@ -286,7 +286,7 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
 
       {/* Related Templates Section */}
       {relatedTemplatesSlot && (
-        <div className="w-screen relative left-1/2 right-1/2 -mx-[50vw] mt-8">
+        <div className="mt-12">
           {relatedTemplatesSlot}
         </div>
       )}
