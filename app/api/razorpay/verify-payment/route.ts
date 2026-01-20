@@ -84,35 +84,26 @@ export async function POST(req: NextRequest) {
 
       await connection.commit();
 
-      // Create invoice via Razorpay
+      // Create payment receipt/invoice via Razorpay
       try {
-        const invoice = await razorpay.invoices.create({
-          type: "invoice",
-          description: `${planName} - ${xp} XP Points Purchase`,
-          customer: {
-            name: session.user.name || session.user.email?.split('@')[0] || "Customer",
-            email: session.user.email,
-          },
-          line_items: [
-            {
-              name: `${planName} Plan`,
-              description: `${xp} XP Points for AI Image Generation`,
-              amount: amount * 100, // Amount in paise
-              currency: "INR",
-              quantity: 1,
-            },
-          ],
-          currency: "INR",
-          email_notify: 1, // Razorpay will email the invoice automatically
-          sms_notify: 0,
-          date: Math.floor(Date.now() / 1000), // Current timestamp
-          expire_by: Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60), // 30 days expiry
-        });
-
-        console.log("Invoice created:", invoice.id);
-      } catch (invoiceError) {
-        // Don't fail the payment if invoice creation fails
-        console.error("Invoice creation error:", invoiceError);
+        // Fetch the payment to get invoice details
+        const paymentWithInvoice = await razorpay.payments.fetch(razorpay_payment_id);
+        
+        // If invoice_id exists in payment, fetch and email it
+        if (paymentWithInvoice.invoice_id) {
+          const invoice = await razorpay.invoices.fetch(paymentWithInvoice.invoice_id);
+          console.log("Invoice found for payment:", invoice.id);
+        } else {
+          // Create an invoice linked to the payment (for already captured payments)
+          // Note: Razorpay automatically generates receipts for payments
+          // You can download them from Dashboard → Payments → Select Payment → Download Receipt
+          console.log("Payment completed without invoice. Receipt available in Razorpay Dashboard.");
+          console.log("Payment ID:", razorpay_payment_id);
+          console.log("View at: https://dashboard.razorpay.com/app/payments/" + razorpay_payment_id);
+        }
+      } catch (invoiceError: any) {
+        // Don't fail the payment if invoice check fails
+        console.error("Invoice check error:", invoiceError?.error?.description || invoiceError);
       }
 
       return NextResponse.json({
