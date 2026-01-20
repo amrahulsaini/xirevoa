@@ -283,6 +283,43 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
     }
   };
 
+  const handleViewPromptPreview = async () => {
+    if (!session) {
+      setErrorMessage('Please login to view prompt');
+      return;
+    }
+
+    const currentXP = (session?.user as any)?.xpoints || 0;
+    if (currentXP < 1) {
+      setShowXPModal(true);
+      return;
+    }
+
+    try {
+      // Deduct 1 XP for viewing
+      const res = await fetch('/api/deduct-xp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: 1, reason: 'View AI prompt preview' }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        if (data.error?.includes('Insufficient')) {
+          setShowXPModal(true);
+        } else {
+          setErrorMessage(data.error || 'Failed to view prompt');
+        }
+        return;
+      }
+
+      setShowPromptPreview(true);
+    } catch (error) {
+      console.error('View prompt preview error:', error);
+      setErrorMessage('Failed to view prompt');
+    }
+  };
+
   const handleSaveEditedPrompt = async () => {
     if (!editedPrompt.trim() || !session) {
       return;
@@ -489,10 +526,10 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
               
               {!showPromptPreview ? (
                 <button
-                  onClick={() => setShowPromptPreview(true)}
+                  onClick={handleViewPromptPreview}
                   className="w-full px-4 py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-semibold transition-colors"
                 >
-                  View AI Prompt (Free Preview)
+                  View AI Prompt (1 XP)
                 </button>
               ) : (
                 <div className="space-y-4">
