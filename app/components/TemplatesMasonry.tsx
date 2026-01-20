@@ -7,13 +7,14 @@ interface TemplateRow extends RowDataPacket {
   id: number;
   title: string;
   image_url: string;
+  tags: string | null;
   coming_soon: boolean;
 }
 
 async function getTemplates(currentTemplateId: number) {
   try {
     const [rows] = await pool.query<TemplateRow[]>(
-      "SELECT id, title, image_url, coming_soon FROM templates WHERE is_active = TRUE AND id != ? ORDER BY display_order ASC",
+      "SELECT id, title, image_url, tags, coming_soon FROM templates WHERE is_active = TRUE AND id != ? ORDER BY display_order ASC",
       [currentTemplateId]
     );
     return rows;
@@ -25,10 +26,32 @@ async function getTemplates(currentTemplateId: number) {
 
 export default async function TemplatesMasonry({
   currentTemplateId,
+  tags,
 }: {
   currentTemplateId: number;
+  tags?: string;
 }) {
-  const templates = await getTemplates(currentTemplateId);
+  const rows = await getTemplates(currentTemplateId);
+
+  const tagArray = (tags || "")
+    .split(",")
+    .map((t) => t.trim())
+    .filter(Boolean);
+
+  const templates = tagArray.length
+    ? (() => {
+        const related: TemplateRow[] = [];
+        const others: TemplateRow[] = [];
+        for (const row of rows) {
+          const hasMatch = tagArray.some((tag) =>
+            (row.tags || "").toLowerCase().includes(tag.toLowerCase())
+          );
+          if (hasMatch) related.push(row);
+          else others.push(row);
+        }
+        return [...related, ...others];
+      })()
+    : rows;
 
   if (templates.length === 0) return null;
 
