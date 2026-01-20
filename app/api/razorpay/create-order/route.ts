@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     const options = {
       amount: amount * 100, // amount in paise (INR)
       currency: "INR",
-      receipt: `receipt_${Date.now()}_${session.user.email}`,
+      receipt: `rcpt_${Date.now()}`, // Max 40 chars
       notes: {
         user_email: session.user.email,
         plan_name: planName,
