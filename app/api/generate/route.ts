@@ -317,6 +317,13 @@ export async function POST(request: NextRequest) {
         console.log(`Image saved to: ${filepath}`);
         console.log(`File size: ${generatedBuffer.length} bytes`);
 
+        // Save the user's original uploaded image too
+        const originalFilename = `original-${Date.now()}.${image.type.split('/')[1] || 'jpg'}`;
+        const originalFilepath = path.join(publicDir, originalFilename);
+        fs.writeFileSync(originalFilepath, buffer);
+        const originalImageUrl = `/api/generated/${originalFilename}`;
+        console.log(`Original image saved to: ${originalFilepath}`);
+
         // Save generation record to database
         let generationId: number | null = null;
         const saveConnection = await pool.getConnection();
@@ -329,12 +336,12 @@ export async function POST(request: NextRequest) {
           
           const templateTitle = templates.length > 0 ? templates[0].title : 'Unknown Template';
 
-          // Save generation record
+          // Save generation record with actual original image URL
           const [insertResult]: any = await saveConnection.query(
             `INSERT INTO generations 
             (user_id, template_id, template_title, original_image_url, generated_image_url, xp_cost, is_outfit, prompt_used, model_used) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [userId, templateId, templateTitle, 'uploaded', generatedImageUrl, XP_COST, isOutfit, aiPrompt, modelName]
+            [userId, templateId, templateTitle, originalImageUrl, generatedImageUrl, XP_COST, isOutfit, aiPrompt, modelName]
           );
 
           generationId = insertResult.insertId;
