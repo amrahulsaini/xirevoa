@@ -372,6 +372,7 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
       setErrorMessage('Failed to view prompt');
     }
   };
+  
   const handleSaveEditedPrompt = async () => {
     if (!editedPrompt.trim() || !session) {
       return;
@@ -388,7 +389,7 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
       const res = await fetch('/api/deduct-xp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: 1, reason: 'Edit prompt before generation' }),
+        body: JSON.stringify({ amount: 1, reason: 'Customize prompt before generation' }),
       });
 
       if (!res.ok) {
@@ -396,16 +397,16 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
         if (data.error?.includes('Insufficient')) {
           setShowXPModal(true);
         } else {
-          setErrorMessage(data.error || 'Failed to edit prompt');
+          setErrorMessage(data.error || 'Failed to customize prompt');
         }
         return;
       }
 
-      setPromptEdited(true);
-      setShowPromptPreview(false);
+      // XP deducted successfully - prompt will be used in generation
+      setErrorMessage(null);
     } catch (error) {
-      console.error('Edit prompt error:', error);
-      setErrorMessage('Failed to edit prompt');
+      console.error('Customize prompt error:', error);
+      setErrorMessage('Failed to customize prompt');
     }
   };
 
@@ -596,14 +597,58 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
                 </button>
               ) : (
                 <div className="space-y-4">
-                  {/* Fixed height card with scrolling */}
-                  <div className="bg-zinc-800 rounded-xl p-4 h-32 overflow-y-auto border border-zinc-700">
-                    <p className="text-sm text-zinc-300 whitespace-pre-wrap leading-relaxed">{template.aiPrompt}</p>
-                  </div>
-                  
-                  <p className="text-xs text-zinc-400 text-center">
-                    You can customize this prompt after generation for 1 XP
-                  </p>
+                  {!promptEdited ? (
+                    <>
+                      {/* Fixed height card with scrolling */}
+                      <div className="bg-zinc-800 rounded-xl p-4 h-32 overflow-y-auto border border-zinc-700">
+                        <p className="text-sm text-zinc-300 whitespace-pre-wrap leading-relaxed">{template.aiPrompt}</p>
+                      </div>
+                      
+                      <button
+                        onClick={() => {
+                          setEditedPrompt(template.aiPrompt || '');
+                          setPromptEdited(true);
+                        }}
+                        className="w-full px-4 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 text-white font-bold transition-all shadow-lg flex items-center justify-center gap-2"
+                      >
+                        <Edit3 className="w-4 h-4" />
+                        Customize Prompt (1 XP)
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <div className="space-y-3">
+                        <label className="block text-sm font-semibold text-white">
+                          Custom Prompt:
+                        </label>
+                        <textarea
+                          value={editedPrompt}
+                          onChange={(e) => setEditedPrompt(e.target.value)}
+                          rows={6}
+                          className="w-full px-4 py-3 rounded-xl bg-zinc-800 border border-zinc-700 text-white focus:border-yellow-500 focus:outline-none resize-none"
+                          placeholder="Enter your custom prompt..."
+                        />
+                        <div className="flex gap-3">
+                          <button
+                            onClick={handleSaveEditedPrompt}
+                            disabled={!editedPrompt.trim()}
+                            className="flex-1 px-4 py-3 rounded-xl bg-yellow-500 hover:bg-yellow-600 text-black font-bold transition-colors disabled:opacity-50"
+                          >
+                            Save & Use (1 XP)
+                          </button>
+                          <button
+                            onClick={() => {
+                              setPromptEdited(false);
+                              setEditedPrompt('');
+                            }}
+                            className="px-4 py-3 rounded-xl border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-white font-semibold transition-colors"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
             </div>
