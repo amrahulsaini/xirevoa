@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Upload, Wand2, Download, RefreshCw, Maximize2, X, Edit3, Sparkles, ArrowRight, Settings, Check } from "lucide-react";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
@@ -27,6 +27,7 @@ interface TemplateGeneratorProps {
 
 export default function TemplateGenerator({ template, isOutfit = false, tags = '' }: TemplateGeneratorProps) {
   const { data: session } = useSession();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [userImage, setUserImage] = useState<File | null>(null);
   const [userImagePreview, setUserImagePreview] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
@@ -39,11 +40,13 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
   const [modelIdUsed, setModelIdUsed] = useState<string>(''); // Track model ID for refinement
   const [showPromptEditor, setShowPromptEditor] = useState(false);
   const [customPrompt, setCustomPrompt] = useState('');
+  const [isDragging, setIsDragging] = useState(false);
+  const [showModelPicker, setShowModelPicker] = useState(false);
+  const [savingDefaultModel, setSavingDefaultModel] = useState(false);
   
   // Model selection
   const [models, setModels] = useState<Model[]>([]);
   const [selectedModel, setSelectedModel] = useState<string>('gemini-2.0-flash-exp');
-  const [saveAsDefault, setSaveAsDefault] = useState(false);
   const [loadingModels, setLoadingModels] = useState(true);
   
 
@@ -70,19 +73,14 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
     }
   }, [session]);
 
-
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!file.type.startsWith('image/')) {
-      setErrorMessage('Please upload an image file');
+  const applyUserImageFile = (file: File) => {
+    if (!file.type.startsWith("image/")) {
+      setErrorMessage("Please upload an image file");
       return;
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      setErrorMessage('Image size should be less than 10MB');
+      setErrorMessage("Image size should be less than 10MB");
       return;
     }
 
@@ -93,6 +91,43 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
       setUserImagePreview(reader.result as string);
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    applyUserImageFile(file);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const file = e.dataTransfer.files?.[0];
+    if (!file) return;
+    applyUserImageFile(file);
+  };
+
+  const handleSaveDefaultModel = async () => {
+    if (!session) {
+      setShowXPModal(true);
+      return;
+    }
+
+    if (!selectedModel) return;
+
+    setSavingDefaultModel(true);
+    try {
+      await fetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ preferredModel: selectedModel }),
+      });
+    } finally {
+      setSavingDefaultModel(false);
+      setShowModelPicker(false);
+    }
   };
 
   const handleGenerate = async () => {
@@ -122,15 +157,6 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
 
     try {
       setProgress(10);
-
-      // Save model preference if checkbox is checked
-      if (saveAsDefault && selectedModel) {
-        await fetch('/api/settings', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ preferredModel: selectedModel }),
-        });
-      }
 
       const generateFormData = new FormData();
       generateFormData.append('image', userImage);
@@ -184,6 +210,7 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
     setModelUsed('');
     setCustomPrompt('');
     setShowPromptEditor(false);
+    setShowModelPicker(false);
   };
 
   const handleEditPrompt = async () => {
@@ -264,164 +291,168 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
   const selectedModelData = models.find(m => m.model_id === selectedModel);
 
   return (
-    <div className="max-w-7xl mx-auto overflow-x-hidden px-4">
+    <div className="w-full overflow-x-hidden">
       {errorMessage && (
         <div className="mb-6 bg-red-500/10 border border-red-500/30 rounded-xl p-4 text-center">
           <p className="text-red-400 font-medium">{errorMessage}</p>
         </div>
       )}
 
-      <div className="text-center mb-8">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-4">
-          {template.title}
-        </h1>
-        <p className="text-zinc-400 text-lg max-w-2xl mx-auto">{template.description}</p>
-      </div>
+      {/* Compact top row: Template mini-card + Upload dropzone */}
+      {!generating && !generatedImage && (
+        <div className="mb-6 space-y-4">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="w-full sm:w-44 shrink-0 rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
+              <div className="relative aspect-square overflow-hidden rounded-xl border border-zinc-800">
+                <img src={template.image} alt={template.title} className="w-full h-full object-cover" />
+              </div>
+              <div className="mt-3">
+                <p className="text-xs font-semibold text-zinc-300">Template</p>
+                <p className="text-sm font-bold text-white line-clamp-2">{template.title}</p>
+              </div>
+            </div>
 
-      {/* Desktop Layout: Upload & Models on Left, Related Templates on Right */}
-      {!generatedImage && !generating && (
-        <div className="grid lg:grid-cols-[2fr_1fr] gap-6 mb-8">
-          {/* Left Column: Upload + Model Selector */}
-          <div className="space-y-6">
-            {/* Upload Area */}
-            <div className="bg-zinc-900 rounded-2xl p-6 border border-zinc-800">
-              <h3 className="text-lg font-bold text-yellow-400 mb-4">📸 Upload Your Photo</h3>
+            <div
+              className={`flex-1 rounded-2xl border bg-zinc-900 p-4 ${
+                isDragging ? "border-yellow-400" : "border-zinc-800"
+              }`}
+              onDragOver={(e) => {
+                e.preventDefault();
+                setIsDragging(true);
+              }}
+              onDragLeave={() => setIsDragging(false)}
+              onDrop={handleDrop}
+              onClick={() => fileInputRef.current?.click()}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") fileInputRef.current?.click();
+              }}
+            >
               {userImagePreview ? (
-                <div className="space-y-4">
-                  <div className="relative aspect-square max-w-md mx-auto rounded-xl overflow-hidden border-2 border-zinc-700">
-                    <img src={userImagePreview} alt="Your photo" className="w-full h-full object-cover" />
+                <div className="flex items-center gap-4">
+                  <div className="relative w-24 h-24 rounded-xl overflow-hidden border border-zinc-800">
+                    <img src={userImagePreview} alt="Your upload" className="w-full h-full object-cover" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-white">Photo selected</p>
+                    <p className="text-xs text-zinc-400">Click to replace • or drag & drop</p>
                     <button
-                      onClick={() => {
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
                         setUserImage(null);
                         setUserImagePreview(null);
                       }}
-                      className="absolute top-2 right-2 bg-red-600 text-white w-8 h-8 rounded-full hover:bg-red-700 flex items-center justify-center font-bold"
+                      className="mt-2 text-xs font-semibold text-red-400"
                     >
-                      ×
+                      Remove
                     </button>
                   </div>
                 </div>
               ) : (
-                <label className="block aspect-square max-w-md mx-auto border-2 border-dashed border-zinc-700 rounded-xl cursor-pointer hover:border-yellow-400 transition-colors">
-                  <div className="h-full flex flex-col items-center justify-center p-8">
-                    <Upload className="w-20 h-20 text-zinc-600 mb-4" />
-                    <span className="text-zinc-400 text-center font-bold text-lg mb-2">
-                      Click to upload your photo
-                    </span>
-                    <span className="text-sm text-zinc-500">Max 10MB • JPG, PNG, WEBP</span>
+                <div className="h-full min-h-[120px] flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-zinc-800 flex items-center justify-center">
+                    <Upload className="w-6 h-6 text-zinc-300" />
                   </div>
-                  <input
-                    type="file"
-                    className="hidden"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                  />
-                </label>
+                  <div>
+                    <p className="text-sm font-bold text-white">Upload your photo</p>
+                    <p className="text-xs text-zinc-400">Drag & drop here, or click to choose (max 10MB)</p>
+                  </div>
+                </div>
               )}
-            </div>
 
-            {/* Model Selector */}
-            <div className="bg-gradient-to-br from-purple-900/40 to-blue-900/40 border-2 border-purple-500/40 rounded-2xl p-6 shadow-lg shadow-purple-500/20">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
-                  <Settings className="w-5 h-5 text-purple-400" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-black text-white">Choose AI Model</h3>
-                  <p className="text-xs text-purple-300">Select the best model for your needs</p>
-                </div>
-              </div>
-              
-              {loadingModels ? (
-                <div className="text-center py-8">
-                  <div className="inline-block w-8 h-8 border-3 border-purple-400 border-t-transparent rounded-full animate-spin"></div>
-                  <p className="text-sm text-purple-300 mt-3">Loading models...</p>
-                </div>
-              ) : (
-                <>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
-                    {models.map((model) => (
-                      <button
-                        key={model.model_id}
-                        onClick={() => model.is_active && setSelectedModel(model.model_id)}
-                        disabled={!model.is_active}
-                        className={`relative p-5 rounded-xl border-2 transition-all ${
-                          selectedModel === model.model_id && model.is_active
-                            ? 'border-purple-400 bg-purple-500/30 shadow-lg shadow-purple-500/30'
-                            : model.is_active
-                            ? 'border-zinc-700 bg-zinc-800/50 hover:border-purple-400/50 hover:bg-zinc-800'
-                            : 'border-zinc-800 bg-zinc-900/50 opacity-50 cursor-not-allowed'
-                        }`}
-                      >
-                        {selectedModel === model.model_id && model.is_active && (
-                          <div className="absolute top-3 right-3 w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
-                            <Check className="w-4 h-4 text-white" />
-                          </div>
-                        )}
-                        <div className="text-left">
-                          <p className="font-black text-white text-base mb-1">{model.model_name}</p>
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-bold text-purple-400">{model.xp_cost} XP</span>
-                            {!model.is_active && (
-                              <span className="text-xs px-2 py-0.5 bg-zinc-700 text-zinc-400 rounded-full">Coming Soon</span>
-                            )}
-                          </div>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                  
-                  {session && userImage && (
-                    <div className="space-y-3">
-                      <label className="flex items-center gap-2 cursor-pointer p-3 bg-zinc-800/50 rounded-lg hover:bg-zinc-800 transition-colors">
-                        <input
-                          type="checkbox"
-                          checked={saveAsDefault}
-                          onChange={(e) => setSaveAsDefault(e.target.checked)}
-                          className="w-4 h-4 rounded border-zinc-600 bg-zinc-900 text-purple-500 focus:ring-purple-500 focus:ring-offset-0"
-                        />
-                        <span className="text-sm text-zinc-300 font-medium">Save as my default model</span>
-                      </label>
-                      
-                      <button
-                        onClick={handleGenerate}
-                        disabled={!userImage || generating}
-                        className="w-full px-6 py-5 bg-gradient-to-r from-yellow-400 via-orange-500 to-yellow-400 hover:from-yellow-500 hover:via-orange-600 hover:to-yellow-500 text-black font-black rounded-xl hover:shadow-2xl hover:shadow-yellow-500/50 transition-all transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-3 text-lg"
-                      >
-                        <Wand2 className="w-6 h-6" />
-                        Generate with {selectedModelData?.model_name || 'AI'} ({selectedModelData?.xp_cost || 3} XP)
-                      </button>
-                    </div>
-                  )}
-                  
-                  {!session && (
-                    <p className="text-xs text-zinc-500 text-center mt-4 p-3 bg-zinc-800/30 rounded-lg">
-                      💡 Sign in to save your preferences and track your generations
-                    </p>
-                  )}
-                </>
-              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                className="hidden"
+                accept="image/*"
+                onChange={handleImageUpload}
+              />
             </div>
           </div>
 
-          {/* Right Column: Template Preview */}
-          <div className="bg-zinc-900 rounded-2xl p-6 border border-zinc-800 lg:sticky lg:top-24 lg:self-start">
-            <h3 className="text-lg font-bold text-yellow-400 mb-4">✨ Template Preview</h3>
-            <div className="relative aspect-square rounded-xl overflow-hidden border-2 border-zinc-700 mb-4">
-              <img 
-                src={template.image} 
-                alt={template.title} 
-                className="w-full h-full object-cover"
-              />
+          {/* Actions row */}
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowModelPicker((v) => !v)}
+                className="w-full sm:w-auto px-4 py-3 rounded-xl border border-zinc-800 bg-zinc-900 text-white font-semibold flex items-center gap-2"
+              >
+                <Settings className="w-4 h-4" />
+                Models
+                {selectedModelData ? (
+                  <span className="text-xs text-zinc-400">({selectedModelData.model_name})</span>
+                ) : null}
+              </button>
+
+              {showModelPicker && (
+                <div className="absolute z-20 mt-2 w-full sm:w-[360px] rounded-2xl border border-zinc-800 bg-zinc-950 p-3">
+                  {loadingModels ? (
+                    <p className="text-sm text-zinc-400">Loading models…</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {models.map((model) => (
+                        <button
+                          key={model.model_id}
+                          type="button"
+                          disabled={!model.is_active}
+                          onClick={() => {
+                            if (!model.is_active) return;
+                            setSelectedModel(model.model_id);
+                            if (generatedImage) setModelIdUsed(model.model_id);
+                          }}
+                          className={`w-full text-left px-3 py-2 rounded-xl border ${
+                            selectedModel === model.model_id
+                              ? "border-yellow-500 bg-zinc-900"
+                              : "border-zinc-800 bg-zinc-950"
+                          } ${model.is_active ? "text-white" : "text-zinc-600"}`}
+                        >
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="text-sm font-semibold">{model.model_name}</span>
+                            <span className="text-xs text-zinc-400">{model.xp_cost} XP</span>
+                          </div>
+                          {!model.is_active ? (
+                            <div className="mt-1 text-xs text-zinc-600">Coming soon</div>
+                          ) : null}
+                        </button>
+                      ))}
+
+                      <div className="pt-2 flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={handleSaveDefaultModel}
+                          disabled={savingDefaultModel || !session}
+                          className="flex-1 px-4 py-2 rounded-xl bg-yellow-500 text-black font-bold disabled:opacity-60"
+                        >
+                          {savingDefaultModel ? "Saving…" : "Save as default"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setShowModelPicker(false)}
+                          className="px-4 py-2 rounded-xl border border-zinc-800 text-white"
+                        >
+                          Close
+                        </button>
+                      </div>
+                      {!session ? (
+                        <p className="text-xs text-zinc-500 pt-2">Sign in to save a default model.</p>
+                      ) : null}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
-            <div className="space-y-2 text-sm">
-              <p className="text-zinc-400">
-                <span className="text-zinc-500 font-medium">Style:</span> {template.title}
-              </p>
-              <p className="text-zinc-400">
-                <span className="text-zinc-500 font-medium">Type:</span> {isOutfit ? 'Outfit Transformation' : 'AI Generation'}
-              </p>
-            </div>
+
+            <button
+              onClick={handleGenerate}
+              disabled={!userImage || generating}
+              className="w-full sm:flex-1 px-5 py-3 rounded-xl bg-yellow-500 text-black font-black flex items-center justify-center gap-2 disabled:opacity-60"
+            >
+              <Wand2 className="w-5 h-5" />
+              Generate ({selectedModelData?.xp_cost || 3} XP)
+            </button>
           </div>
         </div>
       )}
@@ -564,6 +595,78 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
                   <Download className="w-5 h-5" />
                   Download
                 </a>
+              </div>
+
+              {/* Models */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setShowModelPicker((v) => !v)}
+                  className="w-full px-6 py-4 bg-zinc-900 border border-zinc-800 text-white font-black rounded-xl flex items-center justify-center gap-2"
+                >
+                  <Settings className="w-5 h-5" />
+                  Models
+                  {selectedModelData ? (
+                    <span className="text-xs text-zinc-400">({selectedModelData.model_name})</span>
+                  ) : null}
+                </button>
+
+                {showModelPicker && (
+                  <div className="absolute z-20 mt-2 w-full rounded-2xl border border-zinc-800 bg-zinc-950 p-3">
+                    {loadingModels ? (
+                      <p className="text-sm text-zinc-400">Loading models…</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {models.map((model) => (
+                          <button
+                            key={model.model_id}
+                            type="button"
+                            disabled={!model.is_active}
+                            onClick={() => {
+                              if (!model.is_active) return;
+                              setSelectedModel(model.model_id);
+                              setModelIdUsed(model.model_id);
+                            }}
+                            className={`w-full text-left px-3 py-2 rounded-xl border ${
+                              selectedModel === model.model_id
+                                ? "border-yellow-500 bg-zinc-900"
+                                : "border-zinc-800 bg-zinc-950"
+                            } ${model.is_active ? "text-white" : "text-zinc-600"}`}
+                          >
+                            <div className="flex items-center justify-between gap-3">
+                              <span className="text-sm font-semibold">{model.model_name}</span>
+                              <span className="text-xs text-zinc-400">{model.xp_cost} XP</span>
+                            </div>
+                            {!model.is_active ? (
+                              <div className="mt-1 text-xs text-zinc-600">Coming soon</div>
+                            ) : null}
+                          </button>
+                        ))}
+
+                        <div className="pt-2 flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={handleSaveDefaultModel}
+                            disabled={savingDefaultModel || !session}
+                            className="flex-1 px-4 py-2 rounded-xl bg-yellow-500 text-black font-bold disabled:opacity-60"
+                          >
+                            {savingDefaultModel ? "Saving…" : "Save as default"}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setShowModelPicker(false)}
+                            className="px-4 py-2 rounded-xl border border-zinc-800 text-white"
+                          >
+                            Close
+                          </button>
+                        </div>
+                        {!session ? (
+                          <p className="text-xs text-zinc-500 pt-2">Sign in to save a default model.</p>
+                        ) : null}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
               
               {/* Secondary Actions */}
