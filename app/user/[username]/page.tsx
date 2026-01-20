@@ -60,6 +60,43 @@ export default async function ProfilePage({ params }: { params: { username: stri
   const session = await getServerSession(authOptions);
   const username = params.username;
 
+  console.log('Profile page accessed - username:', username);
+  console.log('Params:', JSON.stringify(params));
+
+  if (!username || username.trim() === '') {
+    return (
+      <div className="min-h-screen bg-black">
+        <div className="fixed inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute w-96 h-96 bg-purple-500/10 rounded-full blur-3xl -top-48 -left-48 animate-pulse" />
+          <div className="absolute w-96 h-96 bg-blue-500/10 rounded-full blur-3xl top-1/2 -right-48 animate-pulse delay-1000" />
+        </div>
+
+        <div className="relative z-10">
+          <Header />
+          <div className="h-16 sm:h-20"></div>
+          
+          <div className="container mx-auto px-4 sm:px-6 py-16 text-center">
+            <div className="max-w-md mx-auto bg-gradient-to-br from-zinc-900/80 to-black/80 backdrop-blur-xl rounded-3xl border border-zinc-800 p-12">
+              <div className="text-6xl mb-4">❌</div>
+              <h1 className="text-3xl font-black text-white mb-2">Invalid Profile URL</h1>
+              <p className="text-zinc-400 mb-6">
+                Please provide a valid username in the URL: /user/username
+              </p>
+              <a
+                href="/"
+                className="inline-block bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold px-6 py-3 rounded-xl transition-all hover:scale-105"
+              >
+                Go to Homepage
+              </a>
+            </div>
+          </div>
+
+          <Footer />
+        </div>
+      </div>
+    );
+  }
+
   const userData = await getUserByUsername(username);
 
   if (!userData) {
