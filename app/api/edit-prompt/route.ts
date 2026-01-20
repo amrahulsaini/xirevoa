@@ -161,13 +161,7 @@ export async function POST(request: NextRequest) {
 
     const imageUrl = `/generated/${filename}`;
 
-    // Insert generation record
-    await pool.query<ResultSetHeader>(
-      'INSERT INTO generations (user_id, template_id, template_title, original_image_url, generated_image_url, xp_cost, is_outfit, model_used) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-      [userId, null, 'Refined Image', 'refined', imageUrl, EDIT_COST, false, modelName]
-    );
-
-    // Deduct XP
+    // Deduct XP (don't insert into generations - this is a refinement, not a new generation)
     await pool.query(
       'UPDATE users SET xpoints = xpoints - ? WHERE id = ?',
       [EDIT_COST, userId]
