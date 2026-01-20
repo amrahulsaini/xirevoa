@@ -6,7 +6,7 @@ import { GoogleGenAI } from '@google/genai';
 import { RowDataPacket, ResultSetHeader } from 'mysql2';
 
 const genAI = new GoogleGenAI({});
-const EDIT_COST = 1; // Editing costs 1 XP
+const EDIT_COST = 3; // Editing costs 3 XP
 
 interface UserSettingsRow extends RowDataPacket {
   preferred_model: string;

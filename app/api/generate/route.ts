@@ -28,11 +28,19 @@ export async function POST(request: NextRequest) {
 
     // Get user's preferred model and check XP balance
     const userId = session.user.id;
+    
+    // Get form data first
+    const formData = await request.formData();
+    const image = formData.get('image') as File;
+    const templateId = formData.get('templateId') as string;
+    const isOutfit = formData.get('isOutfit') === 'true';
+    const selectedModel = formData.get('selectedModel') as string | null;
+    
     const connection = await pool.getConnection();
     
-    let preferredModel = 'gemini-2.5-flash-image';
+    let preferredModel = 'gemini-2.0-flash-exp';
     let XP_COST = 3;
-    let modelName = 'Gemini 2.5 Flash';
+    let modelName = 'Gemini 2.0 Flash';
     
     try {
       // Get user settings and XP in one query
@@ -48,13 +56,16 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Get user's preferred model settings
-      const [settingsRows] = await connection.query<RowDataPacket[]>(
-        'SELECT preferred_model FROM user_settings WHERE user_id = ?',
-        [userId]
-      );
-
-      preferredModel = settingsRows.length > 0 ? settingsRows[0].preferred_model : 'gemini-2.5-flash-image';
+      // Use selectedModel from form, or fall back to user's preferred model
+      if (selectedModel) {
+        preferredModel = selectedModel;
+      } else {
+        const [settingsRows] = await connection.query<RowDataPacket[]>(
+          'SELECT preferred_model FROM user_settings WHERE user_id = ?',
+          [userId]
+        );
+        preferredModel = settingsRows.length > 0 ? settingsRows[0].preferred_model : 'gemini-2.0-flash-exp';
+      }
 
       // Get model XP cost
       const [modelRows] = await connection.query<RowDataPacket[]>(
@@ -90,12 +101,6 @@ export async function POST(request: NextRequest) {
     } finally {
       connection.release();
     }
-
-    const formData = await request.formData();
-    const image = formData.get('image') as File;
-    const templateId = formData.get('templateId') as string;
-    const isOutfit = formData.get('isOutfit') === 'true';
-    // Removed customPrompt - only use database prompts for security
 
     console.log('=== GENERATE REQUEST START ===');
     console.log('Template ID:', templateId);
