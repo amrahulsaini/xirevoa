@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
 
     const imageData = response.candidates?.[0]?.content?.parts?.[0];
     
-    if (!imageData || !('inlineData' in imageData)) {
+    if (!imageData || !imageData.inlineData || !imageData.inlineData.data) {
       throw new Error('No image generated');
     }
 
