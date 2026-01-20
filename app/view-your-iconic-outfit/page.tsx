@@ -120,7 +120,7 @@ export default async function ViewYourIconicOutfitPage() {
     <div className="min-h-screen bg-black">
       <Header />
       
-      <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 pt-32">
+      <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 pt-28 sm:pt-36 md:pt-40">
         {/* Header Section */}
         <div className="text-center mb-12">
           <div className="inline-block relative mb-6 animate-pulse">
