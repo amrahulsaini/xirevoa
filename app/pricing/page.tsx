@@ -24,7 +24,64 @@ export default function PricingPage() {
     planName: string;
     amount: number;
   } | null>(null);
-
+  const plans = [
+    {
+      name: "Starter",
+      xp: 100,
+      price: 1,
+      popular: false,
+      features: [
+        "100 XP Points",
+        "~33 AI Image Generations",
+        "Access to 500+ Templates",
+        "HD Quality (2K Resolution)",
+        "No Watermarks",
+        "Instant Generation",
+        "24/7 Support"
+      ],
+      gradient: "from-blue-500 to-cyan-500",
+      icon: Zap
+    },
+    {
+      name: "Professional",
+      xp: 300,
+      price: 249,
+      popular: true,
+      features: [
+        "300 XP Points",
+        "~100 AI Image Generations",
+        "Access to 500+ Templates",
+        "Ultra HD Quality (4K Resolution)",
+        "No Watermarks",
+        "Priority Processing",
+        "Advanced Templates",
+        "24/7 Priority Support",
+        "Bulk Downloads"
+      ],
+      gradient: "from-yellow-400 to-orange-500",
+      icon: Crown
+    },
+    {
+      name: "Creator Pro",
+      xp: 500,
+      price: 400,
+      popular: false,
+      features: [
+        "500 XP Points",
+        "~166 AI Image Generations",
+        "Access to 500+ Templates",
+        "Maximum Quality (8K Resolution)",
+        "No Watermarks",
+        "Fastest Processing",
+        "Exclusive Templates",
+        "Early Access to New Features",
+        "Bulk Downloads",
+        "VIP Support"
+      ],
+      gradient: "from-purple-500 to-pink-500",
+      icon: Sparkles
+    }
+  ];
   const handlePayment = async (plan: typeof plans[0]) => {
     if (status === "unauthenticated") {
       router.push("/auth/login");
@@ -135,64 +192,6 @@ export default function PricingPage() {
       setLoading(null);
     }
   };
-  const plans = [
-    {
-      name: "Starter",
-      xp: 100,
-      price: 1,
-      popular: false,
-      features: [
-        "100 XP Points",
-        "~33 AI Image Generations",
-        "Access to 500+ Templates",
-        "HD Quality (2K Resolution)",
-        "No Watermarks",
-        "Instant Generation",
-        "24/7 Support"
-      ],
-      gradient: "from-blue-500 to-cyan-500",
-      icon: Zap
-    },
-    {
-      name: "Professional",
-      xp: 300,
-      price: 249,
-      popular: true,
-      features: [
-        "300 XP Points",
-        "~100 AI Image Generations",
-        "Access to 500+ Templates",
-        "Ultra HD Quality (4K Resolution)",
-        "No Watermarks",
-        "Priority Processing",
-        "Advanced Templates",
-        "24/7 Priority Support",
-        "Bulk Downloads"
-      ],
-      gradient: "from-yellow-400 to-orange-500",
-      icon: Crown
-    },
-    {
-      name: "Creator Pro",
-      xp: 500,
-      price: 400,
-      popular: false,
-      features: [
-        "500 XP Points",
-        "~166 AI Image Generations",
-        "Access to 500+ Templates",
-        "Maximum Quality (8K Resolution)",
-        "No Watermarks",
-        "Fastest Processing",
-        "Exclusive Templates",
-        "Early Access to New Features",
-        "Bulk Downloads",
-        "VIP Support"
-      ],
-      gradient: "from-purple-500 to-pink-500",
-      icon: Sparkles
-    }
-  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-zinc-900 to-black">
