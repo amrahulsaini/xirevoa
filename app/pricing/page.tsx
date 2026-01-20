@@ -2,7 +2,7 @@
 
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import { Check, Zap, Crown, Sparkles, TrendingUp } from "lucide-react";
+import { Check, Zap, Crown, Sparkles, TrendingUp, CheckCircle, X } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -17,6 +17,13 @@ export default function PricingPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [loading, setLoading] = useState<string | null>(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successData, setSuccessData] = useState<{
+    xpAdded: number;
+    newBalance: number;
+    planName: string;
+    amount: number;
+  } | null>(null);
 
   const handlePayment = async (plan: typeof plans[0]) => {
     if (status === "unauthenticated") {
@@ -74,19 +81,34 @@ export default function PricingPage() {
             const verifyData = await verifyResponse.json();
 
             if (verifyData.success) {
-              // Show success message
-              alert(
-                `🎉 Payment Successful!\n\n${plan.xp} XP Points have been added to your account.\n\nNew Balance: ${verifyData.newBalance} XP`
-              );
-              // Refresh the page to update XP balance in header
-              window.location.reload();
+              // Send receipt email
+              fetch("/api/razorpay/send-receipt", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  planName: plan.name,
+                  xpAdded: plan.xp,
+                  amount: plan.price,
+                  paymentId: response.razorpay_payment_id,
+                  newBalance: verifyData.newBalance,
+                }),
+              }).catch((err) => console.error("Email error:", err));
+
+              // Show success modal
+              setSuccessData({
+                xpAdded: plan.xp,
+                newBalance: verifyData.newBalance,
+                planName: plan.name,
+                amount: plan.price,
+              });
+              setShowSuccessModal(true);
+              setLoading(null);
             } else {
               throw new Error(verifyData.error || "Payment verification failed");
             }
           } catch (error) {
             console.error("Payment verification error:", error);
             alert("Payment verification failed. Please contact support.");
-          } finally {
             setLoading(null);
           }
         },
@@ -262,11 +284,11 @@ export default function PricingPage() {
                   <button 
                     onClick={() => handlePayment(plan)}
                     disabled={loading === plan.name}
-                    className={`w-full py-4 rounded-xl font-bold transition-all duration-300 shadow-lg ${
+                    className={`w-full py-4 rounded-xl font-bold transition-all duration-300 shadow-lg cursor-pointer ${
                       plan.popular 
                         ? 'bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-black shadow-yellow-500/25' 
                         : 'bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700'
-                    } disabled:opacity-60 disabled:cursor-not-allowed`}
+                    } disabled:opacity-60 disabled:cursor-wait`}
                   >
                     {loading === plan.name ? "Processing..." : "Buy Now"}
                   </button>
@@ -306,6 +328,89 @@ export default function PricingPage() {
       </div>
 
       <Footer />
+
+      {/* Success Modal */}
+      {showSuccessModal && successData && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gradient-to-br from-zinc-900 to-black border-2 border-yellow-500/50 rounded-3xl max-w-md w-full p-8 relative animate-in fade-in duration-300">
+            {/* Close button */}
+            <button
+              onClick={() => {
+                setShowSuccessModal(false);
+                window.location.reload();
+              }}
+              className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            {/* Success icon */}
+            <div className="flex justify-center mb-6">
+              <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center animate-in zoom-in duration-500">
+                <CheckCircle className="w-12 h-12 text-white" />
+              </div>
+            </div>
+
+            {/* Title */}
+            <h2 className="text-3xl font-bold text-white text-center mb-2">
+              Payment Successful! 🎉
+            </h2>
+            <p className="text-gray-400 text-center mb-6">
+              Your XP Points have been added
+            </p>
+
+            {/* Details */}
+            <div className="bg-zinc-800/50 rounded-2xl p-6 space-y-4 mb-6">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-400">Plan</span>
+                <span className="text-white font-bold">{successData.planName}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-400">Amount Paid</span>
+                <span className="text-white font-bold">₹{successData.amount}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-400">XP Added</span>
+                <span className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-full bg-yellow-400 flex items-center justify-center">
+                    <span className="text-[10px] font-bold text-black">XP</span>
+                  </div>
+                  <span className="text-yellow-400 font-bold text-xl">+{successData.xpAdded}</span>
+                </span>
+              </div>
+              <div className="border-t border-zinc-700 pt-4 mt-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400">New Balance</span>
+                  <span className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-full bg-yellow-400 flex items-center justify-center">
+                      <span className="text-[10px] font-bold text-black">XP</span>
+                    </div>
+                    <span className="text-yellow-400 font-bold text-2xl">{successData.newBalance}</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Email notice */}
+            <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4 mb-6">
+              <p className="text-blue-400 text-sm text-center">
+                📧 A receipt has been sent to your email
+              </p>
+            </div>
+
+            {/* Action button */}
+            <button
+              onClick={() => {
+                setShowSuccessModal(false);
+                window.location.reload();
+              }}
+              className="w-full py-4 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-black font-bold rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/25"
+            >
+              Start Creating
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
