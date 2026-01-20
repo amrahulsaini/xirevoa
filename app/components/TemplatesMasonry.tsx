@@ -1,11 +1,11 @@
 import pool from "@/lib/db";
 import { RowDataPacket } from "mysql2";
-import Image from "next/image";
-import Link from "next/link";
+import CategoryCard from "./CategoryCard";
 
 interface TemplateRow extends RowDataPacket {
   id: number;
   title: string;
+  description: string;
   image_url: string;
   tags: string | null;
   coming_soon: boolean;
@@ -14,7 +14,7 @@ interface TemplateRow extends RowDataPacket {
 async function getTemplates(currentTemplateId: number) {
   try {
     const [rows] = await pool.query<TemplateRow[]>(
-      "SELECT id, title, image_url, tags, coming_soon FROM templates WHERE is_active = TRUE AND id != ? ORDER BY display_order ASC",
+      "SELECT id, title, description, image_url, tags, coming_soon FROM templates WHERE is_active = TRUE AND id != ? ORDER BY display_order ASC",
       [currentTemplateId]
     );
     return rows;
@@ -69,50 +69,15 @@ export default async function TemplatesMasonry({
             .replace(/(^-|-$)/g, "");
 
           return (
-            <div key={template.id} className="mb-4 break-inside-avoid">
-              {template.coming_soon ? (
-                <div className="block rounded-2xl overflow-hidden border border-zinc-800 bg-zinc-900 opacity-80 cursor-not-allowed">
-                  <div className="relative w-full">
-                    <Image
-                      src={template.image_url}
-                      alt={template.title}
-                      width={600}
-                      height={800}
-                      className="w-full h-auto object-cover"
-                      sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 20vw"
-                    />
-                    <div className="absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-bold bg-yellow-500 text-black">
-                      SOON
-                    </div>
-                  </div>
-                  <div className="p-3">
-                    <p className="text-sm font-semibold text-white line-clamp-2">
-                      {template.title}
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <Link
-                  href={`/${slug}`}
-                  className="block rounded-2xl overflow-hidden border border-zinc-800 bg-zinc-900"
-                >
-                  <div className="relative w-full">
-                    <Image
-                      src={template.image_url}
-                      alt={template.title}
-                      width={600}
-                      height={800}
-                      className="w-full h-auto object-cover"
-                      sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 20vw"
-                    />
-                  </div>
-                  <div className="p-3">
-                    <p className="text-sm font-semibold text-white line-clamp-2">
-                      {template.title}
-                    </p>
-                  </div>
-                </Link>
-              )}
+            <div key={template.id} className="break-inside-avoid">
+              <CategoryCard
+                id={template.id}
+                title={template.title}
+                slug={slug}
+                description={template.description}
+                image={template.image_url}
+                comingSoon={template.coming_soon}
+              />
             </div>
           );
         })}
