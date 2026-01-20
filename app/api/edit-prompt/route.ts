@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import pool from '@/lib/db';
-import { GoogleGenerativeAI } from '@google/generativeai';
+import { GoogleGenerativeAI } from '@google/genai';
 import { RowDataPacket, ResultSetHeader } from 'mysql2';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
