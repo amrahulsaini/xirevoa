@@ -199,9 +199,9 @@ export async function POST(request: NextRequest) {
           templateBase64 = templateImageBuffer.toString('base64');
         }
         
-        // For face swap: Simplified prompt to avoid recitation
+        // For face swap: Use database prompt or custom edited prompt
         contentParts.push(
-          { text: `Create a photorealistic portrait of the person from image 1, wearing clothing inspired by the style shown in image 2.` },
+          { text: aiPrompt },
           {
             inlineData: {
               mimeType: image.type,
