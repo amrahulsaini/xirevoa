@@ -79,32 +79,7 @@ export async function POST(req: NextRequest) {
 
       const newBalance = userRows[0]?.xpoints || 0;
 
-      // Log transaction (optional - create a transactions table if needed)
-      // You can add transaction logging here if you want to keep records
-
       await connection.commit();
-
-      // Create payment receipt/invoice via Razorpay
-      try {
-        // Fetch the payment to get invoice details
-        const paymentWithInvoice = await razorpay.payments.fetch(razorpay_payment_id);
-        
-        // If invoice_id exists in payment, fetch and email it
-        if (paymentWithInvoice.invoice_id) {
-          const invoice = await razorpay.invoices.fetch(paymentWithInvoice.invoice_id);
-          console.log("Invoice found for payment:", invoice.id);
-        } else {
-          // Create an invoice linked to the payment (for already captured payments)
-          // Note: Razorpay automatically generates receipts for payments
-          // You can download them from Dashboard → Payments → Select Payment → Download Receipt
-          console.log("Payment completed without invoice. Receipt available in Razorpay Dashboard.");
-          console.log("Payment ID:", razorpay_payment_id);
-          console.log("View at: https://dashboard.razorpay.com/app/payments/" + razorpay_payment_id);
-        }
-      } catch (invoiceError: any) {
-        // Don't fail the payment if invoice check fails
-        console.error("Invoice check error:", invoiceError?.error?.description || invoiceError);
-      }
 
       return NextResponse.json({
         success: true,
