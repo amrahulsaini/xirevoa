@@ -139,6 +139,14 @@ export default function Header() {
                       </div>
                       <div className="p-2">
                         <Link 
+                          href={`/@${(session.user as any)?.username || session.user?.email?.split('@')[0]}`}
+                          className="flex items-center gap-3 px-4 py-3 rounded-lg text-zinc-400 hover:text-yellow-400 hover:bg-zinc-800 transition-all"
+                          onClick={() => setShowUserMenu(false)}
+                        >
+                          <User className="w-5 h-5" />
+                          <span>Profile</span>
+                        </Link>
+                        <Link 
                           href="/settings"
                           className="flex items-center gap-3 px-4 py-3 rounded-lg text-zinc-400 hover:text-yellow-400 hover:bg-zinc-800 transition-all"
                           onClick={() => setShowUserMenu(false)}

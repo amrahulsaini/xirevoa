@@ -132,7 +132,7 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
       }
       
-      // Fetch latest user data including xpoints
+      // Fetch latest user data including xpoints, username, and profile picture
       if (token.email) {
         const connection = await pool.getConnection();
         try {
@@ -144,7 +144,9 @@ export const authOptions: NextAuthOptions = {
           if (users.length > 0) {
             token.id = users[0].id.toString();
             token.name = users[0].username;
+            token.username = users[0].username;
             token.picture = users[0].profile_picture;
+            token.profilePicture = users[0].profile_picture;
             token.xpoints = users[0].xpoints;
           }
         } finally {
@@ -158,6 +160,9 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = token.id as string;
         session.user.xpoints = token.xpoints as number;
+        session.user.username = token.username as string;
+        session.user.profilePicture = token.profilePicture as string | null;
+        session.user.image = token.profilePicture as string | null;
       }
       return session;
     },
