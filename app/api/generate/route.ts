@@ -328,14 +328,15 @@ export async function POST(request: NextRequest) {
           const templateTitle = templates.length > 0 ? templates[0].title : 'Unknown Template';
 
           // Save generation record
-          await saveConnection.query(
+          const [insertResult]: any = await saveConnection.query(
             `INSERT INTO generations 
-            (user_id, template_id, template_title, original_image_url, generated_image_url, xp_cost, is_outfit, model_used) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-            [userId, templateId, templateTitle, 'uploaded', generatedImageUrl, XP_COST, isOutfit, modelName]
+            (user_id, template_id, template_title, original_image_url, generated_image_url, xp_cost, is_outfit, prompt_used, model_used) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [userId, templateId, templateTitle, 'uploaded', generatedImageUrl, XP_COST, isOutfit, aiPrompt, modelName]
           );
 
-          console.log('Generation record saved to database');
+          const generationId = insertResult.insertId;
+          console.log('Generation record saved to database with ID:', generationId);
         } catch (dbError) {
           console.error('Failed to save generation record:', dbError);
           // Don't fail the request if DB save fails
@@ -349,6 +350,7 @@ export async function POST(request: NextRequest) {
           success: true,
           imageUrl: generatedImageUrl,
           modelUsed: modelName,
+          generationId: generationId || null,
           message: 'Image generated successfully',
         });
       }

@@ -38,6 +38,9 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [modelUsed, setModelUsed] = useState<string>('');
   const [modelIdUsed, setModelIdUsed] = useState<string>(''); // Track model ID for refinement
+  const [generationId, setGenerationId] = useState<number | null>(null); // Track generation ID
+  const [viewedPrompt, setViewedPrompt] = useState<string | null>(null); // Store viewed prompt
+  const [promptViewed, setPromptViewed] = useState(false); // Track if prompt was viewed
   const [showPromptEditor, setShowPromptEditor] = useState(false);
   const [customPrompt, setCustomPrompt] = useState('');
   const [isDragging, setIsDragging] = useState(false);
@@ -199,6 +202,7 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
       setGeneratedImage(result.imageUrl);
       setModelUsed(result.modelUsed || modelData?.model_name || 'Unknown');
       setModelIdUsed(selectedModel); // Save the model ID for refinement
+      setGenerationId(result.generationId || null); // Save generation ID
       setProgress(100);
     } catch (error: any) {
       console.error('Generation error:', error);
@@ -222,6 +226,50 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
     setCustomPrompt('');
     setShowPromptEditor(false);
     setShowModelPicker(false);
+    setGenerationId(null);
+    setViewedPrompt(null);
+    setPromptViewed(false);
+  };
+
+  const handleViewPrompt = async () => {
+    if (!generationId || !session) {
+      setErrorMessage('Unable to view prompt');
+      return;
+    }
+
+    const currentXP = (session?.user as any)?.xpoints || 0;
+    if (currentXP < 1) {
+      setShowXPModal(true);
+      return;
+    }
+
+    setErrorMessage(null);
+
+    try {
+      const res = await fetch('/api/view-prompt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ generationId }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        if (res.status === 400 && data.error?.includes('Insufficient')) {
+          setShowXPModal(true);
+        } else {
+          setErrorMessage(data.error || 'Failed to view prompt');
+        }
+        return;
+      }
+
+      setViewedPrompt(data.prompt);
+      setPromptViewed(true);
+      setCustomPrompt(data.prompt); // Pre-fill for editing
+    } catch (error) {
+      console.error('View prompt error:', error);
+      setErrorMessage('Failed to view prompt');
+    }
   };
 
   const handleEditPrompt = async () => {
@@ -236,7 +284,7 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
     }
 
     const currentXP = (session?.user as any)?.xpoints || 0;
-    const requiredXP = 3;
+    const requiredXP = 1;
     
     if (currentXP < requiredXP) {
       setShowXPModal(true);
@@ -490,12 +538,12 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
                     <span className="text-lg font-black text-white block">Refine Your Image</span>
                     <span className="text-xs text-purple-300">Use AI to enhance your result</span>
                   </div>
-                  <span className="text-sm px-3 py-1.5 bg-purple-500 text-white rounded-full font-black shadow-lg">3 XP</span>
+                  <span className="text-sm px-3 py-1.5 bg-purple-500 text-white rounded-full font-black shadow-lg">1 XP</span>
                 </div>
                 <button
                   onClick={() => {
                     setShowPromptEditor(false);
-                    setCustomPrompt('');
+                    if (!promptViewed) setCustomPrompt('');
                   }}
                   className="w-8 h-8 bg-zinc-800/50 hover:bg-zinc-700 rounded-lg flex items-center justify-center text-zinc-400 hover:text-white transition-all"
                 >
@@ -515,7 +563,7 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
                   className="flex-1 px-6 py-4 bg-gradient-to-r from-purple-600 via-purple-500 to-pink-500 hover:from-purple-700 hover:via-purple-600 hover:to-pink-600 text-white font-black rounded-xl transition-all shadow-lg shadow-purple-500/50 hover:shadow-purple-500/70 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2 text-base"
                 >
                   <Sparkles className="w-5 h-5" />
-                  {generating ? 'Refining...' : 'Refine Image (3 XP)'}
+                  {generating ? 'Refining...' : 'Refine Image (1 XP)'}
                 </button>
                 <button
                   onClick={() => {
@@ -532,12 +580,21 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
             <div className="space-y-3">
               {/* Primary Actions */}
               <div className="grid grid-cols-2 gap-3">
+                {!promptViewed && generationId && (
+                  <button
+                    onClick={handleViewPrompt}
+                    className="px-6 py-4 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-black rounded-xl transition-all shadow-lg shadow-blue-500/30 hover:shadow-blue-500/60 hover:scale-[1.02] flex items-center justify-center gap-2 text-base"
+                  >
+                    <Sparkles className="w-5 h-5" />
+                    View Prompt (1 XP)
+                  </button>
+                )}
                 <button
                   onClick={() => setShowPromptEditor(true)}
                   className="px-6 py-4 bg-gradient-to-r from-purple-600 via-purple-500 to-pink-500 hover:from-purple-700 hover:via-purple-600 hover:to-pink-600 text-white font-black rounded-xl transition-all shadow-lg shadow-purple-500/30 hover:shadow-purple-500/60 hover:scale-[1.02] flex items-center justify-center gap-2 text-base"
                 >
                   <Edit3 className="w-5 h-5" />
-                  ✨ Refine Image
+                  {promptViewed ? 'Edit Prompt (1 XP)' : '✨ Refine Image (1 XP)'}
                 </button>
                 <a
                   href={generatedImage}
