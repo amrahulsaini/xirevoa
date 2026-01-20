@@ -5,7 +5,6 @@ import pool from '@/lib/db';
 import { GoogleGenAI, createUserContent } from '@google/genai';
 import { RowDataPacket, ResultSetHeader } from 'mysql2';
 
-const genAI = new GoogleGenAI({});
 const EDIT_COST = 3; // Editing costs 3 XP
 
 interface UserSettingsRow extends RowDataPacket {
@@ -89,6 +88,11 @@ export async function POST(request: NextRequest) {
     const bytes = await imageFile.arrayBuffer();
     const buffer = Buffer.from(bytes);
     const base64Image = buffer.toString('base64');
+
+    // Initialize Google GenAI (same as generate API)
+    const genAI = new GoogleGenAI({
+      apiKey: process.env.GOOGLE_AI_API_KEY,
+    });
 
     // Call Gemini API with the image and refinement prompt
     const contentParts = [
