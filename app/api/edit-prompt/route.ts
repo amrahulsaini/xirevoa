@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import pool from '@/lib/db';
-import { GoogleGenerativeAI } from '@google/genai';
+import { GoogleGenAI } from '@google/genai';
 import { RowDataPacket, ResultSetHeader } from 'mysql2';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+const genAI = new GoogleGenAI({});
 const EDIT_COST = 1; // Editing costs 1 XP
 
 interface UserSettingsRow extends RowDataPacket {
@@ -87,24 +87,24 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(bytes);
     const base64Image = buffer.toString('base64');
 
-    // Call Gemini Vision API with the image and refinement prompt
-    const model = genAI.getGenerativeModel({ model: preferredModel });
-    
-    const prompt = `You are an expert image editor. The user wants to refine this image with the following request: "${customPrompt}". 
-    
-Please generate an improved version of this image that incorporates the user's refinement request. Keep the core elements and composition similar to the original, but apply the requested changes thoughtfully.`;
-
-    const result = await model.generateContent([
-      prompt,
+    // Call Gemini API with the image and refinement prompt
+    const prompt = [
+      { 
+        text: `You are an expert image editor. The user wants to refine this image with the following request: "${customPrompt}". Please generate an improved version of this image that incorporates the user's refinement request. Keep the core elements and composition similar to the original, but apply the requested changes thoughtfully.`
+      },
       {
         inlineData: {
           data: base64Image,
           mimeType: imageFile.type,
         },
       },
-    ]);
+    ];
 
-    const response = await result.response;
+    const response = await genAI.models.generateContent({
+      model: preferredModel,
+      contents: prompt,
+    });
+
     const imageData = response.candidates?.[0]?.content?.parts?.[0];
     
     if (!imageData || !('inlineData' in imageData)) {
