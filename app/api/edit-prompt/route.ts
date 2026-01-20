@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import pool from '@/lib/db';
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenAI, createUserContent } from '@google/genai';
 import { RowDataPacket, ResultSetHeader } from 'mysql2';
 
 const genAI = new GoogleGenAI({});
@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
     const base64Image = buffer.toString('base64');
 
     // Call Gemini API with the image and refinement prompt
-    const prompt = [
+    const contentParts = [
       { 
         text: `You are an expert image editor. The user wants to refine this image with the following request: "${customPrompt}". Please generate an improved version of this image that incorporates the user's refinement request. Keep the core elements and composition similar to the original, but apply the requested changes thoughtfully.`
       },
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
 
     const response = await genAI.models.generateContent({
       model: preferredModel,
-      contents: prompt,
+      contents: createUserContent(contentParts),
     });
 
     const imageData = response.candidates?.[0]?.content?.parts?.[0];
