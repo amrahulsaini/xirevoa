@@ -84,6 +84,37 @@ export async function POST(req: NextRequest) {
 
       await connection.commit();
 
+      // Create invoice via Razorpay
+      try {
+        const invoice = await razorpay.invoices.create({
+          type: "invoice",
+          description: `${planName} - ${xp} XP Points Purchase`,
+          customer: {
+            name: session.user.name || session.user.email?.split('@')[0] || "Customer",
+            email: session.user.email,
+          },
+          line_items: [
+            {
+              name: `${planName} Plan`,
+              description: `${xp} XP Points for AI Image Generation`,
+              amount: amount * 100, // Amount in paise
+              currency: "INR",
+              quantity: 1,
+            },
+          ],
+          currency: "INR",
+          email_notify: 1, // Razorpay will email the invoice automatically
+          sms_notify: 0,
+          date: Math.floor(Date.now() / 1000), // Current timestamp
+          expire_by: Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60), // 30 days expiry
+        });
+
+        console.log("Invoice created:", invoice.id);
+      } catch (invoiceError) {
+        // Don't fail the payment if invoice creation fails
+        console.error("Invoice creation error:", invoiceError);
+      }
+
       return NextResponse.json({
         success: true,
         message: "Payment successful! XP added to your account.",
