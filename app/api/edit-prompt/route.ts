@@ -112,13 +112,42 @@ export async function POST(request: NextRequest) {
       contents: createUserContent(contentParts),
     });
 
-    const imageData = response.candidates?.[0]?.content?.parts?.[0];
-    
-    if (!imageData || !imageData.inlineData || !imageData.inlineData.data) {
-      throw new Error('No image generated');
+    console.log('=== EDIT-PROMPT RESPONSE ===');
+    console.log('Candidates:', response.candidates?.length || 0);
+    if (response.candidates?.[0]) {
+      console.log('Parts:', response.candidates[0].content?.parts?.length || 0);
+      console.log('Finish reason:', response.candidates[0].finishReason);
     }
 
-    const generatedBase64 = imageData.inlineData.data;
+    if (!response.candidates || response.candidates.length === 0) {
+      throw new Error('No response from AI model');
+    }
+
+    const candidate = response.candidates[0];
+    
+    // Check for safety/policy blocks
+    if (candidate.finishReason && candidate.finishReason !== 'STOP') {
+      console.error('Generation blocked:', candidate.finishReason);
+      throw new Error(`Generation blocked: ${candidate.finishReason}`);
+    }
+
+    if (!candidate.content || !candidate.content.parts || candidate.content.parts.length === 0) {
+      throw new Error('No content parts in response');
+    }
+
+    // Find the image in parts
+    let generatedBase64: string | null = null;
+    for (const part of candidate.content.parts) {
+      if (part.inlineData && part.inlineData.data) {
+        generatedBase64 = part.inlineData.data;
+        break;
+      }
+    }
+    
+    if (!generatedBase64) {
+      throw new Error('No image data found in response');
+    }
+
     const imageBuffer = Buffer.from(generatedBase64, 'base64');
 
     // Save to database
