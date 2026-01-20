@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
 
     // Check user's current XP
     const [userRows] = await pool.query<RowDataPacket[]>(
-      'SELECT xp_balance FROM users WHERE id = ?',
+      'SELECT xpoints FROM users WHERE id = ?',
       [userId]
     );
 
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const currentXP = userRows[0].xp_balance;
+    const currentXP = userRows[0].xpoints;
     if (currentXP < EDIT_COST) {
       return NextResponse.json({ 
         error: 'Insufficient XP', 
@@ -133,7 +133,7 @@ export async function POST(request: NextRequest) {
 
     // Deduct XP
     await pool.query(
-      'UPDATE users SET xp_balance = xp_balance - ? WHERE id = ?',
+      'UPDATE users SET xpoints = xpoints - ? WHERE id = ?',
       [EDIT_COST, userId]
     );
 

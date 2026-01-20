@@ -521,19 +521,24 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
 
           {/* Edit Prompt Section */}
           {showPromptEditor ? (
-            <div className="bg-zinc-800 border border-zinc-700 rounded-2xl p-6 space-y-4">
+            <div className="bg-gradient-to-br from-purple-900/40 to-pink-900/40 border-2 border-purple-500/50 rounded-2xl p-6 space-y-4 shadow-lg shadow-purple-500/20">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Edit3 className="w-5 h-5 text-purple-400" />
-                  <span className="text-lg font-bold text-white">Refine Your Image</span>
-                  <span className="text-sm px-3 py-1 bg-purple-400/20 text-purple-400 rounded-full font-bold">3 XP</span>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                    <Edit3 className="w-5 h-5 text-purple-400" />
+                  </div>
+                  <div>
+                    <span className="text-lg font-black text-white block">Refine Your Image</span>
+                    <span className="text-xs text-purple-300">Use AI to enhance your result</span>
+                  </div>
+                  <span className="text-sm px-3 py-1.5 bg-purple-500 text-white rounded-full font-black shadow-lg">3 XP</span>
                 </div>
                 <button
                   onClick={() => {
                     setShowPromptEditor(false);
                     setCustomPrompt('');
                   }}
-                  className="text-zinc-400 hover:text-white transition-colors"
+                  className="w-8 h-8 bg-zinc-800/50 hover:bg-zinc-700 rounded-lg flex items-center justify-center text-zinc-400 hover:text-white transition-all"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -541,52 +546,69 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
               <textarea
                 value={customPrompt}
                 onChange={(e) => setCustomPrompt(e.target.value)}
-                placeholder="Describe your refinement... (e.g., 'make it more vibrant', 'add sunset lighting', 'change background to mountains')"
-                className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-xl text-white placeholder-zinc-500 focus:border-purple-400 focus:outline-none min-h-[120px] resize-none"
+                placeholder="Tell AI how to improve this image... Try: 'add dramatic cinematic lighting' or 'make background more vibrant'"
+                className="w-full px-5 py-4 bg-black/30 border-2 border-purple-500/30 rounded-xl text-white placeholder-zinc-400 focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-500/50 min-h-[100px] resize-none font-medium"
               />
-              <button
-                onClick={handleEditPrompt}
-                disabled={!customPrompt.trim() || generating}
-                className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white font-bold rounded-xl transition-all shadow-lg hover:shadow-purple-500/50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-lg"
-              >
-                <Sparkles className="w-5 h-5" />
-                Refine Image (3 XP)
-              </button>
+              <div className="flex gap-3">
+                <button
+                  onClick={handleEditPrompt}
+                  disabled={!customPrompt.trim() || generating}
+                  className="flex-1 px-6 py-4 bg-gradient-to-r from-purple-600 via-purple-500 to-pink-500 hover:from-purple-700 hover:via-purple-600 hover:to-pink-600 text-white font-black rounded-xl transition-all shadow-lg shadow-purple-500/50 hover:shadow-purple-500/70 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2 text-base"
+                >
+                  <Sparkles className="w-5 h-5" />
+                  {generating ? 'Refining...' : 'Refine Image (3 XP)'}
+                </button>
+                <button
+                  onClick={() => {
+                    setShowPromptEditor(false);
+                    setCustomPrompt('');
+                  }}
+                  className="px-6 py-4 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold rounded-xl transition-all"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           ) : (
-            <div className="grid sm:grid-cols-3 gap-3">
-              <button
-                onClick={() => setShowPromptEditor(true)}
-                className="px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white font-bold rounded-xl transition-all shadow-lg hover:shadow-purple-500/50 flex items-center justify-center gap-2"
-              >
-                <Edit3 className="w-5 h-5" />
-                Refine Image
-              </button>
-              <button
-                onClick={() => setShowFullScreen(true)}
-                className="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2"
-              >
-                <Maximize2 className="w-5 h-5" />
-                Full View
-              </button>
-              <a
-                href={generatedImage}
-                download="xirevoa-generated.png"
-                className="px-6 py-3 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-bold rounded-xl hover:shadow-lg hover:shadow-green-500/50 transition-all flex items-center justify-center gap-2"
-              >
-                <Download className="w-5 h-5" />
-                Download
-              </a>
+            <div className="space-y-3">
+              {/* Primary Actions */}
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => setShowPromptEditor(true)}
+                  className="px-6 py-4 bg-gradient-to-r from-purple-600 via-purple-500 to-pink-500 hover:from-purple-700 hover:via-purple-600 hover:to-pink-600 text-white font-black rounded-xl transition-all shadow-lg shadow-purple-500/30 hover:shadow-purple-500/60 hover:scale-[1.02] flex items-center justify-center gap-2 text-base"
+                >
+                  <Edit3 className="w-5 h-5" />
+                  ✨ Refine Image
+                </button>
+                <a
+                  href={generatedImage}
+                  download="xirevoa-generated.png"
+                  className="px-6 py-4 bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-700 hover:to-emerald-600 text-white font-black rounded-xl hover:shadow-lg hover:shadow-green-500/50 hover:scale-[1.02] transition-all flex items-center justify-center gap-2 text-base"
+                >
+                  <Download className="w-5 h-5" />
+                  Download
+                </a>
+              </div>
+              
+              {/* Secondary Actions */}
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowFullScreen(true)}
+                  className="flex-1 px-5 py-3 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 hover:border-zinc-600 text-zinc-300 hover:text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2"
+                >
+                  <Maximize2 className="w-4 h-4" />
+                  Full Preview
+                </button>
+                <button
+                  onClick={handleReset}
+                  className="flex-1 px-5 py-3 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 hover:border-zinc-600 text-zinc-300 hover:text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  Create New
+                </button>
+              </div>
             </div>
           )}
-
-          <button
-            onClick={handleReset}
-            className="w-full px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold rounded-xl transition-all flex items-center justify-center gap-2"
-          >
-            <RefreshCw className="w-5 h-5" />
-            Create Another
-          </button>
         </div>
       )}
 
