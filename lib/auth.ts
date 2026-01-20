@@ -67,7 +67,9 @@ export const authOptions: NextAuthOptions = {
             id: user.id.toString(),
             email: user.email,
             name: user.username,
+            username: user.username,
             image: user.profile_picture,
+            profilePicture: user.profile_picture,
             xpoints: user.xpoints,
           };
         } finally {
