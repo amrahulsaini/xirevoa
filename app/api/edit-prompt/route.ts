@@ -29,6 +29,7 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const imageFile = formData.get('image') as File;
     const customPrompt = formData.get('customPrompt') as string;
+    const selectedModel = formData.get('selectedModel') as string | null;
 
     if (!imageFile || !customPrompt) {
       return NextResponse.json({ error: 'Missing image or prompt' }, { status: 400 });
@@ -53,32 +54,34 @@ export async function POST(request: NextRequest) {
       }, { status: 402 });
     }
 
-    // Get user's preferred model
-    let preferredModel = 'gemini-2.0-flash-exp';
+    // Use selectedModel if provided, otherwise get user's preferred model
+    let preferredModel = selectedModel || 'gemini-2.0-flash-exp';
     let modelName = 'Gemini 2.0 Flash';
 
-    const [settingsRows] = await pool.query<UserSettingsRow[]>(
-      'SELECT preferred_model FROM user_settings WHERE user_id = ?',
-      [userId]
-    );
-
-    if (settingsRows.length > 0 && settingsRows[0].preferred_model) {
-      preferredModel = settingsRows[0].preferred_model;
-
-      // Get model details
-      const [modelRows] = await pool.query<ModelRow[]>(
-        'SELECT model_name, xp_cost, is_active FROM ai_models WHERE model_id = ?',
-        [preferredModel]
+    if (!selectedModel) {
+      const [settingsRows] = await pool.query<UserSettingsRow[]>(
+        'SELECT preferred_model FROM user_settings WHERE user_id = ?',
+        [userId]
       );
 
-      if (modelRows.length > 0) {
-        if (!modelRows[0].is_active) {
-          // Fall back to default if model is inactive
-          preferredModel = 'gemini-2.0-flash-exp';
-          modelName = 'Gemini 2.0 Flash';
-        } else {
-          modelName = modelRows[0].model_name;
-        }
+      if (settingsRows.length > 0 && settingsRows[0].preferred_model) {
+        preferredModel = settingsRows[0].preferred_model;
+      }
+    }
+
+    // Get model details
+    const [modelRows] = await pool.query<ModelRow[]>(
+      'SELECT model_name, xp_cost, is_active FROM ai_models WHERE model_id = ?',
+      [preferredModel]
+    );
+
+    if (modelRows.length > 0) {
+      if (!modelRows[0].is_active) {
+        // Fall back to default if model is inactive
+        preferredModel = 'gemini-2.0-flash-exp';
+        modelName = 'Gemini 2.0 Flash';
+      } else {
+        modelName = modelRows[0].model_name;
       }
     }
 

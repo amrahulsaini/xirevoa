@@ -36,6 +36,7 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
   const [showXPModal, setShowXPModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [modelUsed, setModelUsed] = useState<string>('');
+  const [modelIdUsed, setModelIdUsed] = useState<string>(''); // Track model ID for refinement
   const [showPromptEditor, setShowPromptEditor] = useState(false);
   const [customPrompt, setCustomPrompt] = useState('');
   
@@ -181,6 +182,7 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
       const result = await generateRes.json();
       setGeneratedImage(result.imageUrl);
       setModelUsed(result.modelUsed || modelData?.model_name || 'Unknown');
+      setModelIdUsed(selectedModel); // Save the model ID for refinement
       setProgress(100);
       
       // Fetch enhancement suggestions
@@ -245,6 +247,7 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
       const editFormData = new FormData();
       editFormData.append('image', imageFile);
       editFormData.append('customPrompt', customPrompt);
+      editFormData.append('selectedModel', modelIdUsed); // Use same model as original generation
 
       const progressInterval = setInterval(() => {
         setProgress(prev => {
@@ -293,7 +296,7 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
   const selectedModelData = models.find(m => m.model_id === selectedModel);
 
   return (
-    <div className="max-w-7xl mx-auto overflow-x-hidden">
+    <div className="max-w-7xl mx-auto overflow-x-hidden px-4">
       {errorMessage && (
         <div className="mb-6 bg-red-500/10 border border-red-500/30 rounded-xl p-4 text-center">
           <p className="text-red-400 font-medium">{errorMessage}</p>
@@ -307,114 +310,151 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
         <p className="text-zinc-400 text-lg max-w-2xl mx-auto">{template.description}</p>
       </div>
 
-      {/* Model Selector */}
+      {/* Desktop Layout: Upload & Models on Left, Related Templates on Right */}
       {!generatedImage && !generating && (
-        <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 border border-purple-500/30 rounded-2xl p-6 mb-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Settings className="w-5 h-5 text-purple-400" />
-            <h3 className="text-lg font-bold text-white">Choose AI Model</h3>
-          </div>
-          
-          {loadingModels ? (
-            <div className="text-center py-4">
-              <div className="inline-block w-6 h-6 border-2 border-purple-400 border-t-transparent rounded-full animate-spin"></div>
-            </div>
-          ) : (
-            <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
-                {models.map((model) => (
-                  <button
-                    key={model.model_id}
-                    onClick={() => model.is_active && setSelectedModel(model.model_id)}
-                    disabled={!model.is_active}
-                    className={`relative p-4 rounded-xl border-2 transition-all ${
-                      selectedModel === model.model_id && model.is_active
-                        ? 'border-purple-400 bg-purple-500/20'
-                        : model.is_active
-                        ? 'border-zinc-700 bg-zinc-800 hover:border-purple-400/50'
-                        : 'border-zinc-800 bg-zinc-900 opacity-50 cursor-not-allowed'
-                    }`}
-                  >
-                    {selectedModel === model.model_id && model.is_active && (
-                      <div className="absolute top-2 right-2">
-                        <Check className="w-5 h-5 text-purple-400" />
-                      </div>
-                    )}
-                    <div className="text-left">
-                      <p className="font-bold text-white text-sm mb-1">{model.model_name}</p>
-                      <p className="text-xs text-purple-400 font-bold">{model.xp_cost} XP</p>
-                      {!model.is_active && (
-                        <p className="text-xs text-zinc-500 mt-1">Coming Soon</p>
-                      )}
-                    </div>
-                  </button>
-                ))}
-              </div>
-              
-              {session && (
-                <label className="flex items-center gap-2 cursor-pointer">
+        <div className="grid lg:grid-cols-[2fr_1fr] gap-6 mb-8">
+          {/* Left Column: Upload + Model Selector */}
+          <div className="space-y-6">
+            {/* Upload Area */}
+            <div className="bg-zinc-900 rounded-2xl p-6 border border-zinc-800">
+              <h3 className="text-lg font-bold text-yellow-400 mb-4">📸 Upload Your Photo</h3>
+              {userImagePreview ? (
+                <div className="space-y-4">
+                  <div className="relative aspect-square max-w-md mx-auto rounded-xl overflow-hidden border-2 border-zinc-700">
+                    <img src={userImagePreview} alt="Your photo" className="w-full h-full object-cover" />
+                    <button
+                      onClick={() => {
+                        setUserImage(null);
+                        setUserImagePreview(null);
+                      }}
+                      className="absolute top-2 right-2 bg-red-600 text-white w-8 h-8 rounded-full hover:bg-red-700 flex items-center justify-center font-bold"
+                    >
+                      ×
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <label className="block aspect-square max-w-md mx-auto border-2 border-dashed border-zinc-700 rounded-xl cursor-pointer hover:border-yellow-400 transition-colors">
+                  <div className="h-full flex flex-col items-center justify-center p-8">
+                    <Upload className="w-20 h-20 text-zinc-600 mb-4" />
+                    <span className="text-zinc-400 text-center font-bold text-lg mb-2">
+                      Click to upload your photo
+                    </span>
+                    <span className="text-sm text-zinc-500">Max 10MB • JPG, PNG, WEBP</span>
+                  </div>
                   <input
-                    type="checkbox"
-                    checked={saveAsDefault}
-                    onChange={(e) => setSaveAsDefault(e.target.checked)}
-                    className="w-4 h-4 rounded border-zinc-600 bg-zinc-800 text-purple-500 focus:ring-purple-500 focus:ring-offset-0"
+                    type="file"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleImageUpload}
                   />
-                  <span className="text-sm text-zinc-300">Save as my default model</span>
                 </label>
               )}
-              
-              <p className="text-xs text-zinc-500 mt-3">
-                You can change your default model anytime from Settings
-              </p>
-            </>
-          )}
-        </div>
-      )}
-
-      {/* Main Generation Area */}
-      {!generatedImage && !generating && (
-        <div className="bg-zinc-900 rounded-2xl p-6 border border-zinc-800">
-          <h3 className="text-lg font-bold text-yellow-400 mb-4">Upload Your Photo</h3>
-          {userImagePreview ? (
-            <div className="space-y-4">
-              <div className="relative aspect-square max-w-md mx-auto rounded-xl overflow-hidden border-2 border-zinc-700">
-                <img src={userImagePreview} alt="Your photo" className="w-full h-full object-cover" />
-                <button
-                  onClick={() => {
-                    setUserImage(null);
-                    setUserImagePreview(null);
-                  }}
-                  className="absolute top-2 right-2 bg-red-600 text-white w-8 h-8 rounded-full hover:bg-red-700 flex items-center justify-center"
-                >
-                  ×
-                </button>
-              </div>
-              <button
-                onClick={handleGenerate}
-                disabled={!userImage || generating}
-                className="w-full px-6 py-4 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-black font-bold rounded-xl hover:shadow-lg hover:shadow-yellow-500/50 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2 text-lg"
-              >
-                <Wand2 className="w-6 h-6" />
-                Generate with {selectedModelData?.model_name || 'AI'} ({selectedModelData?.xp_cost || 3} XP)
-              </button>
             </div>
-          ) : (
-            <label className="block aspect-square max-w-md mx-auto border-2 border-dashed border-zinc-700 rounded-xl cursor-pointer hover:border-yellow-400 transition-colors">
-              <div className="h-full flex flex-col items-center justify-center p-8">
-                <Upload className="w-20 h-20 text-zinc-600 mb-4" />
-                <span className="text-zinc-400 text-center font-bold text-lg mb-2">
-                  Click to upload your photo
-                </span>
-                <span className="text-sm text-zinc-500">Max 10MB • JPG, PNG, WEBP</span>
+
+            {/* Model Selector */}
+            <div className="bg-gradient-to-br from-purple-900/40 to-blue-900/40 border-2 border-purple-500/40 rounded-2xl p-6 shadow-lg shadow-purple-500/20">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                  <Settings className="w-5 h-5 text-purple-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-black text-white">Choose AI Model</h3>
+                  <p className="text-xs text-purple-300">Select the best model for your needs</p>
+                </div>
               </div>
-              <input
-                type="file"
-                className="hidden"
-                accept="image/*"
-                onChange={handleImageUpload}
+              
+              {loadingModels ? (
+                <div className="text-center py-8">
+                  <div className="inline-block w-8 h-8 border-3 border-purple-400 border-t-transparent rounded-full animate-spin"></div>
+                  <p className="text-sm text-purple-300 mt-3">Loading models...</p>
+                </div>
+              ) : (
+                <>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+                    {models.map((model) => (
+                      <button
+                        key={model.model_id}
+                        onClick={() => model.is_active && setSelectedModel(model.model_id)}
+                        disabled={!model.is_active}
+                        className={`relative p-5 rounded-xl border-2 transition-all ${
+                          selectedModel === model.model_id && model.is_active
+                            ? 'border-purple-400 bg-purple-500/30 shadow-lg shadow-purple-500/30'
+                            : model.is_active
+                            ? 'border-zinc-700 bg-zinc-800/50 hover:border-purple-400/50 hover:bg-zinc-800'
+                            : 'border-zinc-800 bg-zinc-900/50 opacity-50 cursor-not-allowed'
+                        }`}
+                      >
+                        {selectedModel === model.model_id && model.is_active && (
+                          <div className="absolute top-3 right-3 w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
+                            <Check className="w-4 h-4 text-white" />
+                          </div>
+                        )}
+                        <div className="text-left">
+                          <p className="font-black text-white text-base mb-1">{model.model_name}</p>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-bold text-purple-400">{model.xp_cost} XP</span>
+                            {!model.is_active && (
+                              <span className="text-xs px-2 py-0.5 bg-zinc-700 text-zinc-400 rounded-full">Coming Soon</span>
+                            )}
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                  
+                  {session && userImage && (
+                    <div className="space-y-3">
+                      <label className="flex items-center gap-2 cursor-pointer p-3 bg-zinc-800/50 rounded-lg hover:bg-zinc-800 transition-colors">
+                        <input
+                          type="checkbox"
+                          checked={saveAsDefault}
+                          onChange={(e) => setSaveAsDefault(e.target.checked)}
+                          className="w-4 h-4 rounded border-zinc-600 bg-zinc-900 text-purple-500 focus:ring-purple-500 focus:ring-offset-0"
+                        />
+                        <span className="text-sm text-zinc-300 font-medium">Save as my default model</span>
+                      </label>
+                      
+                      <button
+                        onClick={handleGenerate}
+                        disabled={!userImage || generating}
+                        className="w-full px-6 py-5 bg-gradient-to-r from-yellow-400 via-orange-500 to-yellow-400 hover:from-yellow-500 hover:via-orange-600 hover:to-yellow-500 text-black font-black rounded-xl hover:shadow-2xl hover:shadow-yellow-500/50 transition-all transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-3 text-lg"
+                      >
+                        <Wand2 className="w-6 h-6" />
+                        Generate with {selectedModelData?.model_name || 'AI'} ({selectedModelData?.xp_cost || 3} XP)
+                      </button>
+                    </div>
+                  )}
+                  
+                  {!session && (
+                    <p className="text-xs text-zinc-500 text-center mt-4 p-3 bg-zinc-800/30 rounded-lg">
+                      💡 Sign in to save your preferences and track your generations
+                    </p>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Right Column: Template Preview */}
+          <div className="bg-zinc-900 rounded-2xl p-6 border border-zinc-800 lg:sticky lg:top-24 lg:self-start">
+            <h3 className="text-lg font-bold text-yellow-400 mb-4">✨ Template Preview</h3>
+            <div className="relative aspect-square rounded-xl overflow-hidden border-2 border-zinc-700 mb-4">
+              <img 
+                src={template.image} 
+                alt={template.title} 
+                className="w-full h-full object-cover"
               />
-            </label>
-          )}
+            </div>
+            <div className="space-y-2 text-sm">
+              <p className="text-zinc-400">
+                <span className="text-zinc-500 font-medium">Style:</span> {template.title}
+              </p>
+              <p className="text-zinc-400">
+                <span className="text-zinc-500 font-medium">Type:</span> {isOutfit ? 'Outfit Transformation' : 'AI Generation'}
+              </p>
+            </div>
+          </div>
         </div>
       )}
 
