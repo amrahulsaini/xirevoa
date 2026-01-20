@@ -506,6 +506,41 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
             </div>
           </div>
 
+          {/* Prompt Preview Section - BEFORE Generation */}
+          {userImage && !generating && (
+            <div className="bg-zinc-900 rounded-2xl p-6 border border-zinc-800 space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                  <Wand2 className="w-5 h-5 text-yellow-400" />
+                  AI Prompt Preview
+                </h3>
+                <span className="text-xs px-3 py-1.5 bg-green-500/20 text-green-400 rounded-full font-bold border border-green-500/30">
+                  FREE VIEW
+                </span>
+              </div>
+              
+              {!showPromptPreview ? (
+                <button
+                  onClick={() => setShowPromptPreview(true)}
+                  className="w-full px-4 py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-semibold transition-colors"
+                >
+                  View AI Prompt (Free)
+                </button>
+              ) : (
+                <div className="space-y-4">
+                  {/* Fixed height card with scrolling */}
+                  <div className="bg-zinc-800 rounded-xl p-4 h-32 overflow-y-auto border border-zinc-700">
+                    <p className="text-sm text-zinc-300 whitespace-pre-wrap leading-relaxed">{template.aiPrompt}</p>
+                  </div>
+                  
+                  <p className="text-xs text-zinc-400 text-center">
+                    You can customize this prompt after generation for 1 XP
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Actions row */}
           <div className="flex flex-col sm:flex-row gap-3">
             <button
