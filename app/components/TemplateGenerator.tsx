@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Upload, Wand2, Download, RefreshCw, Maximize2, X, Edit3, Sparkles, ArrowRight, Settings, Check, Lightbulb } from "lucide-react";
+import { Upload, Wand2, Download, RefreshCw, Maximize2, X, Edit3, Sparkles, ArrowRight, Settings, Check } from "lucide-react";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import InsufficientXPModal from "./InsufficientXPModal";
@@ -46,9 +46,7 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
   const [saveAsDefault, setSaveAsDefault] = useState(false);
   const [loadingModels, setLoadingModels] = useState(true);
   
-  // AI Enhancement Suggestions
-  const [enhancementSuggestions, setEnhancementSuggestions] = useState<string[]>([]);
-  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+
 
   // Fetch available models
   useEffect(() => {
@@ -72,26 +70,7 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
     }
   }, [session]);
 
-  // Fetch AI enhancement suggestions
-  const fetchEnhancementSuggestions = async (imageUrl: string) => {
-    setLoadingSuggestions(true);
-    try {
-      const res = await fetch('/api/enhancement-suggestions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageUrl }),
-      });
-      
-      if (res.ok) {
-        const data = await res.json();
-        setEnhancementSuggestions(data.suggestions || []);
-      }
-    } catch (error) {
-      console.error('Failed to fetch suggestions:', error);
-    } finally {
-      setLoadingSuggestions(false);
-    }
-  };
+
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -184,11 +163,6 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
       setModelUsed(result.modelUsed || modelData?.model_name || 'Unknown');
       setModelIdUsed(selectedModel); // Save the model ID for refinement
       setProgress(100);
-      
-      // Fetch enhancement suggestions
-      if (result.imageUrl) {
-        fetchEnhancementSuggestions(result.imageUrl);
-      }
     } catch (error: any) {
       console.error('Generation error:', error);
       setErrorMessage(error.message || 'Failed to generate image');
@@ -210,7 +184,6 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
     setModelUsed('');
     setCustomPrompt('');
     setShowPromptEditor(false);
-    setEnhancementSuggestions([]);
   };
 
   const handleEditPrompt = async () => {
@@ -275,11 +248,6 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
       setProgress(100);
       setShowPromptEditor(false);
       setCustomPrompt('');
-      
-      // Refresh suggestions
-      if (result.imageUrl) {
-        fetchEnhancementSuggestions(result.imageUrl);
-      }
     } catch (error: any) {
       console.error('Edit error:', error);
       setErrorMessage(error.message || 'Failed to edit image');
@@ -526,38 +494,6 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
               </div>
             </div>
           </div>
-
-          {/* AI Enhancement Suggestions */}
-          {(loadingSuggestions || enhancementSuggestions.length > 0) && (
-            <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 border border-blue-500/30 rounded-2xl p-6">
-              <div className="flex items-center gap-2 mb-4">
-                <Lightbulb className="w-5 h-5 text-blue-400" />
-                <h3 className="text-lg font-bold text-white">AI Enhancement Ideas</h3>
-              </div>
-              
-              {loadingSuggestions ? (
-                <div className="text-center py-4">
-                  <div className="inline-block w-6 h-6 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
-                  <p className="text-sm text-zinc-400 mt-2">Analyzing your image...</p>
-                </div>
-              ) : (
-                <div className="grid sm:grid-cols-2 gap-3">
-                  {enhancementSuggestions.map((suggestion, index) => (
-                    <button
-                      key={index}
-                      onClick={() => {
-                        setCustomPrompt(suggestion);
-                        setShowPromptEditor(true);
-                      }}
-                      className="p-4 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 hover:border-blue-400 rounded-xl text-left transition-all group"
-                    >
-                      <p className="text-sm text-zinc-300 group-hover:text-white">{suggestion}</p>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
 
           {/* Edit Prompt Section */}
           {showPromptEditor ? (

@@ -150,16 +150,20 @@ export async function POST(request: NextRequest) {
 
     const imageBuffer = Buffer.from(generatedBase64, 'base64');
 
-    // Save to database
-    const timestamp = Date.now();
-    const filename = `${userId}_${timestamp}.png`;
-    const fs = require('fs').promises;
+    // Save to disk
+    const fs = require('fs');
     const path = require('path');
-    const filepath = path.join(process.cwd(), 'public', 'generated', filename);
-    
-    await fs.writeFile(filepath, imageBuffer);
+    const publicDir = path.join(process.cwd(), 'public', 'generated');
+    if (!fs.existsSync(publicDir)) {
+      fs.mkdirSync(publicDir, { recursive: true });
+    }
 
-    const imageUrl = `/generated/${filename}`;
+    const timestamp = Date.now();
+    const filename = `refined-${userId}-${timestamp}.png`;
+    const filepath = path.join(publicDir, filename);
+    fs.writeFileSync(filepath, imageBuffer);
+
+    const imageUrl = `/api/generated/${filename}`;
 
     // Deduct XP (don't insert into generations - this is a refinement, not a new generation)
     await pool.query(
