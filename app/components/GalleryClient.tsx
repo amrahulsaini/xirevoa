@@ -78,13 +78,34 @@ export default function GalleryClient({ generations }: { generations: Generation
             key={generation.id}
             className="group relative bg-zinc-900/50 border border-zinc-800 hover:border-zinc-700 rounded-2xl overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl"
           >
-            {/* Image */}
+            {/* Before & After Images */}
             <div className="relative aspect-square overflow-hidden bg-zinc-800">
-              <img
-                src={generation.generated_image_url}
-                alt={generation.template_title}
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-              />
+              {/* Split view - Original on left, Generated on right */}
+              <div className="flex h-full">
+                {/* Original Image - Left Half */}
+                <div className="w-1/2 relative border-r-2 border-yellow-400">
+                  <img
+                    src={generation.original_image_url}
+                    alt="Original"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute bottom-2 left-2 px-2 py-1 bg-black/70 backdrop-blur-sm rounded text-[10px] font-bold text-white">
+                    BEFORE
+                  </div>
+                </div>
+                
+                {/* Generated Image - Right Half */}
+                <div className="w-1/2 relative">
+                  <img
+                    src={generation.generated_image_url}
+                    alt={generation.template_title}
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                  />
+                  <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/70 backdrop-blur-sm rounded text-[10px] font-bold text-yellow-400">
+                    AFTER
+                  </div>
+                </div>
+              </div>
               
               {/* Overlay on hover */}
               <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3">
