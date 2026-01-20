@@ -80,32 +80,43 @@ export default function GalleryClient({ generations }: { generations: Generation
           >
             {/* Before & After Images */}
             <div className="relative aspect-square overflow-hidden bg-zinc-800">
-              {/* Split view - Original on left, Generated on right */}
-              <div className="flex h-full">
-                {/* Original Image - Left Half */}
-                <div className="w-1/2 relative border-r-2 border-yellow-400">
-                  <img
-                    src={generation.original_image_url}
-                    alt="Original"
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute bottom-2 left-2 px-2 py-1 bg-black/70 backdrop-blur-sm rounded text-[10px] font-bold text-white">
-                    BEFORE
+              {generation.original_image_url && generation.original_image_url !== 'uploaded' ? (
+                // Split view - Original on left, Generated on right
+                <div className="flex h-full">
+                  {/* Original Image - Left Half */}
+                  <div className="w-1/2 relative border-r-2 border-yellow-400">
+                    <img
+                      src={generation.original_image_url}
+                      alt="Original"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute bottom-2 left-2 px-2 py-1 bg-black/70 backdrop-blur-sm rounded text-[10px] font-bold text-white">
+                      BEFORE
+                    </div>
+                  </div>
+                  
+                  {/* Generated Image - Right Half */}
+                  <div className="w-1/2 relative">
+                    <img
+                      src={generation.generated_image_url}
+                      alt={generation.template_title}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                    />
+                    <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/70 backdrop-blur-sm rounded text-[10px] font-bold text-yellow-400">
+                      AFTER
+                    </div>
                   </div>
                 </div>
-                
-                {/* Generated Image - Right Half */}
-                <div className="w-1/2 relative">
+              ) : (
+                // Old generations without original image - show only generated
+                <div className="relative h-full">
                   <img
                     src={generation.generated_image_url}
                     alt={generation.template_title}
                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                   />
-                  <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/70 backdrop-blur-sm rounded text-[10px] font-bold text-yellow-400">
-                    AFTER
-                  </div>
                 </div>
-              </div>
+              )}
               
               {/* Overlay on hover */}
               <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3">
@@ -240,16 +251,18 @@ export default function GalleryClient({ generations }: { generations: Generation
               </button>
 
               {/* Original Image Preview */}
-              <div className="pt-4 border-t border-zinc-800">
-                <div className="text-sm text-gray-400 mb-3">Original Photo</div>
-                <div className="relative aspect-square rounded-xl overflow-hidden border border-zinc-800">
-                  <img
-                    src={selectedImage.original_image_url}
-                    alt="Original"
-                    className="w-full h-full object-cover"
-                  />
+              {selectedImage.original_image_url && selectedImage.original_image_url !== 'uploaded' && (
+                <div className="pt-4 border-t border-zinc-800">
+                  <div className="text-sm text-gray-400 mb-3">Original Photo</div>
+                  <div className="relative aspect-square rounded-xl overflow-hidden border border-zinc-800">
+                    <img
+                      src={selectedImage.original_image_url}
+                      alt="Original"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
