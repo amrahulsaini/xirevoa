@@ -45,38 +45,51 @@ export default async function TemplatesMasonry({
             .replace(/[^a-z0-9]+/g, "-")
             .replace(/(^-|-$)/g, "");
 
-          const href = template.coming_soon ? "#" : `/${slug}`;
-
           return (
             <div key={template.id} className="mb-4 break-inside-avoid">
-              <Link
-                href={href}
-                onClick={(e) => {
-                  if (template.coming_soon) e.preventDefault();
-                }}
-                className="block rounded-2xl overflow-hidden border border-zinc-800 bg-zinc-900"
-              >
-                <div className="relative w-full">
-                  <Image
-                    src={template.image_url}
-                    alt={template.title}
-                    width={600}
-                    height={800}
-                    className="w-full h-auto object-cover"
-                    sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 20vw"
-                  />
-                  {template.coming_soon ? (
+              {template.coming_soon ? (
+                <div className="block rounded-2xl overflow-hidden border border-zinc-800 bg-zinc-900 opacity-80 cursor-not-allowed">
+                  <div className="relative w-full">
+                    <Image
+                      src={template.image_url}
+                      alt={template.title}
+                      width={600}
+                      height={800}
+                      className="w-full h-auto object-cover"
+                      sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 20vw"
+                    />
                     <div className="absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-bold bg-yellow-500 text-black">
                       SOON
                     </div>
-                  ) : null}
+                  </div>
+                  <div className="p-3">
+                    <p className="text-sm font-semibold text-white line-clamp-2">
+                      {template.title}
+                    </p>
+                  </div>
                 </div>
-                <div className="p-3">
-                  <p className="text-sm font-semibold text-white line-clamp-2">
-                    {template.title}
-                  </p>
-                </div>
-              </Link>
+              ) : (
+                <Link
+                  href={`/${slug}`}
+                  className="block rounded-2xl overflow-hidden border border-zinc-800 bg-zinc-900"
+                >
+                  <div className="relative w-full">
+                    <Image
+                      src={template.image_url}
+                      alt={template.title}
+                      width={600}
+                      height={800}
+                      className="w-full h-auto object-cover"
+                      sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 20vw"
+                    />
+                  </div>
+                  <div className="p-3">
+                    <p className="text-sm font-semibold text-white line-clamp-2">
+                      {template.title}
+                    </p>
+                  </div>
+                </Link>
+              )}
             </div>
           );
         })}
