@@ -2,6 +2,7 @@ import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import TemplateGenerator from "@/app/components/TemplateGenerator";
 import TemplatesMasonry from "@/app/components/TemplatesMasonry";
+import RelatedTemplates from "@/app/components/RelatedTemplates";
 import pool from "@/lib/db";
 import { RowDataPacket } from "mysql2";
 import { notFound } from "next/navigation";
@@ -82,7 +83,7 @@ export default async function TemplatePage({
         {/* Template Generator Section */}
         <section className="w-full py-8">
           <div className="container mx-auto px-4 sm:px-6">
-            <div className="grid gap-6 lg:grid-cols-[460px_1fr]">
+            <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_420px]">
               <div>
                 <TemplateGenerator
                   template={template}
@@ -101,6 +102,13 @@ export default async function TemplatePage({
         <section className="w-full py-10 lg:hidden">
           <div className="container mx-auto px-4 sm:px-6">
             <TemplatesMasonry currentTemplateId={template.id} />
+          </div>
+        </section>
+
+        {/* Under the generator: related templates */}
+        <section className="w-full py-12">
+          <div className="container mx-auto px-4 sm:px-6">
+            <RelatedTemplates currentTemplateId={template.id} tags={template.tags} />
           </div>
         </section>
 

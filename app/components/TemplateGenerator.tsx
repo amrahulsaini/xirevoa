@@ -73,6 +73,17 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
     }
   }, [session]);
 
+  useEffect(() => {
+    if (!showModelPicker) return;
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShowModelPicker(false);
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [showModelPicker]);
+
   const applyUserImageFile = (file: File) => {
     if (!file.type.startsWith("image/")) {
       setErrorMessage("Please upload an image file");
@@ -374,81 +385,22 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
 
           {/* Actions row */}
           <div className="flex flex-col sm:flex-row gap-3">
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setShowModelPicker((v) => !v)}
-                className="w-full sm:w-auto px-4 py-3 rounded-xl border border-zinc-800 bg-zinc-900 text-white font-semibold flex items-center gap-2"
-              >
-                <Settings className="w-4 h-4" />
-                Models
-                {selectedModelData ? (
-                  <span className="text-xs text-zinc-400">({selectedModelData.model_name})</span>
-                ) : null}
-              </button>
-
-              {showModelPicker && (
-                <div className="absolute z-20 mt-2 w-full sm:w-[360px] rounded-2xl border border-zinc-800 bg-zinc-950 p-3">
-                  {loadingModels ? (
-                    <p className="text-sm text-zinc-400">Loading models…</p>
-                  ) : (
-                    <div className="space-y-2">
-                      {models.map((model) => (
-                        <button
-                          key={model.model_id}
-                          type="button"
-                          disabled={!model.is_active}
-                          onClick={() => {
-                            if (!model.is_active) return;
-                            setSelectedModel(model.model_id);
-                            if (generatedImage) setModelIdUsed(model.model_id);
-                          }}
-                          className={`w-full text-left px-3 py-2 rounded-xl border ${
-                            selectedModel === model.model_id
-                              ? "border-yellow-500 bg-zinc-900"
-                              : "border-zinc-800 bg-zinc-950"
-                          } ${model.is_active ? "text-white" : "text-zinc-600"}`}
-                        >
-                          <div className="flex items-center justify-between gap-3">
-                            <span className="text-sm font-semibold">{model.model_name}</span>
-                            <span className="text-xs text-zinc-400">{model.xp_cost} XP</span>
-                          </div>
-                          {!model.is_active ? (
-                            <div className="mt-1 text-xs text-zinc-600">Coming soon</div>
-                          ) : null}
-                        </button>
-                      ))}
-
-                      <div className="pt-2 flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={handleSaveDefaultModel}
-                          disabled={savingDefaultModel || !session}
-                          className="flex-1 px-4 py-2 rounded-xl bg-yellow-500 text-black font-bold disabled:opacity-60"
-                        >
-                          {savingDefaultModel ? "Saving…" : "Save as default"}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setShowModelPicker(false)}
-                          className="px-4 py-2 rounded-xl border border-zinc-800 text-white"
-                        >
-                          Close
-                        </button>
-                      </div>
-                      {!session ? (
-                        <p className="text-xs text-zinc-500 pt-2">Sign in to save a default model.</p>
-                      ) : null}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
+            <button
+              type="button"
+              onClick={() => setShowModelPicker(true)}
+              className="w-full sm:w-auto px-4 py-3 rounded-xl border border-zinc-800 bg-zinc-900 text-white font-semibold flex items-center gap-2 hover:bg-zinc-800 transition-colors"
+            >
+              <Settings className="w-4 h-4" />
+              Models
+              {selectedModelData ? (
+                <span className="text-xs text-zinc-400">({selectedModelData.model_name})</span>
+              ) : null}
+            </button>
 
             <button
               onClick={handleGenerate}
               disabled={!userImage || generating}
-              className="w-full sm:flex-1 px-5 py-3 rounded-xl bg-yellow-500 text-black font-black flex items-center justify-center gap-2 disabled:opacity-60"
+              className="w-full sm:flex-1 px-5 py-3 rounded-xl bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black font-black flex items-center justify-center gap-2 transition-colors disabled:opacity-60"
             >
               <Wand2 className="w-5 h-5" />
               Generate ({selectedModelData?.xp_cost || 3} XP)
@@ -598,76 +550,17 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
               </div>
 
               {/* Models */}
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setShowModelPicker((v) => !v)}
-                  className="w-full px-6 py-4 bg-zinc-900 border border-zinc-800 text-white font-black rounded-xl flex items-center justify-center gap-2"
-                >
-                  <Settings className="w-5 h-5" />
-                  Models
-                  {selectedModelData ? (
-                    <span className="text-xs text-zinc-400">({selectedModelData.model_name})</span>
-                  ) : null}
-                </button>
-
-                {showModelPicker && (
-                  <div className="absolute z-20 mt-2 w-full rounded-2xl border border-zinc-800 bg-zinc-950 p-3">
-                    {loadingModels ? (
-                      <p className="text-sm text-zinc-400">Loading models…</p>
-                    ) : (
-                      <div className="space-y-2">
-                        {models.map((model) => (
-                          <button
-                            key={model.model_id}
-                            type="button"
-                            disabled={!model.is_active}
-                            onClick={() => {
-                              if (!model.is_active) return;
-                              setSelectedModel(model.model_id);
-                              setModelIdUsed(model.model_id);
-                            }}
-                            className={`w-full text-left px-3 py-2 rounded-xl border ${
-                              selectedModel === model.model_id
-                                ? "border-yellow-500 bg-zinc-900"
-                                : "border-zinc-800 bg-zinc-950"
-                            } ${model.is_active ? "text-white" : "text-zinc-600"}`}
-                          >
-                            <div className="flex items-center justify-between gap-3">
-                              <span className="text-sm font-semibold">{model.model_name}</span>
-                              <span className="text-xs text-zinc-400">{model.xp_cost} XP</span>
-                            </div>
-                            {!model.is_active ? (
-                              <div className="mt-1 text-xs text-zinc-600">Coming soon</div>
-                            ) : null}
-                          </button>
-                        ))}
-
-                        <div className="pt-2 flex items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={handleSaveDefaultModel}
-                            disabled={savingDefaultModel || !session}
-                            className="flex-1 px-4 py-2 rounded-xl bg-yellow-500 text-black font-bold disabled:opacity-60"
-                          >
-                            {savingDefaultModel ? "Saving…" : "Save as default"}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setShowModelPicker(false)}
-                            className="px-4 py-2 rounded-xl border border-zinc-800 text-white"
-                          >
-                            Close
-                          </button>
-                        </div>
-                        {!session ? (
-                          <p className="text-xs text-zinc-500 pt-2">Sign in to save a default model.</p>
-                        ) : null}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
+              <button
+                type="button"
+                onClick={() => setShowModelPicker(true)}
+                className="w-full px-6 py-4 bg-zinc-900 border border-zinc-800 text-white font-black rounded-xl flex items-center justify-center gap-2 hover:bg-zinc-800 transition-colors"
+              >
+                <Settings className="w-5 h-5" />
+                Models
+                {selectedModelData ? (
+                  <span className="text-xs text-zinc-400">({selectedModelData.model_name})</span>
+                ) : null}
+              </button>
               
               {/* Secondary Actions */}
               <div className="flex gap-3">
@@ -720,6 +613,105 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
         currentXP={(session?.user as any)?.xpoints || 0}
         isLoggedIn={!!session}
       />
+
+      {/* Models dialog */}
+      {showModelPicker && (
+        <div
+          className="fixed inset-0 z-50"
+          onMouseDown={(e) => {
+            if (e.target === e.currentTarget) setShowModelPicker(false);
+          }}
+        >
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+          <div className="relative mx-auto max-w-xl px-4 py-10">
+            <div className="rounded-2xl border border-zinc-800 bg-zinc-950 shadow-2xl">
+              <div className="flex items-center justify-between p-5 border-b border-zinc-800">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center">
+                    <Settings className="w-5 h-5 text-yellow-400" />
+                  </div>
+                  <div>
+                    <p className="text-white font-black text-lg">Choose a model</p>
+                    <p className="text-xs text-zinc-400">Pick once, save as default, and it will be used automatically.</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowModelPicker(false)}
+                  className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:bg-zinc-800 transition-colors flex items-center justify-center"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="p-5">
+                {loadingModels ? (
+                  <p className="text-sm text-zinc-400">Loading models…</p>
+                ) : (
+                  <div className="max-h-[55vh] overflow-y-auto space-y-2 pr-1">
+                    {models.map((model) => {
+                      const isSelected = selectedModel === model.model_id;
+                      return (
+                        <button
+                          key={model.model_id}
+                          type="button"
+                          disabled={!model.is_active}
+                          onClick={() => {
+                            if (!model.is_active) return;
+                            setSelectedModel(model.model_id);
+                            if (generatedImage) setModelIdUsed(model.model_id);
+                          }}
+                          className={`w-full text-left p-4 rounded-xl border transition-colors ${
+                            isSelected
+                              ? "border-yellow-500 bg-zinc-900"
+                              : "border-zinc-800 bg-zinc-950 hover:bg-zinc-900"
+                          } ${model.is_active ? "text-white" : "text-zinc-600"}`}
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <p className="font-bold">{model.model_name}</p>
+                              <p className="text-xs text-zinc-400">Cost: {model.xp_cost} XP</p>
+                              {!model.is_active ? (
+                                <p className="text-xs text-zinc-600 mt-1">Coming soon</p>
+                              ) : null}
+                            </div>
+                            {isSelected ? (
+                              <div className="w-7 h-7 rounded-full bg-yellow-500 text-black flex items-center justify-center">
+                                <Check className="w-4 h-4" />
+                              </div>
+                            ) : null}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+
+                <div className="mt-5 flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={handleSaveDefaultModel}
+                    disabled={savingDefaultModel || !session}
+                    className="flex-1 px-5 py-3 rounded-xl bg-yellow-500 hover:bg-yellow-400 text-black font-black transition-colors disabled:opacity-60"
+                  >
+                    {savingDefaultModel ? "Saving…" : "Save as default"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowModelPicker(false)}
+                    className="px-5 py-3 rounded-xl border border-zinc-800 bg-zinc-900 text-white font-bold hover:bg-zinc-800 transition-colors"
+                  >
+                    Close
+                  </button>
+                </div>
+                {!session ? (
+                  <p className="text-xs text-zinc-500 mt-3">Sign in to save a default model.</p>
+                ) : null}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
