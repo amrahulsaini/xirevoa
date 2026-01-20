@@ -44,6 +44,7 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
   const [showPromptPreview, setShowPromptPreview] = useState(false); // Show prompt before generation
   const [promptEdited, setPromptEdited] = useState(false); // Track if user edited the prompt
   const [editedPrompt, setEditedPrompt] = useState(''); // Store edited prompt
+  const [hasViewedTemplatePrompt, setHasViewedTemplatePrompt] = useState(false); // Track if user has ever viewed this template's prompt
   const [showPromptEditor, setShowPromptEditor] = useState(false);
   const [customPrompt, setCustomPrompt] = useState('');
   const [isDragging, setIsDragging] = useState(false);
@@ -56,6 +57,23 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
   const [loadingModels, setLoadingModels] = useState(true);
   
 
+
+  // Check if user has viewed this template's prompt before
+  useEffect(() => {
+    const checkPromptView = async () => {
+      if (!session || !template) return;
+      
+      try {
+        const res = await fetch(`/api/check-prompt-view?templateId=${template.id}`);
+        const data = await res.json();
+        setHasViewedTemplatePrompt(data.hasViewed || false);
+      } catch (error) {
+        console.error('Failed to check prompt view:', error);
+      }
+    };
+
+    checkPromptView();
+  }, [session, template]);
 
   // Fetch available models
   useEffect(() => {
@@ -309,7 +327,51 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
       setErrorMessage('Failed to view prompt');
     }
   };
+  const handleViewPreGenerationPrompt = async () => {
+    if (!session) {
+      setErrorMessage('Please login to view prompt');
+      return;
+    }
 
+    // Check if need to pay
+    if (!hasViewedTemplatePrompt) {
+      const currentXP = (session?.user as any)?.xpoints || 0;
+      if (currentXP < 1) {
+        setShowXPModal(true);
+        return;
+      }
+    }
+
+    try {
+      const res = await fetch('/api/view-prompt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          templateId: template.id,
+          isPreGeneration: true 
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        if (data.error?.includes('Insufficient')) {
+          setShowXPModal(true);
+        } else {
+          setErrorMessage(data.error || 'Failed to view prompt');
+        }
+        return;
+      }
+
+      setShowPromptPreview(true);
+      if (!hasViewedTemplatePrompt && !data.isFree) {
+        setHasViewedTemplatePrompt(true); // Mark as viewed locally
+      }
+    } catch (error) {
+      console.error('View pre-generation prompt error:', error);
+      setErrorMessage('Failed to view prompt');
+    }
+  };
   const handleSaveEditedPrompt = async () => {
     if (!editedPrompt.trim() || !session) {
       return;
@@ -514,17 +576,23 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
                   <Wand2 className="w-5 h-5 text-yellow-400" />
                   AI Prompt Preview
                 </h3>
-                <span className="text-xs px-3 py-1.5 bg-green-500/20 text-green-400 rounded-full font-bold border border-green-500/30">
-                  FREE VIEW
-                </span>
+                {hasViewedTemplatePrompt ? (
+                  <span className="text-xs px-3 py-1.5 bg-green-500/20 text-green-400 rounded-full font-bold border border-green-500/30">
+                    FREE VIEW
+                  </span>
+                ) : (
+                  <span className="text-xs px-3 py-1.5 bg-yellow-500/20 text-yellow-400 rounded-full font-bold border border-yellow-500/30">
+                    1 XP
+                  </span>
+                )}
               </div>
               
               {!showPromptPreview ? (
                 <button
-                  onClick={() => setShowPromptPreview(true)}
+                  onClick={handleViewPreGenerationPrompt}
                   className="w-full px-4 py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-semibold transition-colors"
                 >
-                  View AI Prompt (Free)
+                  {hasViewedTemplatePrompt ? 'View AI Prompt (Free)' : 'View AI Prompt (1 XP - First Time)'}
                 </button>
               ) : (
                 <div className="space-y-4">
