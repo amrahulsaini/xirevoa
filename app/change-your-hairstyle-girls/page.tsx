@@ -49,7 +49,7 @@ async function getGirlsHairstyleTemplates(): Promise<Category[]> {
 async function getOtherCategories(): Promise<{hairstyles: Category[], jewelleries: Category[], eighties: Category[], cinematic: Category[], instagram: Category[]}> {
   try {
     const [rows] = await pool.query<TemplateRow[]>(
-      'SELECT id, title, description, image_url, tags, coming_soon FROM templates WHERE id IN (23, 24, 25, 26, 27, 62, 63, 64, 65, 66, 67, 33, 34, 28, 16, 35, 36, 10, 1, 8, 2, 9, 7) AND is_active = TRUE ORDER BY display_order ASC'
+      'SELECT id, title, description, image_url, tags, coming_soon FROM templates WHERE id IN (23, 24, 25, 26, 27, 62, 63, 64, 65, 66, 67, 68, 69, 70, 33, 34, 28, 16, 35, 36, 10, 1, 8, 2, 9, 7) AND is_active = TRUE ORDER BY display_order ASC'
     );
     
     const allTemplates = rows.map((row: TemplateRow) => ({
@@ -64,7 +64,7 @@ async function getOtherCategories(): Promise<{hairstyles: Category[], jewellerie
     
     return {
       hairstyles: allTemplates.filter(t => [23, 24, 25, 26, 27].includes(t.id)),
-      jewelleries: allTemplates.filter(t => [62, 63, 64, 65, 66, 67].includes(t.id)),
+      jewelleries: allTemplates.filter(t => [62, 63, 64, 65, 66, 67, 68, 69, 70].includes(t.id)),
       eighties: allTemplates.filter(t => [33, 34].includes(t.id)),
       cinematic: allTemplates.filter(t => [28, 16, 35, 36, 10].includes(t.id)),
       instagram: allTemplates.filter(t => [1, 8, 2, 9, 7].includes(t.id)),

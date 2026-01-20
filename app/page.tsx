@@ -79,6 +79,9 @@ export default async function Home({
   // Fetch girls hairstyle templates (IDs 39, 40, 41, 42)
   const girlsHairstyleTemplates = templates.filter(t => [39, 40, 41, 42].includes(t.id));
   
+  // Fetch jewellery templates (IDs 62-70)
+  const jewelleryTemplates = templates.filter(t => [62, 63, 64, 65, 66, 67, 68, 69, 70].includes(t.id));
+  
   // Fetch outfit templates (IDs 43-50)
   const outfitTemplates = templates.filter(t => [43, 44, 45, 46, 47, 48, 49, 50, 52, 53, 54, 55, 56, 57, 58, 59, 60].includes(t.id));
   
@@ -360,7 +363,7 @@ export default async function Home({
               </div>
             </div>
             
-            <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-6">
+            <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-6">
               {/* Hairstyles Card */}
               <a
                 href="/change-your-hairstyle-girls"
@@ -407,6 +410,54 @@ export default async function Home({
                   </div>
                 </div>
               </a>
+
+              {/* Jewelleries Card */}
+              {jewelleryTemplates.length > 0 && (
+                <a
+                  href="/change-your-hairstyle-girls"
+                  className="group relative block bg-gradient-to-br from-yellow-900/40 via-amber-900/40 to-yellow-900/40 rounded-3xl overflow-hidden border-2 border-yellow-500/40 hover:border-yellow-400/80 transition-all hover:scale-105 hover:shadow-2xl hover:shadow-yellow-500/50"
+                >
+                  <div className="aspect-[4/5] overflow-hidden relative">
+                    <div className="grid grid-cols-2 gap-1 h-full">
+                      {jewelleryTemplates.slice(0, 4).map((template, index) => (
+                        <div key={template.id} className="overflow-hidden">
+                          <img 
+                            src={template.image} 
+                            alt=""
+                            className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-500"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {/* Gradient Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
+                    
+                    {/* Center Content */}
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6">
+                      <div className="bg-black/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-yellow-500/50 max-w-sm">
+                        <div className="mb-4">
+                          <div className="bg-gradient-to-r from-yellow-500 to-amber-500 text-black text-sm font-bold px-4 py-2 rounded-full inline-block shadow-lg">
+                            💎 {jewelleryTemplates.length} Jewelleries
+                          </div>
+                        </div>
+                        <h3 className="text-white font-black text-2xl mb-2 group-hover:text-yellow-300 transition-colors">
+                          Try Best Jewelleries
+                        </h3>
+                        <p className="text-yellow-200/90 text-sm mb-4">
+                          Discover elegant necklaces, earrings & accessories that enhance your beauty
+                        </p>
+                        <div className="flex items-center justify-center gap-2 text-yellow-400 font-bold group-hover:gap-3 transition-all">
+                          <span>Explore Now</span>
+                          <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </a>
+              )}
 
               {/* Iconic Outfits Card */}
               <a
