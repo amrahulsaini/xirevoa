@@ -117,7 +117,7 @@ export default function PricingPage() {
     {
       name: "Starter",
       xp: 100,
-      price: 99,
+      price: 1,
       popular: false,
       features: [
         "100 XP Points",
