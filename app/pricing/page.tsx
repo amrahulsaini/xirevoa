@@ -1,8 +1,118 @@
+"use client";
+
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { Check, Zap, Crown, Sparkles, TrendingUp } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
 
 export default function PricingPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const [loading, setLoading] = useState<string | null>(null);
+
+  const handlePayment = async (plan: typeof plans[0]) => {
+    if (status === "unauthenticated") {
+      router.push("/auth/login");
+      return;
+    }
+
+    if (status === "loading") return;
+
+    setLoading(plan.name);
+
+    try {
+      // Create order
+      const orderResponse = await fetch("/api/razorpay/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: plan.price,
+          xp: plan.xp,
+          planName: plan.name,
+        }),
+      });
+
+      if (!orderResponse.ok) {
+        throw new Error("Failed to create order");
+      }
+
+      const orderData = await orderResponse.json();
+
+      // Configure Razorpay options
+      const options = {
+        key: orderData.keyId,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: "Xirevoa",
+        description: `${plan.name} - ${plan.xp} XP Points`,
+        image: "/logo.png", // Your logo
+        order_id: orderData.orderId,
+        handler: async function (response: any) {
+          try {
+            // Verify payment
+            const verifyResponse = await fetch("/api/razorpay/verify-payment", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                xp: plan.xp,
+                planName: plan.name,
+                amount: plan.price,
+              }),
+            });
+
+            const verifyData = await verifyResponse.json();
+
+            if (verifyData.success) {
+              // Show success message
+              alert(
+                `🎉 Payment Successful!\n\n${plan.xp} XP Points have been added to your account.\n\nNew Balance: ${verifyData.newBalance} XP`
+              );
+              // Refresh the page to update XP balance in header
+              window.location.reload();
+            } else {
+              throw new Error(verifyData.error || "Payment verification failed");
+            }
+          } catch (error) {
+            console.error("Payment verification error:", error);
+            alert("Payment verification failed. Please contact support.");
+          } finally {
+            setLoading(null);
+          }
+        },
+        prefill: {
+          name: session?.user?.name || "",
+          email: session?.user?.email || "",
+        },
+        theme: {
+          color: "#F59E0B", // Orange-500 to match your brand
+        },
+        modal: {
+          ondismiss: function () {
+            setLoading(null);
+          },
+        },
+      };
+
+      // Open Razorpay checkout
+      const razorpayInstance = new window.Razorpay(options);
+      razorpayInstance.open();
+    } catch (error) {
+      console.error("Payment error:", error);
+      alert("Failed to initiate payment. Please try again.");
+      setLoading(null);
+    }
+  };
   const plans = [
     {
       name: "Starter",
@@ -150,18 +260,19 @@ export default function PricingPage() {
 
                   {/* CTA Button */}
                   <button 
-                    disabled
+                    onClick={() => handlePayment(plan)}
+                    disabled={loading === plan.name}
                     className={`w-full py-4 rounded-xl font-bold transition-all duration-300 shadow-lg ${
                       plan.popular 
                         ? 'bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-black shadow-yellow-500/25' 
                         : 'bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700'
-                    } opacity-60 cursor-not-allowed`}
+                    } disabled:opacity-60 disabled:cursor-not-allowed`}
                   >
-                    Coming Soon
+                    {loading === plan.name ? "Processing..." : "Buy Now"}
                   </button>
                   
                   <p className="text-center text-xs text-gray-500">
-                    Payment integration in progress
+                    Secure payment via Razorpay
                   </p>
                 </div>
               </div>
