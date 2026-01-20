@@ -199,22 +199,24 @@ export async function POST(request: NextRequest) {
           templateBase64 = templateImageBuffer.toString('base64');
         }
         
-        // For face swap: Use database prompt or custom edited prompt
+        // For face swap: Structure with images FIRST, then prompt
+        // This ensures AI sees the images before reading the prompt that references them
         contentParts.push(
-          { text: aiPrompt },
+          { text: `Image 1 - Person's face:` },
           {
             inlineData: {
               mimeType: image.type,
               data: base64Image,
             },
           },
-          { text: `Reference image for clothing style:` },
+          { text: `Image 2 - Reference outfit/clothing style:` },
           {
             inlineData: {
               mimeType: 'image/jpeg',
               data: templateBase64,
             },
-          }
+          },
+          { text: aiPrompt }
         );
 
         console.log('Including both images for face swap - User face + Template outfit image');
