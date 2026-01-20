@@ -163,8 +163,8 @@ export async function POST(request: NextRequest) {
 
     // Insert generation record
     await pool.query<ResultSetHeader>(
-      'INSERT INTO generations (user_id, template_id, image_url, prompt, model_used, created_at) VALUES (?, ?, ?, ?, ?, NOW())',
-      [userId, null, imageUrl, customPrompt, modelName]
+      'INSERT INTO generations (user_id, template_id, template_title, original_image_url, generated_image_url, xp_cost, is_outfit, model_used) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [userId, null, 'Refined Image', 'refined', imageUrl, EDIT_COST, false, modelName]
     );
 
     // Deduct XP
