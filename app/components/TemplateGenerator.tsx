@@ -248,12 +248,6 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
       return;
     }
 
-    const currentXP = (session?.user as any)?.xpoints || 0;
-    if (currentXP < 1) {
-      setShowXPModal(true);
-      return;
-    }
-
     setErrorMessage(null);
 
     try {
@@ -266,11 +260,7 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
       const data = await res.json();
 
       if (!res.ok) {
-        if (res.status === 400 && data.error?.includes('Insufficient')) {
-          setShowXPModal(true);
-        } else {
-          setErrorMessage(data.error || 'Failed to view prompt');
-        }
+        setErrorMessage(data.error || 'Failed to view prompt');
         return;
       }
 
@@ -516,77 +506,6 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
             </div>
           </div>
 
-          {/* Prompt Preview and Edit Section */}
-          {userImage && !generating && (
-            <div className="bg-zinc-900 rounded-2xl p-6 border border-zinc-800 space-y-4">
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <Wand2 className="w-5 h-5 text-yellow-400" />
-                AI Prompt Preview
-              </h3>
-              
-              {!showPromptPreview ? (
-                <button
-                  onClick={handleViewPromptPreview}
-                  className="w-full px-4 py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-semibold transition-colors"
-                >
-                  View AI Prompt (1 XP)
-                </button>
-              ) : (
-                <div className="space-y-4">
-                  <div className="bg-zinc-800 rounded-xl p-4">
-                    <p className="text-sm text-zinc-300 whitespace-pre-wrap">{template.aiPrompt}</p>
-                  </div>
-                  
-                  {!promptEdited ? (
-                    <div className="space-y-3">
-                      <p className="text-xs text-zinc-400">Want to customize the prompt?</p>
-                      <button
-                        onClick={() => {
-                          setEditedPrompt(template.aiPrompt || '');
-                          setPromptEdited(true);
-                        }}
-                        className="w-full px-4 py-3 rounded-xl border border-yellow-500 bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-400 font-semibold transition-colors"
-                      >
-                        Edit Prompt (1 XP)
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      <label className="block text-sm font-semibold text-white">
-                        Custom Prompt:
-                      </label>
-                      <textarea
-                        value={editedPrompt}
-                        onChange={(e) => setEditedPrompt(e.target.value)}
-                        rows={6}
-                        className="w-full px-4 py-3 rounded-xl bg-zinc-800 border border-zinc-700 text-white focus:border-yellow-500 focus:outline-none resize-none"
-                        placeholder="Enter your custom prompt..."
-                      />
-                      <div className="flex gap-3">
-                        <button
-                          onClick={handleSaveEditedPrompt}
-                          disabled={!editedPrompt.trim()}
-                          className="flex-1 px-4 py-3 rounded-xl bg-yellow-500 hover:bg-yellow-600 text-black font-bold transition-colors disabled:opacity-50"
-                        >
-                          Save Changes (1 XP)
-                        </button>
-                        <button
-                          onClick={() => {
-                            setPromptEdited(false);
-                            setEditedPrompt('');
-                          }}
-                          className="px-4 py-3 rounded-xl border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-white font-semibold transition-colors"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
-
           {/* Actions row */}
           <div className="flex flex-col sm:flex-row gap-3">
             <button
@@ -682,6 +601,37 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
             </div>
           </div>
 
+          {/* View Prompt Section - FREE after generation */}
+          {viewedPrompt && (
+            <div className="bg-zinc-900 rounded-2xl p-6 border border-zinc-800 space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-yellow-400" />
+                  AI Prompt Used
+                </h3>
+                <span className="text-xs px-3 py-1.5 bg-green-500/20 text-green-400 rounded-full font-bold border border-green-500/30">
+                  FREE VIEW
+                </span>
+              </div>
+              
+              {/* Fixed height card with scrolling */}
+              <div className="bg-zinc-800 rounded-xl p-4 h-32 overflow-y-auto border border-zinc-700">
+                <p className="text-sm text-zinc-300 whitespace-pre-wrap leading-relaxed">{viewedPrompt}</p>
+              </div>
+
+              <button
+                onClick={() => {
+                  setShowPromptEditor(true);
+                  setCustomPrompt(viewedPrompt);
+                }}
+                className="w-full px-4 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 text-white font-bold transition-all shadow-lg flex items-center justify-center gap-2"
+              >
+                <Edit3 className="w-4 h-4" />
+                Edit & Regenerate (1 XP)
+              </button>
+            </div>
+          )}
+
           {/* Edit Prompt Section */}
           {showPromptEditor ? (
             <div className="bg-gradient-to-br from-purple-900/40 to-pink-900/40 border-2 border-purple-500/50 rounded-2xl p-6 space-y-4 shadow-lg shadow-purple-500/20">
@@ -742,7 +692,7 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
                     className="px-6 py-4 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-black rounded-xl transition-all shadow-lg shadow-blue-500/30 hover:shadow-blue-500/60 hover:scale-[1.02] flex items-center justify-center gap-2 text-base"
                   >
                     <Sparkles className="w-5 h-5" />
-                    View Prompt (1 XP)
+                    View Prompt (Free)
                   </button>
                 )}
                 <button

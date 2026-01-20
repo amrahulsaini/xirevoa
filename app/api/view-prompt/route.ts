@@ -19,21 +19,6 @@ export async function POST(req: NextRequest) {
     const connection = await pool.getConnection();
 
     try {
-      // Check user's XP balance
-      const [userRows]: any = await connection.query(
-        "SELECT xpoints FROM users WHERE id = ?",
-        [session.user.id]
-      );
-
-      const currentXP = userRows[0]?.xpoints || 0;
-
-      if (currentXP < 1) {
-        return NextResponse.json(
-          { error: "Insufficient XP. You need 1 XP to view the prompt." },
-          { status: 400 }
-        );
-      }
-
       // Get the generation and its prompt
       const [generations]: any = await connection.query(
         "SELECT prompt_used, user_id FROM generations WHERE id = ?",
@@ -64,19 +49,10 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // Deduct 1 XP
-      await connection.query(
-        "UPDATE users SET xpoints = xpoints - 1 WHERE id = ?",
-        [session.user.id]
-      );
-
-      const newBalance = currentXP - 1;
-
+      // No XP deduction - viewing is now FREE after generation
       return NextResponse.json({
         success: true,
         prompt,
-        xpDeducted: 1,
-        newBalance,
       });
     } finally {
       connection.release();
