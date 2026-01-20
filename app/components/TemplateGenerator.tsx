@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Upload, Wand2, Download, RefreshCw, Maximize2, X } from "lucide-react";
+import { Upload, Wand2, Download, RefreshCw, Maximize2, X, Edit3, Sparkles } from "lucide-react";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import InsufficientXPModal from "./InsufficientXPModal";
@@ -28,6 +28,9 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
   const [showFullScreen, setShowFullScreen] = useState(false);
   const [showXPModal, setShowXPModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [modelUsed, setModelUsed] = useState<string>('');
+  const [showPromptEditor, setShowPromptEditor] = useState(false);
+  const [customPrompt, setCustomPrompt] = useState('');
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -111,6 +114,7 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
       const result = await generateRes.json();
       console.log('Generate result:', result);
       setGeneratedImage(result.imageUrl);
+      setModelUsed(result.modelUsed || 'Unknown');
       setProgress(100);
     } catch (error: any) {
       console.error('Generation error:', error);
@@ -130,6 +134,81 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
     setUserImagePreview(null);
     setGeneratedImage(null);
     setProgress(0);
+    setModelUsed('');
+    setCustomPrompt('');
+    setShowPromptEditor(false);
+  };
+
+  const handleEditPrompt = async () => {
+    if (!customPrompt.trim()) {
+      setErrorMessage('Please enter a prompt to refine your image');
+      return;
+    }
+
+    // Check if user is logged in
+    if (!session) {
+      setShowXPModal(true);
+      return;
+    }
+
+    // CHECK XP FIRST (1 XP for editing)
+    const currentXP = (session?.user as any)?.xpoints || 0;
+    const requiredXP = 1;
+    
+    if (currentXP < requiredXP) {
+      setShowXPModal(true);
+      return;
+    }
+
+    setErrorMessage(null);
+    setGenerating(true);
+    setProgress(0);
+
+    try {
+      setProgress(10);
+
+      const editFormData = new FormData();
+      editFormData.append('imageUrl', generatedImage || '');
+      editFormData.append('prompt', customPrompt);
+      editFormData.append('templateId', template.id.toString());
+
+      const progressInterval = setInterval(() => {
+        setProgress(prev => {
+          if (prev < 70) return prev + 10;
+          return prev;
+        });
+      }, 800);
+
+      const editRes = await fetch('/api/edit-prompt', {
+        method: 'POST',
+        body: editFormData,
+      });
+
+      clearInterval(progressInterval);
+      setProgress(90);
+
+      if (!editRes.ok) {
+        const error = await editRes.json();
+        throw new Error(error.error || 'Failed to edit image');
+      }
+
+      const result = await editRes.json();
+      setGeneratedImage(result.imageUrl);
+      setModelUsed(result.modelUsed || modelUsed);
+      setProgress(100);
+      setShowPromptEditor(false);
+      setCustomPrompt('');
+    } catch (error: any) {
+      console.error('Edit error:', error);
+      setErrorMessage(error.message || 'Failed to edit image');
+      setGenerating(false);
+      setProgress(0);
+    } finally {
+      setTimeout(() => {
+        setGenerating(false);
+        setProgress(0);
+      }, 500);
+    }
   };
 
   return (
@@ -242,7 +321,12 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
           {generatedImage && !generating && (
             <>
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-bold text-yellow-400">✨ You'll Love This!</h3>
+                <div>
+                  <h3 className="text-lg font-bold text-yellow-400">✨ You'll Love This!</h3>
+                  {modelUsed && (
+                    <p className="text-xs text-zinc-500 mt-1">Generated with {modelUsed}</p>
+                  )}
+                </div>
                 <button
                   onClick={handleReset}
                   className="flex items-center gap-2 px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-yellow-400 rounded-lg transition-colors text-sm"
@@ -261,23 +345,68 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
                     <Maximize2 className="w-5 h-5" />
                   </button>
                 </div>
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => setShowFullScreen(true)}
-                    className="flex-1 px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2"
-                  >
-                    <Maximize2 className="w-4 h-4" />
-                    Preview
-                  </button>
-                  <a
-                    href={generatedImage}
-                    download="xirevoa-generated.png"
-                    className="flex-1 px-4 py-2.5 bg-gradient-to-r from-green-600 to-green-500 text-white font-bold rounded-xl hover:shadow-lg hover:shadow-green-500/50 transition-all flex items-center justify-center gap-2"
-                  >
-                    <Download className="w-4 h-4" />
-                    Download
-                  </a>
-                </div>
+                
+                {/* Prompt Editor */}
+                {showPromptEditor ? (
+                  <div className="bg-zinc-800 border border-zinc-700 rounded-xl p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Edit3 className="w-4 h-4 text-yellow-400" />
+                        <span className="text-sm font-bold text-white">Refine Your Image</span>
+                        <span className="text-xs px-2 py-0.5 bg-yellow-400/20 text-yellow-400 rounded-full">1 XP</span>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setShowPromptEditor(false);
+                          setCustomPrompt('');
+                        }}
+                        className="text-zinc-400 hover:text-white transition-colors"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                    <textarea
+                      value={customPrompt}
+                      onChange={(e) => setCustomPrompt(e.target.value)}
+                      placeholder="Describe how you want to refine this image... (e.g., 'make it more vibrant', 'add sunset lighting', 'change background to mountains')"
+                      className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:border-yellow-400 focus:outline-none min-h-[100px] resize-none"
+                    />
+                    <button
+                      onClick={handleEditPrompt}
+                      disabled={!customPrompt.trim() || generating}
+                      className="w-full px-4 py-2.5 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-black font-bold rounded-xl transition-all shadow-lg hover:shadow-yellow-500/50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                      <Sparkles className="w-4 h-4" />
+                      Refine Image (1 XP)
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      onClick={() => setShowPromptEditor(true)}
+                      className="px-4 py-2.5 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white font-bold rounded-xl transition-all shadow-lg hover:shadow-purple-500/50 flex items-center justify-center gap-2"
+                    >
+                      <Edit3 className="w-4 h-4" />
+                      Edit Prompt
+                    </button>
+                    <button
+                      onClick={() => setShowFullScreen(true)}
+                      className="px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2"
+                    >
+                      <Maximize2 className="w-4 h-4" />
+                      Preview
+                    </button>
+                  </div>
+                )}
+
+                <a
+                  href={generatedImage}
+                  download="xirevoa-generated.png"
+                  className="block w-full px-4 py-2.5 bg-gradient-to-r from-green-600 to-green-500 text-white font-bold rounded-xl hover:shadow-lg hover:shadow-green-500/50 transition-all flex items-center justify-center gap-2"
+                >
+                  <Download className="w-4 h-4" />
+                  Download
+                </a>
               </div>
             </>
           )}

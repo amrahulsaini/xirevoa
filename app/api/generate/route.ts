@@ -325,9 +325,9 @@ export async function POST(request: NextRequest) {
           // Save generation record
           await saveConnection.query(
             `INSERT INTO generations 
-            (user_id, template_id, template_title, original_image_url, generated_image_url, xp_cost, is_outfit) 
-            VALUES (?, ?, ?, ?, ?, ?, ?)`,
-            [userId, templateId, templateTitle, 'uploaded', generatedImageUrl, XP_COST, isOutfit]
+            (user_id, template_id, template_title, original_image_url, generated_image_url, xp_cost, is_outfit, model_used) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+            [userId, templateId, templateTitle, 'uploaded', generatedImageUrl, XP_COST, isOutfit, modelName]
           );
 
           console.log('Generation record saved to database');
@@ -343,6 +343,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
           success: true,
           imageUrl: generatedImageUrl,
+          modelUsed: modelName,
           message: 'Image generated successfully',
         });
       }
