@@ -209,7 +209,7 @@ export async function POST(request: NextRequest) {
               data: base64Image,
             },
           },
-          { text: `Image 2 - Reference outfit/clothing style:` },
+          { text: `Image 2 - Reference style (outfit/jewellery/accessory):` },
           {
             inlineData: {
               mimeType: 'image/jpeg',
