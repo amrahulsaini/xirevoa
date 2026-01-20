@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Download, Maximize2, X, Calendar, Zap, Image as ImageIcon, Trash2 } from "lucide-react";
 
 interface Generation {
@@ -85,22 +86,30 @@ export default function GalleryClient({ generations }: { generations: Generation
                 <div className="flex h-full">
                   {/* Original Image - Left Half */}
                   <div className="w-1/2 relative border-r-2 border-yellow-400">
-                    <img
+                    <Image
                       src={generation.original_image_url}
                       alt="Original"
-                      className="w-full h-full object-cover"
+                      fill
+                      sizes="(max-width: 768px) 50vw, 25vw"
+                      className="object-cover"
+                      quality={85}
+                      priority={false}
                     />
-                    <div className="absolute bottom-2 left-2 px-2 py-1 bg-black/70 backdrop-blur-sm rounded text-[10px] font-bold text-white">
+                    <div className="absolute bottom-2 left-2 px-2 py-1 bg-black/70 backdrop-blur-sm rounded text-[10px] font-bold text-white z-10">
                       BEFORE
                     </div>
                   </div>
                   
                   {/* Generated Image - Right Half */}
                   <div className="w-1/2 relative">
-                    <img
+                    <Image
                       src={generation.generated_image_url}
                       alt={generation.template_title}
-                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                      fill
+                      sizes="(max-width: 768px) 50vw, 25vw"
+                      className="object-cover transition-transform duration-300 group-hover:scale-110"
+                      quality={85}
+                      priority={false}
                     />
                     <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/70 backdrop-blur-sm rounded text-[10px] font-bold text-yellow-400">
                       AFTER
@@ -110,10 +119,14 @@ export default function GalleryClient({ generations }: { generations: Generation
               ) : (
                 // Old generations without original image - show only generated
                 <div className="relative h-full">
-                  <img
+                  <Image
                     src={generation.generated_image_url}
                     alt={generation.template_title}
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-cover transition-transform duration-300 group-hover:scale-110"
+                    quality={85}
+                    priority={false}
                   />
                 </div>
               )}
@@ -189,10 +202,14 @@ export default function GalleryClient({ generations }: { generations: Generation
             {/* Image */}
             <div className="flex-1 relative rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800">
               <div className="relative w-full h-full min-h-[400px]">
-                <img
+                <Image
                   src={selectedImage.generated_image_url}
                   alt={selectedImage.template_title}
-                  className="w-full h-full object-contain"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 70vw"
+                  className="object-contain"
+                  quality={95}
+                  priority={true}
                 />
               </div>
             </div>
@@ -255,10 +272,13 @@ export default function GalleryClient({ generations }: { generations: Generation
                 <div className="pt-4 border-t border-zinc-800">
                   <div className="text-sm text-gray-400 mb-3">Original Photo</div>
                   <div className="relative aspect-square rounded-xl overflow-hidden border border-zinc-800">
-                    <img
+                    <Image
                       src={selectedImage.original_image_url}
                       alt="Original"
-                      className="w-full h-full object-cover"
+                      fill
+                      sizes="320px"
+                      className="object-cover"
+                      quality={85}
                     />
                   </div>
                 </div>
