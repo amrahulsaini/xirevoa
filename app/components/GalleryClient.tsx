@@ -219,16 +219,18 @@ export default function GalleryClient({ generations }: { generations: Generation
               </button>
 
               {/* Original Image Preview */}
-              <div className="pt-4 border-t border-zinc-800">
-                <div className="text-sm text-gray-400 mb-3">Original Photo</div>
-                <div className="relative aspect-square rounded-xl overflow-hidden border border-zinc-800">
-                  <img
-                    src={selectedImage.original_image_url}
-                    alt="Original"
-                    className="w-full h-full object-cover"
-                  />
+              {selectedImage.original_image_url !== 'uploaded' && (
+                <div className="pt-4 border-t border-zinc-800">
+                  <div className="text-sm text-gray-400 mb-3">Original Photo</div>
+                  <div className="relative aspect-square rounded-xl overflow-hidden border border-zinc-800">
+                    <img
+                      src={selectedImage.original_image_url}
+                      alt="Original"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
