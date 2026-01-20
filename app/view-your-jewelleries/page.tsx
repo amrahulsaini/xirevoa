@@ -46,8 +46,38 @@ async function getJewelleryTemplates(): Promise<Category[]> {
   }
 }
 
+async function getOtherCategories(): Promise<{hairstyles: Category[], eighties: Category[], cinematic: Category[], instagram: Category[], outfits: Category[]}> {
+  try {
+    const [rows] = await pool.query<TemplateRow[]>(
+      'SELECT id, title, description, image_url, tags, coming_soon FROM templates WHERE id IN (39, 40, 41, 42, 23, 24, 25, 26, 27, 33, 34, 28, 16, 35, 36, 10, 1, 8, 2, 9, 7, 43, 44, 45, 46, 47, 48, 49, 50, 52, 53, 54, 55, 56, 57, 58, 59, 60) AND is_active = TRUE ORDER BY display_order ASC'
+    );
+    
+    const allTemplates = rows.map((row: TemplateRow) => ({
+      id: row.id,
+      title: row.title,
+      slug: row.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+      description: row.description,
+      image: row.image_url,
+      tags: row.tags || '',
+      comingSoon: row.coming_soon,
+    }));
+    
+    return {
+      hairstyles: allTemplates.filter(t => [39, 40, 41, 42, 23, 24, 25, 26, 27].includes(t.id)),
+      eighties: allTemplates.filter(t => [33, 34].includes(t.id)),
+      cinematic: allTemplates.filter(t => [28, 16, 35, 36, 10].includes(t.id)),
+      instagram: allTemplates.filter(t => [1, 8, 2, 9, 7].includes(t.id)),
+      outfits: allTemplates.filter(t => [43, 44, 45, 46, 47, 48, 49, 50, 52, 53, 54, 55, 56, 57, 58, 59, 60].includes(t.id)),
+    };
+  } catch (error) {
+    console.error('Error fetching other categories:', error);
+    return { hairstyles: [], eighties: [], cinematic: [], instagram: [], outfits: [] };
+  }
+}
+
 export default async function ViewYourJewelleriesPage() {
   const jewelleries = await getJewelleryTemplates();
+  const { hairstyles, eighties, cinematic, instagram, outfits } = await getOtherCategories();
 
   return (
     <div className="min-h-screen bg-black">
@@ -105,6 +135,121 @@ export default async function ViewYourJewelleriesPage() {
         {jewelleries.length === 0 && (
           <section className="container mx-auto px-4 sm:px-6 py-16 text-center">
             <p className="text-zinc-400 text-lg">No jewellery templates available at the moment.</p>
+          </section>
+        )}
+
+        {hairstyles.length > 0 && (
+          <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 border-t border-zinc-800">
+            <div className="mb-6">
+              <h2 className="text-2xl sm:text-3xl font-black text-white mb-2">💇‍♀️ Try Different Hairstyles</h2>
+              <p className="text-zinc-400">Explore stunning hairstyles while keeping your face resemblance</p>
+            </div>
+            <div className="columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-4 space-y-4">
+              {hairstyles.map((template) => (
+                <div key={template.id} className="break-inside-avoid">
+                  <CategoryCard
+                    id={template.id}
+                    title={template.title}
+                    slug={template.slug}
+                    description={template.description}
+                    image={template.image}
+                    comingSoon={template.comingSoon}
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {outfits.length > 0 && (
+          <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 border-t border-zinc-800">
+            <div className="mb-6">
+              <h2 className="text-2xl sm:text-3xl font-black text-white mb-2">👗 View Your Iconic Outfit</h2>
+              <p className="text-zinc-400">Try on stylish outfits and fashion looks</p>
+            </div>
+            <div className="columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-4 space-y-4">
+              {outfits.map((template) => (
+                <div key={template.id} className="break-inside-avoid">
+                  <CategoryCard
+                    id={template.id}
+                    title={template.title}
+                    slug={template.slug}
+                    description={template.description}
+                    image={template.image}
+                    comingSoon={template.comingSoon}
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {eighties.length > 0 && (
+          <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 border-t border-zinc-800">
+            <div className="mb-6">
+              <h2 className="text-2xl sm:text-3xl font-black text-white mb-2">👴 See How You'd Look in Your 80s</h2>
+              <p className="text-zinc-400">Transform into your future self</p>
+            </div>
+            <div className="columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-4 space-y-4">
+              {eighties.map((template) => (
+                <div key={template.id} className="break-inside-avoid">
+                  <CategoryCard
+                    id={template.id}
+                    title={template.title}
+                    slug={template.slug}
+                    description={template.description}
+                    image={template.image}
+                    comingSoon={template.comingSoon}
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {cinematic.length > 0 && (
+          <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 border-t border-zinc-800">
+            <div className="mb-6">
+              <h2 className="text-2xl sm:text-3xl font-black text-white mb-2">🎬 Cinematic Universe</h2>
+              <p className="text-zinc-400">Epic movie scenes & iconic moments</p>
+            </div>
+            <div className="columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-4 space-y-4">
+              {cinematic.map((template) => (
+                <div key={template.id} className="break-inside-avoid">
+                  <CategoryCard
+                    id={template.id}
+                    title={template.title}
+                    slug={template.slug}
+                    description={template.description}
+                    image={template.image}
+                    comingSoon={template.comingSoon}
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {instagram.length > 0 && (
+          <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 border-t border-zinc-800">
+            <div className="mb-6">
+              <h2 className="text-2xl sm:text-3xl font-black text-white mb-2">📸 Instagram Collage Stories</h2>
+              <p className="text-zinc-400">Perfect layouts for social media</p>
+            </div>
+            <div className="columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-4 space-y-4">
+              {instagram.map((template) => (
+                <div key={template.id} className="break-inside-avoid">
+                  <CategoryCard
+                    id={template.id}
+                    title={template.title}
+                    slug={template.slug}
+                    description={template.description}
+                    image={template.image}
+                    comingSoon={template.comingSoon}
+                  />
+                </div>
+              ))}
+            </div>
           </section>
         )}
 
