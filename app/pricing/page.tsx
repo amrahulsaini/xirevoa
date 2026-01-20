@@ -28,7 +28,7 @@ export default function PricingPage() {
     {
       name: "Starter",
       xp: 100,
-      price: 1,
+      price: 99,
       popular: false,
       features: [
         "100 XP Points",
@@ -64,7 +64,7 @@ export default function PricingPage() {
     {
       name: "Creator Pro",
       xp: 500,
-      price: 400,
+      price: 399,
       popular: false,
       features: [
         "500 XP Points",

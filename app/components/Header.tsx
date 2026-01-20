@@ -139,7 +139,7 @@ export default function Header() {
                       </div>
                       <div className="p-2">
                         <Link 
-                          href="/profile"
+                          href="/settings"
                           className="flex items-center gap-3 px-4 py-3 rounded-lg text-zinc-400 hover:text-yellow-400 hover:bg-zinc-800 transition-all"
                           onClick={() => setShowUserMenu(false)}
                         >
