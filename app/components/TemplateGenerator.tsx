@@ -41,6 +41,9 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
   const [generationId, setGenerationId] = useState<number | null>(null); // Track generation ID
   const [viewedPrompt, setViewedPrompt] = useState<string | null>(null); // Store viewed prompt
   const [promptViewed, setPromptViewed] = useState(false); // Track if prompt was viewed
+  const [showPromptPreview, setShowPromptPreview] = useState(false); // Show prompt before generation
+  const [promptEdited, setPromptEdited] = useState(false); // Track if user edited the prompt
+  const [editedPrompt, setEditedPrompt] = useState(''); // Store edited prompt
   const [showPromptEditor, setShowPromptEditor] = useState(false);
   const [customPrompt, setCustomPrompt] = useState('');
   const [isDragging, setIsDragging] = useState(false);
@@ -177,6 +180,11 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
       generateFormData.append('templateId', template.id.toString());
       generateFormData.append('isOutfit', isOutfit.toString());
       generateFormData.append('selectedModel', selectedModel);
+      
+      // Add custom prompt if user edited it
+      if (promptEdited && editedPrompt.trim()) {
+        generateFormData.append('customPrompt', editedPrompt.trim());
+      }
 
       const progressInterval = setInterval(() => {
         setProgress(prev => {
@@ -229,6 +237,9 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
     setGenerationId(null);
     setViewedPrompt(null);
     setPromptViewed(false);
+    setShowPromptPreview(false);
+    setPromptEdited(false);
+    setEditedPrompt('');
   };
 
   const handleViewPrompt = async () => {
@@ -269,6 +280,43 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
     } catch (error) {
       console.error('View prompt error:', error);
       setErrorMessage('Failed to view prompt');
+    }
+  };
+
+  const handleSaveEditedPrompt = async () => {
+    if (!editedPrompt.trim() || !session) {
+      return;
+    }
+
+    const currentXP = (session?.user as any)?.xpoints || 0;
+    if (currentXP < 1) {
+      setShowXPModal(true);
+      return;
+    }
+
+    try {
+      // Deduct 1 XP for editing
+      const res = await fetch('/api/deduct-xp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: 1, reason: 'Edit prompt before generation' }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        if (data.error?.includes('Insufficient')) {
+          setShowXPModal(true);
+        } else {
+          setErrorMessage(data.error || 'Failed to edit prompt');
+        }
+        return;
+      }
+
+      setPromptEdited(true);
+      setShowPromptPreview(false);
+    } catch (error) {
+      console.error('Edit prompt error:', error);
+      setErrorMessage('Failed to edit prompt');
     }
   };
 
@@ -430,6 +478,77 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
               />
             </div>
           </div>
+
+          {/* Prompt Preview and Edit Section */}
+          {userImage && !generating && (
+            <div className="bg-zinc-900 rounded-2xl p-6 border border-zinc-800 space-y-4">
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <Wand2 className="w-5 h-5 text-yellow-400" />
+                AI Prompt Preview
+              </h3>
+              
+              {!showPromptPreview ? (
+                <button
+                  onClick={() => setShowPromptPreview(true)}
+                  className="w-full px-4 py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-semibold transition-colors"
+                >
+                  View AI Prompt (Free Preview)
+                </button>
+              ) : (
+                <div className="space-y-4">
+                  <div className="bg-zinc-800 rounded-xl p-4">
+                    <p className="text-sm text-zinc-300 whitespace-pre-wrap">{template.aiPrompt}</p>
+                  </div>
+                  
+                  {!promptEdited ? (
+                    <div className="space-y-3">
+                      <p className="text-xs text-zinc-400">Want to customize the prompt?</p>
+                      <button
+                        onClick={() => {
+                          setEditedPrompt(template.aiPrompt || '');
+                          setPromptEdited(true);
+                        }}
+                        className="w-full px-4 py-3 rounded-xl border border-yellow-500 bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-400 font-semibold transition-colors"
+                      >
+                        Edit Prompt (1 XP)
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <label className="block text-sm font-semibold text-white">
+                        Custom Prompt:
+                      </label>
+                      <textarea
+                        value={editedPrompt}
+                        onChange={(e) => setEditedPrompt(e.target.value)}
+                        rows={6}
+                        className="w-full px-4 py-3 rounded-xl bg-zinc-800 border border-zinc-700 text-white focus:border-yellow-500 focus:outline-none resize-none"
+                        placeholder="Enter your custom prompt..."
+                      />
+                      <div className="flex gap-3">
+                        <button
+                          onClick={handleSaveEditedPrompt}
+                          disabled={!editedPrompt.trim()}
+                          className="flex-1 px-4 py-3 rounded-xl bg-yellow-500 hover:bg-yellow-600 text-black font-bold transition-colors disabled:opacity-50"
+                        >
+                          Save Changes (1 XP)
+                        </button>
+                        <button
+                          onClick={() => {
+                            setPromptEdited(false);
+                            setEditedPrompt('');
+                          }}
+                          className="px-4 py-3 rounded-xl border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-white font-semibold transition-colors"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Actions row */}
           <div className="flex flex-col sm:flex-row gap-3">

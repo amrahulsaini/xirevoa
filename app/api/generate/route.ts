@@ -35,6 +35,7 @@ export async function POST(request: NextRequest) {
     const templateId = formData.get('templateId') as string;
     const isOutfit = formData.get('isOutfit') === 'true';
     const selectedModel = formData.get('selectedModel') as string | null;
+    const customPrompt = formData.get('customPrompt') as string | null;
     
     const connection = await pool.getConnection();
     
@@ -133,8 +134,8 @@ export async function POST(request: NextRequest) {
       }
 
       const template = rows[0];
-      // Use database prompt only
-      aiPrompt = template.ai_prompt || 'Create a photorealistic image showing the person from the first image wearing similar clothing and styling as shown in the second reference image. Match skin tones and lighting naturally.';
+      // Use custom prompt if provided, otherwise use database prompt
+      aiPrompt = customPrompt || template.ai_prompt || 'Create a photorealistic image showing the person from the first image wearing similar clothing and styling as shown in the second reference image. Match skin tones and lighting naturally.';
       templateImagePath = rows[0].image_url;
       
       console.log('Using outfit template:', template.title);
@@ -156,8 +157,8 @@ export async function POST(request: NextRequest) {
       }
 
       const template = rows[0];
-      // Only use database prompt for security - never accept custom prompts
-      aiPrompt = template.ai_prompt || 'Generate an AI-enhanced image';
+      // Use custom prompt if provided, otherwise use database prompt
+      aiPrompt = customPrompt || template.ai_prompt || 'Generate an AI-enhanced image';
       
       console.log('Using regular template:', template.title);
       console.log('AI Prompt from database:', template.ai_prompt);
