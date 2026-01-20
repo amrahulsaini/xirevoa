@@ -317,6 +317,7 @@ export async function POST(request: NextRequest) {
         console.log(`File size: ${generatedBuffer.length} bytes`);
 
         // Save generation record to database
+        let generationId: number | null = null;
         const saveConnection = await pool.getConnection();
         try {
           // Get template title
@@ -335,7 +336,7 @@ export async function POST(request: NextRequest) {
             [userId, templateId, templateTitle, 'uploaded', generatedImageUrl, XP_COST, isOutfit, aiPrompt, modelName]
           );
 
-          const generationId = insertResult.insertId;
+          generationId = insertResult.insertId;
           console.log('Generation record saved to database with ID:', generationId);
         } catch (dbError) {
           console.error('Failed to save generation record:', dbError);
@@ -350,7 +351,7 @@ export async function POST(request: NextRequest) {
           success: true,
           imageUrl: generatedImageUrl,
           modelUsed: modelName,
-          generationId: generationId || null,
+          generationId: generationId,
           message: 'Image generated successfully',
         });
       }
