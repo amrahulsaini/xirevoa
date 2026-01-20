@@ -46,10 +46,10 @@ async function getGirlsHairstyleTemplates(): Promise<Category[]> {
   }
 }
 
-async function getOtherCategories(): Promise<{hairstyles: Category[], eighties: Category[], cinematic: Category[], instagram: Category[]}> {
+async function getOtherCategories(): Promise<{hairstyles: Category[], jewelleries: Category[], eighties: Category[], cinematic: Category[], instagram: Category[]}> {
   try {
     const [rows] = await pool.query<TemplateRow[]>(
-      'SELECT id, title, description, image_url, tags, coming_soon FROM templates WHERE id IN (23, 24, 25, 26, 27, 33, 34, 28, 16, 35, 36, 10, 1, 8, 2, 9, 7) AND is_active = TRUE ORDER BY display_order ASC'
+      'SELECT id, title, description, image_url, tags, coming_soon FROM templates WHERE id IN (23, 24, 25, 26, 27, 62, 63, 64, 65, 66, 67, 33, 34, 28, 16, 35, 36, 10, 1, 8, 2, 9, 7) AND is_active = TRUE ORDER BY display_order ASC'
     );
     
     const allTemplates = rows.map((row: TemplateRow) => ({
@@ -64,19 +64,20 @@ async function getOtherCategories(): Promise<{hairstyles: Category[], eighties: 
     
     return {
       hairstyles: allTemplates.filter(t => [23, 24, 25, 26, 27].includes(t.id)),
+      jewelleries: allTemplates.filter(t => [62, 63, 64, 65, 66, 67].includes(t.id)),
       eighties: allTemplates.filter(t => [33, 34].includes(t.id)),
       cinematic: allTemplates.filter(t => [28, 16, 35, 36, 10].includes(t.id)),
       instagram: allTemplates.filter(t => [1, 8, 2, 9, 7].includes(t.id)),
     };
   } catch (error) {
     console.error('Error fetching other categories:', error);
-    return { hairstyles: [], eighties: [], cinematic: [], instagram: [] };
+    return { hairstyles: [], jewelleries: [], eighties: [], cinematic: [], instagram: [] };
   }
 }
 
 export default async function GirlsHairstylePage() {
   const girlsTemplates = await getGirlsHairstyleTemplates();
-  const { hairstyles, eighties, cinematic, instagram } = await getOtherCategories();
+  const { hairstyles, jewelleries, eighties, cinematic, instagram } = await getOtherCategories();
 
   return (
     <div className="min-h-screen bg-black">
@@ -143,6 +144,29 @@ export default async function GirlsHairstylePage() {
             </div>
             <div className="columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-4 space-y-4">
               {hairstyles.map((template) => (
+                <div key={template.id} className="break-inside-avoid">
+                  <CategoryCard
+                    id={template.id}
+                    title={template.title}
+                    slug={template.slug}
+                    description={template.description}
+                    image={template.image}
+                    comingSoon={template.comingSoon}
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {jewelleries.length > 0 && (
+          <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 border-t border-zinc-800">
+            <div className="mb-6">
+              <h2 className="text-2xl sm:text-3xl font-black text-white mb-2">💎 Try Best Jewelleries</h2>
+              <p className="text-zinc-400">Discover elegant necklaces, earrings & accessories that enhance your beauty</p>
+            </div>
+            <div className="columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-4 space-y-4">
+              {jewelleries.map((template) => (
                 <div key={template.id} className="break-inside-avoid">
                   <CategoryCard
                     id={template.id}
