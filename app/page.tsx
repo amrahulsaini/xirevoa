@@ -414,7 +414,7 @@ export default async function Home({
               {/* Jewelleries Card */}
               {jewelleryTemplates.length > 0 && (
                 <a
-                  href="/change-your-hairstyle-girls"
+                  href="/change-your-hairstyle-girls#jewelleries"
                   className="group relative block bg-gradient-to-br from-yellow-900/40 via-amber-900/40 to-yellow-900/40 rounded-3xl overflow-hidden border-2 border-yellow-500/40 hover:border-yellow-400/80 transition-all hover:scale-105 hover:shadow-2xl hover:shadow-yellow-500/50"
                 >
                   <div className="aspect-[4/5] overflow-hidden relative">
