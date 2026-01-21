@@ -199,9 +199,12 @@ export async function POST(request: NextRequest) {
           templateBase64 = templateImageBuffer.toString('base64');
         }
         
-        // For face swap: Send both images with the prompt
-        // Use simple structure that Gemini understands
+        // For face swap: Send both images with enhanced prompt
+        // Put prompt first with clear context
+        const enhancedPrompt = `TASK: Create a new AI-generated image by combining elements from the two provided images.\n\nThe first image contains the person's face/body.\nThe second image shows the reference outfit/jewelry/style.\n\n${aiPrompt}\n\nIMPORTANT: Generate a NEW image, do not return either of the original images.`;
+        
         contentParts.push(
+          { text: enhancedPrompt },
           {
             inlineData: {
               mimeType: image.type,
@@ -213,8 +216,7 @@ export async function POST(request: NextRequest) {
               mimeType: 'image/jpeg',
               data: templateBase64,
             },
-          },
-          { text: aiPrompt }
+          }
         );
 
         console.log('Including both images for face swap - User face + Template outfit image');
