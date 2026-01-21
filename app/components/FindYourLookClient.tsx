@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Upload, Sparkles, X, Download, RefreshCw, Loader2, Scissors } from "lucide-react";
+import { Upload, Sparkles, Download, RefreshCw, Loader2, Scissors } from "lucide-react";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface HairstyleRecommendation {
   name: string;
@@ -13,66 +14,30 @@ interface HairstyleRecommendation {
   templateId: number;
 }
 
-const HARDCODED_HAIRSTYLES = [
-  {
-    id: 101,
-    name: "Classic Pompadour",
-    image: "/cdn/hairstyles/pompadour.jpg",
-    description: "Timeless volume and sophistication",
-    faceShapes: ["oval", "square", "rectangular"]
-  },
-  {
-    id: 102,
-    name: "Modern Quiff",
-    image: "/cdn/hairstyles/quiff.jpg",
-    description: "Contemporary style with height",
-    faceShapes: ["round", "oval", "heart"]
-  },
-  {
-    id: 103,
-    name: "Textured Crop",
-    image: "/cdn/hairstyles/textured-crop.jpg",
-    description: "Low-maintenance and trendy",
-    faceShapes: ["square", "round", "oval"]
-  },
-  {
-    id: 104,
-    name: "Side Part",
-    image: "/cdn/hairstyles/side-part.jpg",
-    description: "Professional and clean",
-    faceShapes: ["oval", "rectangular", "diamond"]
-  },
-  {
-    id: 105,
-    name: "Slick Back",
-    image: "/cdn/hairstyles/slick-back.jpg",
-    description: "Elegant and refined",
-    faceShapes: ["oval", "square", "rectangular"]
-  },
-  {
-    id: 106,
-    name: "Buzz Cut",
-    image: "/cdn/hairstyles/buzz-cut.jpg",
-    description: "Bold and minimalist",
-    faceShapes: ["oval", "square", "diamond"]
-  },
-  {
-    id: 107,
-    name: "Crew Cut",
-    image: "/cdn/hairstyles/crew-cut.jpg",
-    description: "Military-inspired classic",
-    faceShapes: ["square", "oval", "rectangular"]
-  },
-  {
-    id: 108,
-    name: "French Crop",
-    image: "/cdn/hairstyles/french-crop.jpg",
-    description: "Stylish with short fringe",
-    faceShapes: ["round", "heart", "oval"]
-  }
-];
+interface Template {
+  id: number;
+  title: string;
+  slug: string;
+  description: string;
+  image: string;
+  tags: string;
+  comingSoon?: boolean;
+}
 
-export default function FindYourLookClient() {
+interface Props {
+  hairstyleTemplates: Template[];
+}
+
+// Map template IDs to face shapes for smart recommendations
+const TEMPLATE_FACE_SHAPES: Record<number, string[]> = {
+  23: ["oval", "square", "rectangular"],
+  24: ["round", "oval", "heart"],
+  25: ["square", "round", "oval"],
+  26: ["oval", "rectangular", "diamond"],
+  27: ["oval", "square", "heart"],
+};
+
+export default function FindYourLookClient({ hairstyleTemplates }: Props) {
   const { data: session } = useSession();
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -84,7 +49,7 @@ export default function FindYourLookClient() {
   const [faceAnalysis, setFaceAnalysis] = useState<string>('');
   const [generating, setGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
-  const [selectedHairstyle, setSelectedHairstyle] = useState<number | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -151,18 +116,18 @@ export default function FindYourLookClient() {
     }
   };
 
-  const generateHairstyle = async (hairstyleId: number) => {
+  const generateWithTemplate = async (templateId: number) => {
     if (!uploadedImage || !session) return;
     
     setGenerating(true);
-    setSelectedHairstyle(hairstyleId);
+    setSelectedTemplate(templateId);
 
     try {
       const formData = new FormData();
       formData.append('image', uploadedImage);
-      formData.append('hairstyleId', hairstyleId.toString());
+      formData.append('templateId', templateId.toString());
 
-      const response = await fetch('/api/generate-hairstyle', {
+      const response = await fetch('/api/generate', {
         method: 'POST',
         body: formData,
       });
@@ -191,17 +156,18 @@ export default function FindYourLookClient() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-12">
-      {/* Header */}
-      <div className="text-center mb-12">
-        <div className="flex items-center justify-center gap-3 mb-4">
-          <Scissors className="w-12 h-12 text-blue-500" />
-          <h1 className="text-5xl font-black bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-            Find Your Look
-          </h1>
+    <div className="container mx-auto px-4 py-12">
+      {/* Hero Section */}
+      <div className="text-center mb-16">
+        <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-full mb-6">
+          <Scissors className="w-6 h-6 text-blue-400" />
+          <span className="text-sm font-semibold text-blue-400">AI-Powered Recommendations</span>
         </div>
-        <p className="text-xl text-zinc-400 max-w-2xl mx-auto">
-          Upload your photo and let AI recommend the perfect hairstyles for your face shape
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black mb-6 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+          Find Your Perfect Look
+        </h1>
+        <p className="text-lg sm:text-xl text-zinc-400 max-w-3xl mx-auto leading-relaxed">
+          Upload your photo and let our AI analyze your face shape to recommend the most flattering hairstyles
         </p>
       </div>
 
@@ -311,11 +277,11 @@ export default function FindYourLookClient() {
                     </div>
                     <p className="text-sm text-blue-400 mb-3">{rec.reason}</p>
                     <button
-                      onClick={() => generateHairstyle(rec.templateId)}
+                      onClick={() => generateWithTemplate(rec.templateId)}
                       disabled={generating}
                       className="w-full px-4 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-zinc-700 disabled:to-zinc-700 text-white font-bold rounded-lg transition-all flex items-center justify-center gap-2"
                     >
-                      {generating && selectedHairstyle === rec.templateId ? (
+                      {generating && selectedTemplate === rec.templateId ? (
                         <>
                           <Loader2 className="w-4 h-4 animate-spin" />
                           Generating...
@@ -343,24 +309,44 @@ export default function FindYourLookClient() {
       )}
 
       {/* All Hairstyles Section */}
-      <div className="mt-16">
-        <h2 className="text-3xl font-black text-center mb-8">All Men's Hairstyles</h2>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {HARDCODED_HAIRSTYLES.map((style) => (
-            <div key={style.id} className="bg-zinc-900 rounded-xl overflow-hidden border border-zinc-800 hover:border-zinc-700 transition-all group">
-              <div className="relative aspect-square bg-zinc-800">
-                <div className="absolute inset-0 flex items-center justify-center text-zinc-600">
-                  <Scissors className="w-12 h-12" />
+      {hairstyleTemplates.length > 0 && (
+        <div className="mt-20">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-black mb-4">All Hairstyle Templates</h2>
+            <p className="text-zinc-400">Explore our collection of AI-powered hairstyle transformations</p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+            {hairstyleTemplates.map((template) => (
+              <Link
+                key={template.id}
+                href={`/${template.id}`}
+                className="group bg-zinc-900/50 backdrop-blur-sm rounded-2xl overflow-hidden border border-zinc-800 hover:border-zinc-700 transition-all hover:scale-[1.02]"
+              >
+                <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-zinc-800 to-zinc-900">
+                  <Image
+                    src={template.image}
+                    alt={template.title}
+                    fill
+                    className="object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
-              </div>
-              <div className="p-4">
-                <h3 className="font-bold text-lg mb-1">{style.name}</h3>
-                <p className="text-sm text-zinc-400">{style.description}</p>
-              </div>
-            </div>
-          ))}
+                <div className="p-4">
+                  <h3 className="font-bold text-lg mb-2 group-hover:text-blue-400 transition-colors">
+                    {template.title}
+                  </h3>
+                  <p className="text-sm text-zinc-400 line-clamp-2">{template.description}</p>
+                  {template.comingSoon && (
+                    <span className="inline-block mt-2 px-3 py-1 text-xs font-bold bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 rounded-full">
+                      Coming Soon
+                    </span>
+                  )}
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

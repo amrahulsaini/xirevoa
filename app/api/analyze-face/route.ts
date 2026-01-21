@@ -2,57 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import pool from '@/lib/db';
+import { RowDataPacket } from 'mysql2';
 
-const HARDCODED_HAIRSTYLES = [
-  {
-    id: 101,
-    name: "Classic Pompadour",
-    description: "Timeless volume and sophistication",
-    faceShapes: ["oval", "square", "rectangular"]
-  },
-  {
-    id: 102,
-    name: "Modern Quiff",
-    description: "Contemporary style with height",
-    faceShapes: ["round", "oval", "heart"]
-  },
-  {
-    id: 103,
-    name: "Textured Crop",
-    description: "Low-maintenance and trendy",
-    faceShapes: ["square", "round", "oval"]
-  },
-  {
-    id: 104,
-    name: "Side Part",
-    description: "Professional and clean",
-    faceShapes: ["oval", "rectangular", "diamond"]
-  },
-  {
-    id: 105,
-    name: "Slick Back",
-    description: "Elegant and refined",
-    faceShapes: ["oval", "square", "rectangular"]
-  },
-  {
-    id: 106,
-    name: "Buzz Cut",
-    description: "Bold and minimalist",
-    faceShapes: ["oval", "square", "diamond"]
-  },
-  {
-    id: 107,
-    name: "Crew Cut",
-    description: "Military-inspired classic",
-    faceShapes: ["square", "oval", "rectangular"]
-  },
-  {
-    id: 108,
-    name: "French Crop",
-    description: "Stylish with short fringe",
-    faceShapes: ["round", "heart", "oval"]
-  }
-];
+const TEMPLATE_FACE_SHAPES: Record<number, string[]> = {
+  23: ["oval", "square", "rectangular"],
+  24: ["round", "oval", "heart"],
+  25: ["square", "round", "oval"],
+  26: ["oval", "rectangular", "diamond"],
+  27: ["oval", "square", "heart"],
+};
 
 export async function POST(request: NextRequest) {
   try {
@@ -73,6 +32,11 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    // Fetch hairstyle templates from database
+    const [templates] = await pool.query<RowDataPacket[]>(
+      'SELECT id, title, description FROM templates WHERE id IN (23, 24, 25, 26, 27) AND is_active = TRUE ORDER BY display_order ASC'
+    );
 
     // Initialize Google GenAI
     const ai = new GoogleGenAI({
@@ -124,18 +88,35 @@ Respond with ONLY the face shape name (lowercase), followed by a brief 2-sentenc
     // Normalize "oblong" to "rectangular"
     const normalizedShape = detectedShape === 'oblong' ? 'rectangular' : detectedShape;
 
-    // Find matching hairstyles
-    const matchingHairstyles = HARDCODED_HAIRSTYLES.filter(style =>
-      style.faceShapes.includes(normalizedShape)
-    );
+    // Find matching hairstyles from database
+    const matchingTemplates = templates.filter((t: any) => {
+      const shapes = TEMPLATE_FACE_SHAPES[t.id] || [];
+      return shapes.includes(normalizedShape);
+    });
 
     // Take top 3 recommendations
-    const recommendations = matchingHairstyles.slice(0, 3).map(style => ({
-      name: style.name,
-      description: style.description,
-      templateId: style.id,
+    const recommendations = matchingTemplates.slice(0, 3).map((t: any) => ({
+      name: t.title,
+      description: t.description,
+      templateId: t.id,
       reason: `Perfect for ${normalizedShape} face shapes - enhances your natural features`
     }));
+
+    // If less than 3, add remaining templates
+    if (recommendations.length < 3) {
+      const remaining = templates
+        .filter((t: any) => !matchingTemplates.find((m: any) => m.id === t.id))
+        .slice(0, 3 - recommendations.length);
+      
+      remaining.forEach((t: any) => {
+        recommendations.push({
+          name: t.title,
+          description: t.description,
+          templateId: t.id,
+          reason: `Great alternative style for your features`
+        });
+      });
+    }
 
     console.log('=== FACE ANALYSIS SUCCESS ===');
     console.log('Detected shape:', normalizedShape);
