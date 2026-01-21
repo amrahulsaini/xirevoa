@@ -20,7 +20,7 @@ interface TemplateData extends RowDataPacket {
 async function getTemplateBySlug(slug: string) {
   try {
     // List of outfit template IDs (includes jewelleries 62-70)
-    const OUTFIT_TEMPLATE_IDS = [43, 44, 45, 46, 47, 48, 49, 50, 52, 53, 54, 55, 56, 57, 58, 59, 60, 62, 63, 64, 65, 66, 67, 68, 69, 70];
+    const OUTFIT_TEMPLATE_IDS = [43, 44, 45, 46, 47, 48, 49, 50, 52, 53, 54, 55, 56, 57, 58, 59, 60, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71];
     
     // Check regular templates
     const [rows] = await pool.query<TemplateData[]>(
