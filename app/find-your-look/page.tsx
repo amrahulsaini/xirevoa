@@ -92,14 +92,12 @@ export default async function FindYourLookPage() {
         {/* Related Categories */}
         <div className="container mx-auto px-4 py-16">
           <CategoryRow 
-            title="Iconic Outfits"
-            categories={relatedCategories.outfits}
-            viewAllLink="/view-your-iconic-outfit"
+            categoryName="Iconic Outfits"
+            templates={relatedCategories.outfits}
           />
           <CategoryRow 
-            title="80s Style"
-            categories={relatedCategories.eighties}
-            viewAllLink="/how-would-you-see-yourself-in-80s"
+            categoryName="80s Style"
+            templates={relatedCategories.eighties}
           />
         </div>
       </main>
