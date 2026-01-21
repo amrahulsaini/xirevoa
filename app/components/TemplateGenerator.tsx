@@ -832,62 +832,57 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
             </div>
           ) : (
             <div className="space-y-3">
-              {/* Primary Actions */}
-              <div className="grid grid-cols-2 gap-3">
+              {/* Compact 2x2 Grid - Primary Actions */}
+              <div className="grid grid-cols-2 gap-2">
                 {!promptViewed && generationId && (
                   <button
                     onClick={handleViewPrompt}
-                    className="px-6 py-4 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-black rounded-xl transition-all shadow-lg shadow-blue-500/30 hover:shadow-blue-500/60 hover:scale-[1.02] flex items-center justify-center gap-2 text-base"
+                    className="px-4 py-3 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-bold rounded-lg transition-all flex items-center justify-center gap-2 text-sm"
                   >
-                    <Sparkles className="w-5 h-5" />
-                    View Prompt (Free)
+                    <Sparkles className="w-4 h-4" />
+                    View Prompt
                   </button>
                 )}
                 <button
                   onClick={() => setShowPromptEditor(true)}
-                  className="px-6 py-4 bg-gradient-to-r from-purple-600 via-purple-500 to-pink-500 hover:from-purple-700 hover:via-purple-600 hover:to-pink-600 text-white font-black rounded-xl transition-all shadow-lg shadow-purple-500/30 hover:shadow-purple-500/60 hover:scale-[1.02] flex items-center justify-center gap-2 text-base"
+                  className={`px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 text-white font-bold rounded-lg transition-all flex items-center justify-center gap-2 text-sm ${!promptViewed && generationId ? '' : 'col-span-2'}`}
                 >
-                  <Edit3 className="w-5 h-5" />
-                  {promptViewed ? 'Edit Prompt (1 XP)' : '✨ Refine Image (1 XP)'}
+                  <Edit3 className="w-4 h-4" />
+                  ✨ Refine (1 XP)
                 </button>
                 <a
                   href={generatedImage}
                   download="xirevoa-generated.png"
-                  className="px-6 py-4 bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-700 hover:to-emerald-600 text-white font-black rounded-xl hover:shadow-lg hover:shadow-green-500/50 hover:scale-[1.02] transition-all flex items-center justify-center gap-2 text-base"
+                  className="px-4 py-3 bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-700 hover:to-emerald-600 text-white font-bold rounded-lg transition-all flex items-center justify-center gap-2 text-sm"
                 >
-                  <Download className="w-5 h-5" />
+                  <Download className="w-4 h-4" />
                   Download
                 </a>
+                <button
+                  type="button"
+                  onClick={() => setShowModelPicker(true)}
+                  className="px-4 py-3 bg-zinc-800 hover:bg-zinc-700 text-white font-bold rounded-lg flex items-center justify-center gap-2 text-sm"
+                >
+                  <Settings className="w-4 h-4" />
+                  Models
+                </button>
               </div>
-
-              {/* Models */}
-              <button
-                type="button"
-                onClick={() => setShowModelPicker(true)}
-                className="w-full px-6 py-4 bg-zinc-900 border border-zinc-800 text-white font-black rounded-xl flex items-center justify-center gap-2 hover:bg-zinc-800 transition-colors"
-              >
-                <Settings className="w-5 h-5" />
-                Models
-                {selectedModelData ? (
-                  <span className="text-xs text-zinc-400">({selectedModelData.model_name})</span>
-                ) : null}
-              </button>
               
               {/* Secondary Actions */}
-              <div className="flex gap-3">
+              <div className="flex gap-2">
                 <button
                   onClick={() => setShowFullScreen(true)}
-                  className="flex-1 px-5 py-3 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 hover:border-zinc-600 text-zinc-300 hover:text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2"
+                  className="flex-1 px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white font-semibold rounded-lg transition-all flex items-center justify-center gap-2 text-sm"
                 >
                   <Maximize2 className="w-4 h-4" />
-                  Full Preview
+                  Preview
                 </button>
                 <button
                   onClick={handleReset}
-                  className="flex-1 px-5 py-3 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 hover:border-zinc-600 text-zinc-300 hover:text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2"
+                  className="flex-1 px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white font-semibold rounded-lg transition-all flex items-center justify-center gap-2 text-sm"
                 >
                   <RefreshCw className="w-4 h-4" />
-                  Create New
+                  New
                 </button>
               </div>
             </div>
