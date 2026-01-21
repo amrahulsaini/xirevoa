@@ -199,17 +199,15 @@ export async function POST(request: NextRequest) {
           templateBase64 = templateImageBuffer.toString('base64');
         }
         
-        // For face swap: Structure with images FIRST, then prompt
-        // This ensures AI sees the images before reading the prompt that references them
+        // For face swap: Send both images with the prompt
+        // Use simple structure that Gemini understands
         contentParts.push(
-          { text: `Image 1 - Person's face:` },
           {
             inlineData: {
               mimeType: image.type,
               data: base64Image,
             },
           },
-          { text: `Image 2 - Reference style (outfit/jewellery/accessory):` },
           {
             inlineData: {
               mimeType: 'image/jpeg',
