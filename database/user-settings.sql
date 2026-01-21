@@ -27,8 +27,8 @@ CREATE TABLE IF NOT EXISTS ai_models (
 
 -- Insert available models
 INSERT INTO ai_models (model_id, model_name, model_type, description, xp_cost, max_resolution, supports_thinking, is_active, display_order) VALUES
-('gemini-2.5-flash-image', 'Gemini 2.5 Flash', 'gemini', 'Fast and efficient image generation optimized for speed. Perfect for quick iterations and high-volume tasks.', 3, '1K', FALSE, TRUE, 1),
-('gemini-3-pro-image-preview', 'Gemini 3 Pro Image', 'gemini', 'Professional-grade image generation with advanced thinking and reasoning. Supports up to 4K resolution, Google Search grounding, and complex multi-turn editing.', 6, '4K', TRUE, TRUE, 2),
+('gemini-2.5-flash-image', 'Nano Banana', 'gemini', 'Fast and efficient image generation optimized for speed. Perfect for quick iterations and high-volume tasks.', 3, '1K', FALSE, TRUE, 1),
+('gemini-3-pro-image-preview', 'Nano Banana Pro', 'gemini', 'Professional-grade image generation with advanced thinking and reasoning. Supports up to 4K resolution, Google Search grounding, and complex multi-turn editing.', 6, '4K', TRUE, TRUE, 2),
 ('gpt-image-1.5', 'GPT Image 1.5', 'openai', 'Latest OpenAI image generation model with precise, high-fidelity results. Coming soon.', 8, '2K', FALSE, FALSE, 3),
 ('imagen-4.0-generate-001', 'Imagen 4', 'imagen', 'Google\'s high-fidelity image generation model for realistic and high-quality images. Coming soon.', 5, '2K', FALSE, FALSE, 4);
 
