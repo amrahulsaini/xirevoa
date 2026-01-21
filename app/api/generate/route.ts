@@ -177,12 +177,14 @@ export async function POST(request: NextRequest) {
 
     // Build content parts
     const contentParts: any[] = [];
+    
+    // Store template base64 for later comparison
+    let templateBase64: string | null = null;
 
     // If outfit template, structure differently for face swap
     if (isOutfit && templateImagePath) {
       try {
         // Read template image from public directory or fetch from URL
-        let templateBase64: string;
         
         if (templateImagePath.startsWith('http://') || templateImagePath.startsWith('https://')) {
           // Fetch from URL
@@ -313,13 +315,22 @@ Create a high-quality, realistic result with proper lighting and perspective.` }
         const imageData = part.inlineData.data;
         const generatedBuffer = Buffer.from(imageData, 'base64');
 
-        // Check if generated image is the same as input (common AI failure mode)
-        if (isOutfit && imageData === base64Image) {
-          console.error('AI returned the original user image unchanged');
-          return NextResponse.json(
-            { error: 'AI model failed to generate a new image. Please try again or use a different photo.' },
-            { status: 500 }
-          );
+        // Check if generated image is the same as either input (common AI failure mode)
+        if (isOutfit) {
+          if (imageData === base64Image) {
+            console.error('❌ AI returned the original user image unchanged');
+            return NextResponse.json(
+              { error: 'AI model failed to generate a new image. Please try again or use a different photo.' },
+              { status: 500 }
+            );
+          }
+          if (templateBase64 && imageData === templateBase64) {
+            console.error('❌ AI returned the template image unchanged');
+            return NextResponse.json(
+              { error: 'AI model failed to generate. It returned the template unchanged. Please try again.' },
+              { status: 500 }
+            );
+          }
         }
 
         const publicDir = path.join(process.cwd(), 'public', 'generated');
