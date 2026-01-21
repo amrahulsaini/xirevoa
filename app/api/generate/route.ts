@@ -199,12 +199,9 @@ export async function POST(request: NextRequest) {
           templateBase64 = templateImageBuffer.toString('base64');
         }
         
-        // For face swap: Send both images with enhanced prompt
-        // Put prompt first with clear context
-        const enhancedPrompt = `TASK: Create a new AI-generated image by combining elements from the two provided images.\n\nThe first image contains the person's face/body.\nThe second image shows the reference outfit/jewelry/style.\n\n${aiPrompt}\n\nIMPORTANT: Generate a NEW image, do not return either of the original images.`;
-        
+        // For face swap: Simple structure - prompt then both images
         contentParts.push(
-          { text: enhancedPrompt },
+          { text: aiPrompt },
           {
             inlineData: {
               mimeType: image.type,
