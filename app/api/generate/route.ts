@@ -199,15 +199,16 @@ export async function POST(request: NextRequest) {
           templateBase64 = templateImageBuffer.toString('base64');
         }
         
-        // For face swap: Simple structure - prompt then both images
+        // For face swap: Simplified prompt to avoid recitation
         contentParts.push(
-          { text: aiPrompt },
+          { text: `Create a photorealistic portrait of the person from image 1, wearing clothing inspired by the style shown in image 2.` },
           {
             inlineData: {
               mimeType: image.type,
               data: base64Image,
             },
           },
+          { text: `Reference image for clothing style:` },
           {
             inlineData: {
               mimeType: 'image/jpeg',
