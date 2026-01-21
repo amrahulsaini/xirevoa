@@ -313,6 +313,15 @@ Create a high-quality, realistic result with proper lighting and perspective.` }
         const imageData = part.inlineData.data;
         const generatedBuffer = Buffer.from(imageData, 'base64');
 
+        // Check if generated image is the same as input (common AI failure mode)
+        if (isOutfit && imageData === base64Image) {
+          console.error('AI returned the original user image unchanged');
+          return NextResponse.json(
+            { error: 'AI model failed to generate a new image. Please try again or use a different photo.' },
+            { status: 500 }
+          );
+        }
+
         const publicDir = path.join(process.cwd(), 'public', 'generated');
         if (!fs.existsSync(publicDir)) {
           fs.mkdirSync(publicDir, { recursive: true });
