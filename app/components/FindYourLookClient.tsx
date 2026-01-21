@@ -152,7 +152,7 @@ export default function FindYourLookClient({ hairstyleTemplates }: Props) {
     setRecommendations([]);
     setFaceAnalysis('');
     setGeneratedImage(null);
-    setSelectedHairstyle(null);
+    setSelectedTemplate(null);
   };
 
   return (
