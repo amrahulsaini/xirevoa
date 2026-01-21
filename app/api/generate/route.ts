@@ -199,16 +199,26 @@ export async function POST(request: NextRequest) {
           templateBase64 = templateImageBuffer.toString('base64');
         }
         
-        // For face swap: Simplified prompt to avoid recitation
+        // For face swap: Explicit prompt for full outfit transformation
         contentParts.push(
-          { text: `Create a photorealistic portrait of the person from image 1, wearing clothing inspired by the style shown in image 2.` },
+          { text: `Generate a complete full-body photorealistic portrait from head to toe.
+
+Take the FACE and BODY from the first image (the person).
+Apply the COMPLETE OUTFIT from the second reference image onto that person's body.
+
+Match the clothing style, colors, and details exactly as shown in the reference outfit.
+Ensure proper fit and natural appearance on the person's body type.
+Keep the person's facial features, skin tone, and hair exactly as they appear.
+Generate the ENTIRE image showing the full outfit from top to bottom - include head, torso, and legs.
+
+Create a high-quality, realistic result with proper lighting and perspective.` },
           {
             inlineData: {
               mimeType: image.type,
               data: base64Image,
             },
           },
-          { text: `Reference image for clothing style:` },
+          { text: `Reference outfit to apply:` },
           {
             inlineData: {
               mimeType: 'image/jpeg',
