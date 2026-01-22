@@ -93,6 +93,14 @@ Ensure proper fit, natural lighting, and realistic shadows. Generate a complete,
     logs.push(`Finish reason: ${candidate.finishReason}`);
     logs.push(`Content parts: ${candidate.content?.parts?.length || 0}`);
 
+    if (!candidate.content || !candidate.content.parts) {
+      logs.push('❌ No content or parts in candidate');
+      return NextResponse.json(
+        { error: 'Invalid response structure', logs: logs.join('\n') },
+        { status: 500 }
+      );
+    }
+
     for (const part of candidate.content.parts) {
       if (part.text) {
         logs.push(`📝 Text part: ${part.text}`);
