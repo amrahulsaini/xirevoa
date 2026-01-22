@@ -104,7 +104,7 @@ Ensure proper fit, natural lighting, and realistic shadows. Generate a complete,
     for (const part of candidate.content.parts) {
       if (part.text) {
         logs.push(`📝 Text part: ${part.text}`);
-      } else if (part.inlineData) {
+      } else if (part.inlineData && part.inlineData.data) {
         const imageData = part.inlineData.data;
         const generatedBuffer = Buffer.from(imageData, 'base64');
         
