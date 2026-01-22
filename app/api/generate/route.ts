@@ -201,27 +201,28 @@ export async function POST(request: NextRequest) {
           templateBase64 = templateImageBuffer.toString('base64');
         }
         
-        // For face swap: Use database prompt with two images
+        // For face swap: Images FIRST, prompt LAST (Google's recommended pattern)
+        // This gives AI full visual context before reading instructions
         contentParts.push(
-          { text: aiPrompt },
+          {
+            inlineData: {
+              mimeType: 'image/jpeg',
+              data: templateBase64,
+            },
+          },
           {
             inlineData: {
               mimeType: image.type,
               data: base64Image,
             },
           },
-          {
-            inlineData: {
-              mimeType: 'image/jpeg',
-              data: templateBase64,
-            },
-          }
+          { text: aiPrompt }
         );
 
-        console.log('Including both images for face swap - User face + Template outfit image');
-        console.log('=== 2-IMAGE MODE ===');
-        console.log('User image size (base64):', base64Image.length, 'characters');
+        console.log('Including both images for face swap - Template outfit + User face');
+        console.log('=== 2-IMAGE MODE (Images First, Prompt Last) ===');
         console.log('Template image size (base64):', templateBase64.length, 'characters');
+        console.log('User image size (base64):', base64Image.length, 'characters');
         console.log('Template image path:', templateImagePath);
       } catch (error) {
         console.error('Error reading outfit image:', error);
