@@ -39,9 +39,9 @@ export async function POST(request: NextRequest) {
     
     const connection = await pool.getConnection();
     
-    let preferredModel = 'gemini-2.0-flash-exp';
+    let preferredModel = 'gemini-2.5-flash-image'; // Use latest model by default
     let XP_COST = 3;
-    let modelName = 'Gemini 2.0 Flash';
+    let modelName = 'Nano Banana';
     
     try {
       // Get user settings and XP in one query
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
           'SELECT preferred_model FROM user_settings WHERE user_id = ?',
           [userId]
         );
-        preferredModel = settingsRows.length > 0 ? settingsRows[0].preferred_model : 'gemini-2.0-flash-exp';
+        preferredModel = settingsRows.length > 0 ? settingsRows[0].preferred_model : 'gemini-2.5-flash-image';
       }
 
       // Get model XP cost
@@ -201,8 +201,21 @@ export async function POST(request: NextRequest) {
           templateBase64 = templateImageBuffer.toString('base64');
         }
         
-        // For face swap: Images FIRST, prompt LAST (Google's recommended pattern)
-        // This gives AI full visual context before reading instructions
+        // For face swap: Images FIRST, prompt LAST with VERY explicit instructions
+        // Wrap the database prompt with explicit generation commands
+        const enhancedPrompt = `IMPORTANT: You MUST generate a NEW image. Do NOT return either of the input images.
+
+TASK: ${aiPrompt}
+
+REQUIREMENTS:
+- Generate a COMPLETELY NEW image showing the result
+- The person from the second image should be wearing/styled with elements from the first image
+- Combine features naturally and realistically
+- DO NOT simply return one of the input images unchanged
+- Create an actual transformation/combination of both images
+
+Generate the new image now.`;
+
         contentParts.push(
           {
             inlineData: {
@@ -216,14 +229,15 @@ export async function POST(request: NextRequest) {
               data: base64Image,
             },
           },
-          { text: aiPrompt }
+          { text: enhancedPrompt }
         );
 
         console.log('Including both images for face swap - Template outfit + User face');
-        console.log('=== 2-IMAGE MODE (Images First, Prompt Last) ===');
+        console.log('=== 2-IMAGE MODE (Images First, Enhanced Prompt Last) ===');
         console.log('Template image size (base64):', templateBase64.length, 'characters');
         console.log('User image size (base64):', base64Image.length, 'characters');
         console.log('Template image path:', templateImagePath);
+        console.log('Enhanced prompt:', enhancedPrompt);
       } catch (error) {
         console.error('Error reading outfit image:', error);
         // Fallback to single image
