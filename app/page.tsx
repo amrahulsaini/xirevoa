@@ -3,6 +3,7 @@ import CategoryRow from "./components/CategoryRow";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import AutoScrollBanner from "./components/AutoScrollBanner";
+import FeaturedBanner from "./components/FeaturedBanner";
 import pool from "@/lib/db";
 import { RowDataPacket } from "mysql2";
 
@@ -188,6 +189,9 @@ export default async function Home({
   // Default view with category rows and masonry grid
   return (
     <div className="min-h-screen bg-black">
+      {/* Featured Banner */}
+      <FeaturedBanner />
+      
       {/* Animated Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl -top-48 -left-48 animate-pulse" />
