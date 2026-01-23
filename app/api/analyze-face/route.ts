@@ -84,12 +84,12 @@ Be creative and specific with hairstyle names and descriptions. Make the AI prom
     const analysisText = response.candidates?.[0]?.content?.parts?.[0]?.text || '';
     console.log('Analysis result:', analysisText);
 
-    // Parse the AI response
-    const faceAnalysisMatch = analysisText.match(/FACE_ANALYSIS:\s*(.+?)(?=\n\nHAIRSTYLE_|$)/s);
+    // Parse the AI response (using [\s\S] instead of . with s flag for ES2017 compatibility)
+    const faceAnalysisMatch = analysisText.match(/FACE_ANALYSIS:\s*([\s\S]+?)(?=\n\nHAIRSTYLE_|$)/);
     const faceAnalysis = faceAnalysisMatch ? faceAnalysisMatch[1].trim() : 'AI analysis completed';
 
-    // Extract hairstyle recommendations
-    const hairstyleRegex = /HAIRSTYLE_\d+:\s*NAME:\s*(.+?)\s*DESCRIPTION:\s*(.+?)\s*REASON:\s*(.+?)\s*PROMPT:\s*(.+?)(?=\n\nHAIRSTYLE_|$)/gs;
+    // Extract hairstyle recommendations (using [\s\S] instead of . with s flag)
+    const hairstyleRegex = /HAIRSTYLE_\d+:\s*NAME:\s*(.+?)\s*DESCRIPTION:\s*(.+?)\s*REASON:\s*(.+?)\s*PROMPT:\s*([\s\S]+?)(?=\n\nHAIRSTYLE_|$)/g;
     const recommendations = [];
     let match;
 
