@@ -19,10 +19,6 @@ export default function FeaturedBanner() {
   const [templates, setTemplates] = useState<Template[]>([]);
 
   useEffect(() => {
-    // Check if banner was dismissed
-    const dismissed = localStorage.getItem('featured-banner-dismissed');
-    if (dismissed) return;
-
     // Fetch featured templates
     fetch('/api/templates/featured')
       .then(res => res.json())
@@ -40,7 +36,6 @@ export default function FeaturedBanner() {
     setIsClosing(true);
     setTimeout(() => {
       setIsVisible(false);
-      localStorage.setItem('featured-banner-dismissed', 'true');
     }, 300);
   };
 
