@@ -284,6 +284,7 @@ export default function FindYourLookClient() {
             )}
           </div>
         </div>
+        </div>
       )}
     </div>
   );
