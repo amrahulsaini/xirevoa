@@ -8,44 +8,24 @@ interface TemplateRow extends RowDataPacket {
   description: string;
   image_url: string;
   tags: string | null;
-  category: string | null;
   coming_soon: boolean;
 }
 
 async function getTemplates(currentTemplateId: number) {
   try {
-    // If currentTemplateId is 0, get all templates
     if (currentTemplateId === 0) {
-      try {
-        const [rows] = await pool.query<TemplateRow[]>(
-          "SELECT id, title, description, image_url, tags, category, coming_soon FROM templates WHERE is_active = TRUE ORDER BY display_order ASC"
-        );
-        return rows;
-      } catch (error) {
-        // If category column doesn't exist, query without it
-        console.log('Category column not found, querying without it');
-        const [rows] = await pool.query<TemplateRow[]>(
-          "SELECT id, title, description, image_url, tags, NULL as category, coming_soon FROM templates WHERE is_active = TRUE ORDER BY display_order ASC"
-        );
-        return rows;
-      }
+      // Get all templates if currentTemplateId is 0
+      const [rows] = await pool.query<TemplateRow[]>(
+        "SELECT id, title, description, image_url, tags, coming_soon FROM templates WHERE is_active = TRUE ORDER BY display_order ASC"
+      );
+      return rows;
     }
     
-    try {
-      const [rows] = await pool.query<TemplateRow[]>(
-        "SELECT id, title, description, image_url, tags, category, coming_soon FROM templates WHERE is_active = TRUE AND id != ? ORDER BY display_order ASC",
-        [currentTemplateId]
-      );
-      return rows;
-    } catch (error) {
-      // If category column doesn't exist, query without it
-      console.log('Category column not found, querying without it');
-      const [rows] = await pool.query<TemplateRow[]>(
-        "SELECT id, title, description, image_url, tags, NULL as category, coming_soon FROM templates WHERE is_active = TRUE AND id != ? ORDER BY display_order ASC",
-        [currentTemplateId]
-      );
-      return rows;
-    }
+    const [rows] = await pool.query<TemplateRow[]>(
+      "SELECT id, title, description, image_url, tags, coming_soon FROM templates WHERE is_active = TRUE AND id != ? ORDER BY display_order ASC",
+      [currentTemplateId]
+    );
+    return rows;
   } catch (error) {
     console.error("Error fetching templates:", error);
     return [] as TemplateRow[];
@@ -55,11 +35,9 @@ async function getTemplates(currentTemplateId: number) {
 export default async function TemplatesMasonry({
   currentTemplateId,
   tags,
-  category,
 }: {
   currentTemplateId: number;
   tags?: string;
-  category?: string;
 }) {
   const rows = await getTemplates(currentTemplateId);
 
@@ -68,37 +46,27 @@ export default async function TemplatesMasonry({
     .map((t) => t.trim())
     .filter(Boolean);
 
-  // Prioritize: 1. Same category, 2. Matching tags, 3. Others (all in display order)
-  const categoryTemplates: TemplateRow[] = [];
-  const tagMatchTemplates: TemplateRow[] = [];
-  const otherTemplates: TemplateRow[] = [];
-
-  for (const row of rows) {
-    // Check if same category (and category is not empty/null)
-    if (category && row.category && row.category.toLowerCase() === category.toLowerCase()) {
-      categoryTemplates.push(row);
-    }
-    // Check if tags match (but not already in category list)
-    else if (tagArray.length && tagArray.some((tag) =>
-      (row.tags || "").toLowerCase().includes(tag.toLowerCase())
-    )) {
-      tagMatchTemplates.push(row);
-    }
-    // Everything else
-    else {
-      otherTemplates.push(row);
-    }
-  }
-
-  const templates = [...categoryTemplates, ...tagMatchTemplates, ...otherTemplates];
+  const templates = tagArray.length
+    ? (() => {
+        const related: TemplateRow[] = [];
+        const others: TemplateRow[] = [];
+        for (const row of rows) {
+          const hasMatch = tagArray.some((tag) =>
+            (row.tags || "").toLowerCase().includes(tag.toLowerCase())
+          );
+          if (hasMatch) related.push(row);
+          else others.push(row);
+        }
+        return [...related, ...others];
+      })()
+    : rows;
 
   if (templates.length === 0) return null;
 
   return (
     <div className="w-full">
-      <div className="mb-8 text-center">
-        <h2 className="text-3xl sm:text-4xl font-black text-white mb-2">Explore All Templates</h2>
-        <p className="text-zinc-400">Discover amazing AI transformations</p>
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-lg font-bold text-white">More templates</h2>
       </div>
 
       <div className="columns-2 md:columns-3 xl:columns-4 2xl:columns-5 gap-4 [column-fill:_balance]">

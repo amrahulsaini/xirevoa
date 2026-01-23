@@ -15,7 +15,6 @@ interface TemplateData extends RowDataPacket {
   image_url: string;
   ai_prompt: string | null;
   tags: string | null;
-  category: string | null;
 }
 
 async function getTemplateBySlug(slug: string) {
@@ -23,21 +22,10 @@ async function getTemplateBySlug(slug: string) {
     // List of outfit template IDs (includes jewelleries 62-70)
     const OUTFIT_TEMPLATE_IDS = [43, 44, 45, 46, 47, 48, 49, 50, 52, 53, 54, 55, 56, 57, 58, 59, 60, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71];
     
-    // Try to query with category column first
-    let rows: TemplateData[];
-    try {
-      const [result] = await pool.query<TemplateData[]>(
-        'SELECT id, title, description, image_url, ai_prompt, tags, category FROM templates WHERE is_active = TRUE'
-      );
-      rows = result;
-    } catch (error) {
-      // If category column doesn't exist, query without it
-      console.log('Category column not found, querying without it');
-      const [result] = await pool.query<TemplateData[]>(
-        'SELECT id, title, description, image_url, ai_prompt, tags, NULL as category FROM templates WHERE is_active = TRUE'
-      );
-      rows = result;
-    }
+    // Check regular templates
+    const [rows] = await pool.query<TemplateData[]>(
+      'SELECT id, title, description, image_url, ai_prompt, tags FROM templates WHERE is_active = TRUE'
+    );
     
     const template = rows.find(row => {
       const templateSlug = row.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -52,7 +40,6 @@ async function getTemplateBySlug(slug: string) {
         image: template.image_url,
         aiPrompt: template.ai_prompt || '',
         tags: template.tags || '',
-        category: template.category || '',
         isOutfit: OUTFIT_TEMPLATE_IDS.includes(template.id), // Check if this is an outfit template
       };
     }
@@ -106,7 +93,7 @@ export default async function TemplatePage({
         {/* Under the generator: more templates (Pinterest style) */}
         <section className="w-full py-12">
           <div className="container mx-auto px-4 sm:px-6">
-            <TemplatesMasonry currentTemplateId={template.id} tags={template.tags} category={template.category} />
+            <TemplatesMasonry currentTemplateId={template.id} tags={template.tags} />
           </div>
         </section>
 

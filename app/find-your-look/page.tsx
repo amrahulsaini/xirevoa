@@ -32,7 +32,7 @@ export default async function FindYourLookPage() {
         {/* All Templates */}
         <section className="w-full py-12">
           <div className="container mx-auto px-4 sm:px-6">
-            <TemplatesMasonry currentTemplateId={0} tags="" category="" />
+            <TemplatesMasonry currentTemplateId={0} />
           </div>
         </section>
 
