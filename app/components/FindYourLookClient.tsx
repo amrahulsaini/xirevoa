@@ -5,39 +5,15 @@ import { Upload, Sparkles, Download, RefreshCw, Loader2, Scissors } from "lucide
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 
 interface HairstyleRecommendation {
   name: string;
   description: string;
   reason: string;
-  templateId: number;
+  aiPrompt: string;
 }
 
-interface Template {
-  id: number;
-  title: string;
-  slug: string;
-  description: string;
-  image: string;
-  tags: string;
-  comingSoon?: boolean;
-}
-
-interface Props {
-  hairstyleTemplates: Template[];
-}
-
-// Map template IDs to face shapes for smart recommendations
-const TEMPLATE_FACE_SHAPES: Record<number, string[]> = {
-  23: ["oval", "square", "rectangular"],
-  24: ["round", "oval", "heart"],
-  25: ["square", "round", "oval"],
-  26: ["oval", "rectangular", "diamond"],
-  27: ["oval", "square", "heart"],
-};
-
-export default function FindYourLookClient({ hairstyleTemplates }: Props) {
+export default function FindYourLookClient() {
   const { data: session } = useSession();
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -49,7 +25,7 @@ export default function FindYourLookClient({ hairstyleTemplates }: Props) {
   const [faceAnalysis, setFaceAnalysis] = useState<string>('');
   const [generating, setGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
-  const [selectedTemplate, setSelectedTemplate] = useState<number | null>(null);
+  const [selectedHairstyle, setSelectedHairstyle] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -116,16 +92,17 @@ export default function FindYourLookClient({ hairstyleTemplates }: Props) {
     }
   };
 
-  const generateWithTemplate = async (templateId: number) => {
+  const generateWithHairstyle = async (hairstyleName: string, aiPrompt: string) => {
     if (!uploadedImage || !session) return;
     
     setGenerating(true);
-    setSelectedTemplate(templateId);
+    setSelectedHairstyle(hairstyleName);
 
     try {
       const formData = new FormData();
       formData.append('image', uploadedImage);
-      formData.append('templateId', templateId.toString());
+      formData.append('prompt', aiPrompt);
+      formData.append('isUniversalHairstyle', 'true');
 
       const response = await fetch('/api/generate', {
         method: 'POST',
@@ -152,7 +129,7 @@ export default function FindYourLookClient({ hairstyleTemplates }: Props) {
     setRecommendations([]);
     setFaceAnalysis('');
     setGeneratedImage(null);
-    setSelectedTemplate(null);
+    setSelectedHairstyle(null);
   };
 
   return (
@@ -264,9 +241,9 @@ export default function FindYourLookClient({ hairstyleTemplates }: Props) {
             {recommendations.length > 0 && (
               <div className="space-y-3">
                 <h3 className="text-2xl font-bold">Recommended Styles</h3>
-                {recommendations.map((rec) => (
+                {recommendations.map((rec, index) => (
                   <div
-                    key={rec.templateId}
+                    key={index}
                     className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 hover:border-zinc-700 transition-all"
                   >
                     <div className="flex justify-between items-start mb-2">
@@ -277,11 +254,11 @@ export default function FindYourLookClient({ hairstyleTemplates }: Props) {
                     </div>
                     <p className="text-sm text-blue-400 mb-3">{rec.reason}</p>
                     <button
-                      onClick={() => generateWithTemplate(rec.templateId)}
+                      onClick={() => generateWithHairstyle(rec.name, rec.aiPrompt)}
                       disabled={generating}
                       className="w-full px-4 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-zinc-700 disabled:to-zinc-700 text-white font-bold rounded-lg transition-all flex items-center justify-center gap-2"
                     >
-                      {generating && selectedTemplate === rec.templateId ? (
+                      {generating && selectedHairstyle === rec.name ? (
                         <>
                           <Loader2 className="w-4 h-4 animate-spin" />
                           Generating...
@@ -304,46 +281,6 @@ export default function FindYourLookClient({ hairstyleTemplates }: Props) {
                 <p>Upload a photo to get personalized recommendations</p>
               </div>
             )}
-          </div>
-        </div>
-      )}
-
-      {/* All Hairstyles Section */}
-      {hairstyleTemplates.length > 0 && (
-        <div className="mt-20">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-black mb-4">All Hairstyle Templates</h2>
-            <p className="text-zinc-400">Explore our collection of AI-powered hairstyle transformations</p>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-            {hairstyleTemplates.map((template) => (
-              <Link
-                key={template.id}
-                href={`/${template.id}`}
-                className="group bg-zinc-900/50 backdrop-blur-sm rounded-2xl overflow-hidden border border-zinc-800 hover:border-zinc-700 transition-all hover:scale-[1.02]"
-              >
-                <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-zinc-800 to-zinc-900">
-                  <Image
-                    src={template.image}
-                    alt={template.title}
-                    fill
-                    className="object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                </div>
-                <div className="p-4">
-                  <h3 className="font-bold text-lg mb-2 group-hover:text-blue-400 transition-colors">
-                    {template.title}
-                  </h3>
-                  <p className="text-sm text-zinc-400 line-clamp-2">{template.description}</p>
-                  {template.comingSoon && (
-                    <span className="inline-block mt-2 px-3 py-1 text-xs font-bold bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 rounded-full">
-                      Coming Soon
-                    </span>
-                  )}
-                </div>
-              </Link>
-            ))}
           </div>
         </div>
       )}

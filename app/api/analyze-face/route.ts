@@ -2,16 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import pool from '@/lib/db';
-import { RowDataPacket } from 'mysql2';
-
-const TEMPLATE_FACE_SHAPES: Record<number, string[]> = {
-  23: ["oval", "square", "rectangular"],
-  24: ["round", "oval", "heart"],
-  25: ["square", "round", "oval"],
-  26: ["oval", "rectangular", "diamond"],
-  27: ["oval", "square", "heart"],
-};
 
 export async function POST(request: NextRequest) {
   try {
@@ -33,11 +23,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Fetch hairstyle templates from database
-    const [templates] = await pool.query<RowDataPacket[]>(
-      'SELECT id, title, description FROM templates WHERE id IN (23, 24, 25, 26, 27) AND is_active = TRUE ORDER BY display_order ASC'
-    );
-
     // Initialize Google GenAI
     const ai = new GoogleGenAI({
       apiKey: process.env.GOOGLE_AI_API_KEY,
@@ -48,16 +33,34 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(bytes);
     const base64Image = buffer.toString('base64');
 
-    // Analyze face shape using Gemini
-    const analysisPrompt = `Analyze this person's face shape. Determine if the face is:
-- Oval (balanced proportions, slightly longer than wide)
-- Round (similar width and length, soft angles)
-- Square (strong jawline, similar width throughout)
-- Rectangular/Oblong (longer face with straight sides)
-- Heart (wider forehead, narrow chin)
-- Diamond (narrow forehead and chin, wider cheekbones)
+    // Analyze face and recommend hairstyles using Gemini
+    const analysisPrompt = `You are an expert hairstylist and beauty consultant. Analyze this person's face carefully and provide personalized hairstyle recommendations.
 
-Respond with ONLY the face shape name (lowercase), followed by a brief 2-sentence explanation of why this shape suits certain hairstyles. Format: "SHAPE: explanation here"`;
+First, analyze their face shape (oval, round, square, rectangular, heart, or diamond) and facial features.
+
+Then, recommend 3 SPECIFIC hairstyles that would look amazing on them. For each hairstyle, you must provide:
+1. A creative hairstyle NAME (e.g., "Textured Layered Bob", "Soft Wavy Lob", "Side-Swept Pixie")
+2. A brief DESCRIPTION (1 sentence about the style)
+3. WHY it suits their face shape and features (be specific)
+4. A detailed AI PROMPT to generate this hairstyle on their photo
+
+Format your response EXACTLY like this:
+
+FACE_ANALYSIS: [Your analysis of their face shape and features in 2-3 sentences]
+
+HAIRSTYLE_1:
+NAME: [Hairstyle name]
+DESCRIPTION: [Brief description]
+REASON: [Why it suits them]
+PROMPT: [Detailed prompt: "Create a photorealistic portrait of the person with [detailed hairstyle description]. Maintain their exact facial features, skin tone, and natural beauty. The hairstyle should feature [specific details about cut, length, texture, styling]. Natural lighting, professional photography, 8K HD quality."]
+
+HAIRSTYLE_2:
+[Same format]
+
+HAIRSTYLE_3:
+[Same format]
+
+Be creative and specific with hairstyle names and descriptions. Make the AI prompts detailed and photorealistic.`;
 
     console.log('=== FACE ANALYSIS START ===');
     const response = await ai.models.generateContent({
@@ -81,52 +84,60 @@ Respond with ONLY the face shape name (lowercase), followed by a brief 2-sentenc
     const analysisText = response.candidates?.[0]?.content?.parts?.[0]?.text || '';
     console.log('Analysis result:', analysisText);
 
-    // Extract face shape from response
-    const faceShapeMatch = analysisText.match(/^(oval|round|square|rectangular|oblong|heart|diamond)/i);
-    const detectedShape = faceShapeMatch ? faceShapeMatch[1].toLowerCase() : 'oval';
-    
-    // Normalize "oblong" to "rectangular"
-    const normalizedShape = detectedShape === 'oblong' ? 'rectangular' : detectedShape;
+    // Parse the AI response
+    const faceAnalysisMatch = analysisText.match(/FACE_ANALYSIS:\s*(.+?)(?=\n\nHAIRSTYLE_|$)/s);
+    const faceAnalysis = faceAnalysisMatch ? faceAnalysisMatch[1].trim() : 'AI analysis completed';
 
-    // Find matching hairstyles from database
-    const matchingTemplates = templates.filter((t: any) => {
-      const shapes = TEMPLATE_FACE_SHAPES[t.id] || [];
-      return shapes.includes(normalizedShape);
-    });
+    // Extract hairstyle recommendations
+    const hairstyleRegex = /HAIRSTYLE_\d+:\s*NAME:\s*(.+?)\s*DESCRIPTION:\s*(.+?)\s*REASON:\s*(.+?)\s*PROMPT:\s*(.+?)(?=\n\nHAIRSTYLE_|$)/gs;
+    const recommendations = [];
+    let match;
 
-    // Take top 3 recommendations
-    const recommendations = matchingTemplates.slice(0, 3).map((t: any) => ({
-      name: t.title,
-      description: t.description,
-      templateId: t.id,
-      reason: `Perfect for ${normalizedShape} face shapes - enhances your natural features`
-    }));
-
-    // If less than 3, add remaining templates
-    if (recommendations.length < 3) {
-      const remaining = templates
-        .filter((t: any) => !matchingTemplates.find((m: any) => m.id === t.id))
-        .slice(0, 3 - recommendations.length);
-      
-      remaining.forEach((t: any) => {
-        recommendations.push({
-          name: t.title,
-          description: t.description,
-          templateId: t.id,
-          reason: `Great alternative style for your features`
-        });
+    while ((match = hairstyleRegex.exec(analysisText)) !== null) {
+      recommendations.push({
+        name: match[1].trim(),
+        description: match[2].trim(),
+        reason: match[3].trim(),
+        aiPrompt: match[4].trim(),
       });
     }
 
+    // Ensure we have at least 3 recommendations
+    if (recommendations.length < 3) {
+      // Add fallback recommendations if AI didn't provide enough
+      const fallbacks = [
+        {
+          name: "Modern Layered Cut",
+          description: "Versatile layered hairstyle with natural movement",
+          reason: "Complements most face shapes with its balanced proportions",
+          aiPrompt: "Create a photorealistic portrait of the person with a modern layered haircut featuring soft, face-framing layers. The layers should add volume and movement. Maintain exact facial features, skin tone, and natural beauty. Natural lighting, professional styling, 8K HD quality."
+        },
+        {
+          name: "Soft Wavy Style",
+          description: "Elegant waves that add dimension and texture",
+          reason: "Softens features and adds a touch of glamour",
+          aiPrompt: "Create a photorealistic portrait of the person with soft, flowing waves. The waves should be natural-looking with gentle movement and shine. Maintain exact facial features, skin tone, and natural beauty. Soft lighting, elegant styling, 8K HD quality."
+        },
+        {
+          name: "Sleek Straight Look",
+          description: "Polished straight hair with a glossy finish",
+          reason: "Creates a sophisticated and timeless appearance",
+          aiPrompt: "Create a photorealistic portrait of the person with sleek, straight hair with a glossy, healthy shine. The hair should be perfectly smooth and polished. Maintain exact facial features, skin tone, and natural beauty. Studio lighting, high-end finish, 8K HD quality."
+        }
+      ];
+
+      while (recommendations.length < 3 && fallbacks.length > 0) {
+        recommendations.push(fallbacks.shift()!);
+      }
+    }
+
     console.log('=== FACE ANALYSIS SUCCESS ===');
-    console.log('Detected shape:', normalizedShape);
     console.log('Recommendations:', recommendations.length);
 
     return NextResponse.json({
       success: true,
-      faceShape: analysisText,
-      detectedShape: normalizedShape,
-      recommendations,
+      faceShape: faceAnalysis,
+      recommendations: recommendations.slice(0, 3),
     });
 
   } catch (error: any) {

@@ -15,6 +15,7 @@ interface TemplateData extends RowDataPacket {
   image_url: string;
   ai_prompt: string | null;
   tags: string | null;
+  category: string | null;
 }
 
 async function getTemplateBySlug(slug: string) {
@@ -24,7 +25,7 @@ async function getTemplateBySlug(slug: string) {
     
     // Check regular templates
     const [rows] = await pool.query<TemplateData[]>(
-      'SELECT id, title, description, image_url, ai_prompt, tags FROM templates WHERE is_active = TRUE'
+      'SELECT id, title, description, image_url, ai_prompt, tags, category FROM templates WHERE is_active = TRUE'
     );
     
     const template = rows.find(row => {
@@ -40,6 +41,7 @@ async function getTemplateBySlug(slug: string) {
         image: template.image_url,
         aiPrompt: template.ai_prompt || '',
         tags: template.tags || '',
+        category: template.category || '',
         isOutfit: OUTFIT_TEMPLATE_IDS.includes(template.id), // Check if this is an outfit template
       };
     }
@@ -93,7 +95,7 @@ export default async function TemplatePage({
         {/* Under the generator: more templates (Pinterest style) */}
         <section className="w-full py-12">
           <div className="container mx-auto px-4 sm:px-6">
-            <TemplatesMasonry currentTemplateId={template.id} tags={template.tags} />
+            <TemplatesMasonry currentTemplateId={template.id} tags={template.tags} category={template.category} />
           </div>
         </section>
 

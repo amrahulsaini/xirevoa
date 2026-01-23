@@ -8,13 +8,14 @@ interface TemplateRow extends RowDataPacket {
   description: string;
   image_url: string;
   tags: string | null;
+  category: string | null;
   coming_soon: boolean;
 }
 
 async function getTemplates(currentTemplateId: number) {
   try {
     const [rows] = await pool.query<TemplateRow[]>(
-      "SELECT id, title, description, image_url, tags, coming_soon FROM templates WHERE is_active = TRUE AND id != ? ORDER BY display_order ASC",
+      "SELECT id, title, description, image_url, tags, category, coming_soon FROM templates WHERE is_active = TRUE AND id != ? ORDER BY display_order ASC",
       [currentTemplateId]
     );
     return rows;
@@ -27,9 +28,11 @@ async function getTemplates(currentTemplateId: number) {
 export default async function TemplatesMasonry({
   currentTemplateId,
   tags,
+  category,
 }: {
   currentTemplateId: number;
   tags?: string;
+  category?: string;
 }) {
   const rows = await getTemplates(currentTemplateId);
 
@@ -38,20 +41,29 @@ export default async function TemplatesMasonry({
     .map((t) => t.trim())
     .filter(Boolean);
 
-  const templates = tagArray.length
-    ? (() => {
-        const related: TemplateRow[] = [];
-        const others: TemplateRow[] = [];
-        for (const row of rows) {
-          const hasMatch = tagArray.some((tag) =>
-            (row.tags || "").toLowerCase().includes(tag.toLowerCase())
-          );
-          if (hasMatch) related.push(row);
-          else others.push(row);
-        }
-        return [...related, ...others];
-      })()
-    : rows;
+  // Prioritize: 1. Same category, 2. Matching tags, 3. Others (all in display order)
+  const categoryTemplates: TemplateRow[] = [];
+  const tagMatchTemplates: TemplateRow[] = [];
+  const otherTemplates: TemplateRow[] = [];
+
+  for (const row of rows) {
+    // Check if same category (and category is not empty/null)
+    if (category && row.category && row.category.toLowerCase() === category.toLowerCase()) {
+      categoryTemplates.push(row);
+    }
+    // Check if tags match (but not already in category list)
+    else if (tagArray.length && tagArray.some((tag) =>
+      (row.tags || "").toLowerCase().includes(tag.toLowerCase())
+    )) {
+      tagMatchTemplates.push(row);
+    }
+    // Everything else
+    else {
+      otherTemplates.push(row);
+    }
+  }
+
+  const templates = [...categoryTemplates, ...tagMatchTemplates, ...otherTemplates];
 
   if (templates.length === 0) return null;
 

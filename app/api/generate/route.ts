@@ -36,6 +36,8 @@ export async function POST(request: NextRequest) {
     const isOutfit = formData.get('isOutfit') === 'true';
     const selectedModel = formData.get('selectedModel') as string | null;
     const customPrompt = formData.get('customPrompt') as string | null;
+    const isUniversalHairstyle = formData.get('isUniversalHairstyle') === 'true';
+    const prompt = formData.get('prompt') as string | null;
     
     const connection = await pool.getConnection();
     
@@ -106,12 +108,21 @@ export async function POST(request: NextRequest) {
     console.log('=== GENERATE REQUEST START ===');
     console.log('Template ID:', templateId);
     console.log('Is Outfit:', isOutfit);
+    console.log('Is Universal Hairstyle:', isUniversalHairstyle);
     console.log('Image name:', image?.name);
     console.log('Image type:', image?.type);
 
-    if (!image || !templateId) {
+    if (!image) {
       return NextResponse.json(
-        { error: 'Image and template ID are required' },
+        { error: 'Image is required' },
+        { status: 400 }
+      );
+    }
+
+    // For universal hairstyles, we don't need a templateId
+    if (!isUniversalHairstyle && !templateId) {
+      return NextResponse.json(
+        { error: 'Template ID is required' },
         { status: 400 }
       );
     }
@@ -119,7 +130,11 @@ export async function POST(request: NextRequest) {
     let aiPrompt = 'Generate an AI-enhanced image';
     let templateImagePath: string | null = null;
 
-    if (isOutfit) {
+    if (isUniversalHairstyle) {
+      // Use the AI-generated prompt directly
+      aiPrompt = prompt || 'Create a photorealistic portrait of the person with a stylish hairstyle. Maintain exact facial features, skin tone, and natural beauty. Natural lighting, professional photography, 8K HD quality.';
+      console.log('Using universal AI hairstyle prompt:', aiPrompt);
+    } else if (isOutfit) {
       // Fetch outfit template from regular templates table
       const [rows] = await pool.query<Template[]>(
         'SELECT id, title, ai_prompt, image_url FROM templates WHERE id = ?',
@@ -362,20 +377,25 @@ Generate the new image now.`;
         let generationId: number | null = null;
         const saveConnection = await pool.getConnection();
         try {
-          // Get template title
-          const [templates] = await saveConnection.query<Template[]>(
-            'SELECT title FROM templates WHERE id = ?',
-            [templateId]
-          );
+          let templateTitle = 'Unknown Template';
           
-          const templateTitle = templates.length > 0 ? templates[0].title : 'Unknown Template';
+          if (isUniversalHairstyle) {
+            templateTitle = 'AI Hairstyle (Find Your Look)';
+          } else if (templateId) {
+            // Get template title
+            const [templates] = await saveConnection.query<Template[]>(
+              'SELECT title FROM templates WHERE id = ?',
+              [templateId]
+            );
+            templateTitle = templates.length > 0 ? templates[0].title : 'Unknown Template';
+          }
 
           // Save generation record with actual original image URL
           const [insertResult]: any = await saveConnection.query(
             `INSERT INTO generations 
             (user_id, template_id, template_title, original_image_url, generated_image_url, xp_cost, is_outfit, prompt_used, model_used) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [userId, templateId, templateTitle, originalImageUrl, generatedImageUrl, XP_COST, isOutfit, aiPrompt, modelName]
+            [userId, templateId || null, templateTitle, originalImageUrl, generatedImageUrl, XP_COST, isOutfit, aiPrompt, modelName]
           );
 
           generationId = insertResult.insertId;
