@@ -58,52 +58,53 @@ export default function FeaturedBanner() {
 
       {/* Banner */}
       <div 
-        className={`fixed top-0 left-0 right-0 z-50 transition-transform duration-500 ease-out ${
+        className={`fixed top-0 left-0 right-0 bottom-0 sm:bottom-auto z-50 overflow-y-auto transition-transform duration-500 ease-out ${
           isClosing ? '-translate-y-full' : 'translate-y-0'
         }`}
       >
-        <div className="container mx-auto px-4 py-6">
-          <div className="bg-gradient-to-br from-yellow-500/10 via-purple-500/10 to-pink-500/10 backdrop-blur-xl border-2 border-yellow-500/30 rounded-3xl shadow-2xl overflow-hidden">
+        <div className="container mx-auto px-4 py-4 sm:py-6 min-h-screen sm:min-h-0 flex items-center">
+          <div className="w-full bg-gradient-to-br from-yellow-500/10 via-purple-500/10 to-pink-500/10 backdrop-blur-xl border-2 border-yellow-500/30 rounded-3xl shadow-2xl overflow-hidden">
             {/* Close Button */}
             <button
               onClick={handleClose}
-              className="absolute top-4 right-4 z-10 p-2 bg-black/50 hover:bg-black/70 text-white rounded-full transition-all hover:scale-110"
+              className="absolute top-2 right-2 sm:top-4 sm:right-4 z-10 p-2 bg-black/50 hover:bg-black/70 text-white rounded-full transition-all hover:scale-110"
               aria-label="Close banner"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <div className="p-6 sm:p-8">
+            <div className="p-4 sm:p-6 md:p-8 max-h-[90vh] overflow-y-auto">
               {/* Header */}
-              <div className="text-center mb-8">
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full mb-4 animate-pulse">
-                  <Sparkles className="w-5 h-5 text-white" />
-                  <span className="text-sm font-black text-white uppercase tracking-wider">
+              <div className="text-center mb-6 sm:mb-8">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full mb-3 sm:mb-4 animate-pulse">
+                  <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                  <span className="text-xs sm:text-sm font-black text-white uppercase tracking-wider">
                     New Featured Templates
                   </span>
                 </div>
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black bg-gradient-to-r from-yellow-400 via-orange-400 to-pink-400 bg-clip-text text-transparent mb-2">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black bg-gradient-to-r from-yellow-400 via-orange-400 to-pink-400 bg-clip-text text-transparent mb-2">
                   Transform Yourself Today!
                 </h2>
-                <p className="text-white/80 text-lg">
+                <p className="text-white/80 text-sm sm:text-base lg:text-lg">
                   Check out our latest AI-powered transformations
                 </p>
               </div>
 
               {/* Templates Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 {templates.map((template, index) => (
                   <Link
                     key={template.id}
                     href={`/${template.slug}`}
-                    className="group relative bg-gradient-to-br from-zinc-900/90 to-black/90 rounded-2xl overflow-hidden border border-yellow-500/20 hover:border-yellow-500/50 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-yellow-500/20"
+                    onClick={handleClose}
+                    className="group relative bg-gradient-to-br from-zinc-900/90 to-black/90 rounded-xl sm:rounded-2xl overflow-hidden border border-yellow-500/20 hover:border-yellow-500/50 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-yellow-500/20"
                     style={{
                       animationDelay: `${index * 100}ms`,
                       animation: 'slideUp 0.6s ease-out forwards'
                     }}
                   >
                     {/* Image */}
-                    <div className="relative aspect-[3/4] overflow-hidden">
+                    <div className="relative aspect-[4/3] sm:aspect-[3/4] overflow-hidden">
                       <Image
                         src={template.image}
                         alt={template.title}
@@ -114,7 +115,7 @@ export default function FeaturedBanner() {
                       
                       {/* Hover overlay */}
                       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <div className="px-4 py-2 bg-yellow-500 text-black font-bold rounded-full flex items-center gap-2">
+                        <div className="px-3 py-1.5 sm:px-4 sm:py-2 bg-yellow-500 text-black font-bold rounded-full flex items-center gap-2 text-sm">
                           Try Now
                           <ChevronRight className="w-4 h-4" />
                         </div>
@@ -122,11 +123,11 @@ export default function FeaturedBanner() {
                     </div>
 
                     {/* Content */}
-                    <div className="p-4">
-                      <h3 className="font-black text-lg text-white mb-2 group-hover:text-yellow-400 transition-colors">
+                    <div className="p-3 sm:p-4">
+                      <h3 className="font-black text-base sm:text-lg text-white mb-1 sm:mb-2 group-hover:text-yellow-400 transition-colors line-clamp-2">
                         {template.title}
                       </h3>
-                      <p className="text-sm text-zinc-400 line-clamp-2">
+                      <p className="text-xs sm:text-sm text-zinc-400 line-clamp-2">
                         {template.description}
                       </p>
                     </div>
