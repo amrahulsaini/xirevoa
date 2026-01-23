@@ -96,8 +96,9 @@ export default async function TemplatesMasonry({
 
   return (
     <div className="w-full">
-      <div className=\"mb-8 text-center\">\n        <h2 className=\"text-3xl sm:text-4xl font-black text-white mb-2\">Explore All Templates</h2>
-        <p className=\"text-zinc-400\">Discover amazing AI transformations</p>
+      <div className="mb-8 text-center">
+        <h2 className="text-3xl sm:text-4xl font-black text-white mb-2">Explore All Templates</h2>
+        <p className="text-zinc-400">Discover amazing AI transformations</p>
       </div>
 
       <div className="columns-2 md:columns-3 xl:columns-4 2xl:columns-5 gap-4 [column-fill:_balance]">
