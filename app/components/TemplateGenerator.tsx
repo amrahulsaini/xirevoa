@@ -5,6 +5,7 @@ import { Upload, Wand2, Download, RefreshCw, Maximize2, X, Edit3, Sparkles, Arro
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import InsufficientXPModal from "./InsufficientXPModal";
+import ImageHistoryModal from "./ImageHistoryModal";
 
 interface Model {
   model_id: string;
@@ -50,6 +51,7 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
   const [isDragging, setIsDragging] = useState(false);
   const [showModelPicker, setShowModelPicker] = useState(false);
   const [savingDefaultModel, setSavingDefaultModel] = useState(false);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
   
   // Model selection
   const [models, setModels] = useState<Model[]>([]);
@@ -126,6 +128,24 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
       setUserImagePreview(reader.result as string);
     };
     reader.readAsDataURL(file);
+    setShowHistoryModal(false);
+  };
+
+  const handleHistoryImageSelect = async (imageSource: File | string) => {
+    if (imageSource instanceof File) {
+      applyUserImageFile(imageSource);
+    } else {
+      // Convert URL to File
+      try {
+        const response = await fetch(imageSource);
+        const blob = await response.blob();
+        const file = new File([blob], 'selected-image.jpg', { type: blob.type });
+        applyUserImageFile(file);
+      } catch (error) {
+        console.error('Failed to load image:', error);
+        setErrorMessage('Failed to load selected image');
+      }
+    }
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -548,14 +568,25 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
                   </div>
                 </div>
               ) : (
-                <div className="h-full min-h-[120px] flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-zinc-800 flex items-center justify-center">
-                    <Upload className="w-6 h-6 text-zinc-300" />
+                <div className="h-full min-h-[120px] flex flex-col items-center justify-center gap-3">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-zinc-800 flex items-center justify-center">
+                      <Upload className="w-6 h-6 text-zinc-300" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-white">Upload your photo</p>
+                      <p className="text-xs text-zinc-400">Drag & drop here, or click to choose (max 10MB)</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm font-bold text-white">Upload your photo</p>
-                    <p className="text-xs text-zinc-400">Drag & drop here, or click to choose (max 10MB)</p>
-                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowHistoryModal(true);
+                    }}
+                    className="text-xs font-semibold text-yellow-400 hover:text-yellow-300 transition-colors underline"
+                  >
+                    Or select from your uploads & generations
+                  </button>
                 </div>
               )}
 
@@ -1017,6 +1048,14 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
             </div>
           </div>
         </div>
+      )}
+
+      {/* Image History Modal */}
+      {showHistoryModal && (
+        <ImageHistoryModal
+          onSelectImage={handleHistoryImageSelect}
+          onClose={() => setShowHistoryModal(false)}
+        />
       )}
     </div>
   );
