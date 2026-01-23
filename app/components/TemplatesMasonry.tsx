@@ -14,6 +14,14 @@ interface TemplateRow extends RowDataPacket {
 
 async function getTemplates(currentTemplateId: number) {
   try {
+    // If currentTemplateId is 0, get all templates
+    if (currentTemplateId === 0) {
+      const [rows] = await pool.query<TemplateRow[]>(
+        "SELECT id, title, description, image_url, tags, category, coming_soon FROM templates WHERE is_active = TRUE ORDER BY display_order ASC"
+      );
+      return rows;
+    }
+    
     const [rows] = await pool.query<TemplateRow[]>(
       "SELECT id, title, description, image_url, tags, category, coming_soon FROM templates WHERE is_active = TRUE AND id != ? ORDER BY display_order ASC",
       [currentTemplateId]
@@ -69,8 +77,8 @@ export default async function TemplatesMasonry({
 
   return (
     <div className="w-full">
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-bold text-white">More templates</h2>
+      <div className=\"mb-8 text-center\">\n        <h2 className=\"text-3xl sm:text-4xl font-black text-white mb-2\">Explore All Templates</h2>
+        <p className=\"text-zinc-400\">Discover amazing AI transformations</p>
       </div>
 
       <div className="columns-2 md:columns-3 xl:columns-4 2xl:columns-5 gap-4 [column-fill:_balance]">

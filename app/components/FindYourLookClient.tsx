@@ -176,55 +176,56 @@ export default function FindYourLookClient() {
           </button>
         </div>
       ) : (
-        <div className="grid lg:grid-cols-2 gap-8">
-          {/* Left: Image Preview */}
-          <div className="space-y-4">
-            <div className="relative aspect-square rounded-2xl overflow-hidden bg-zinc-900">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-8">
+            {/* Left: Image Preview */}
+            <div className="space-y-4">
+              <div className="relative aspect-square rounded-2xl overflow-hidden bg-zinc-900">
+                {generatedImage ? (
+                  <Image src={generatedImage} alt="Generated" fill className="object-cover" />
+                ) : (
+                  <Image src={imagePreview} alt="Your photo" fill className="object-cover" />
+                )}
+              </div>
+              
               {generatedImage ? (
-                <Image src={generatedImage} alt="Generated" fill className="object-cover" />
+                <div className="grid grid-cols-2 gap-2">
+                  <a
+                    href={generatedImage}
+                    download="xirevoa-hairstyle.png"
+                    className="px-4 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg flex items-center justify-center gap-2 transition-colors"
+                  >
+                    <Download className="w-4 h-4" />
+                    Download
+                  </a>
+                  <button
+                    onClick={reset}
+                    className="px-4 py-3 bg-zinc-800 hover:bg-zinc-700 text-white font-bold rounded-lg flex items-center justify-center gap-2 transition-colors"
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                    Try Another
+                  </button>
+                </div>
               ) : (
-                <Image src={imagePreview} alt="Your photo" fill className="object-cover" />
+                <button
+                  onClick={analyzeAndRecommend}
+                  disabled={analyzing || recommendations.length > 0}
+                  className="w-full px-6 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:from-zinc-700 disabled:to-zinc-700 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2"
+                >
+                  {analyzing ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Analyzing...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-5 h-5" />
+                      Analyze & Recommend
+                    </>
+                  )}
+                </button>
               )}
             </div>
-            
-            {generatedImage ? (
-              <div className="grid grid-cols-2 gap-2">
-                <a
-                  href={generatedImage}
-                  download="xirevoa-hairstyle.png"
-                  className="px-4 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg flex items-center justify-center gap-2"
-                >
-                  <Download className="w-4 h-4" />
-                  Download
-                </a>
-                <button
-                  onClick={reset}
-                  className="px-4 py-3 bg-zinc-800 hover:bg-zinc-700 text-white font-bold rounded-lg flex items-center justify-center gap-2"
-                >
-                  <RefreshCw className="w-4 h-4" />
-                  Try Another
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={analyzeAndRecommend}
-                disabled={analyzing || recommendations.length > 0}
-                className="w-full px-6 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:from-zinc-700 disabled:to-zinc-700 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2"
-              >
-                {analyzing ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Analyzing...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-5 h-5" />
-                    Analyze & Recommend
-                  </>
-                )}
-              </button>
-            )}
-          </div>
 
           {/* Right: Recommendations */}
           <div className="space-y-6">
