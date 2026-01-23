@@ -11,9 +11,9 @@ interface TemplateRow extends RowDataPacket {
 
 export async function GET() {
   try {
-    // Fetch featured templates (IDs: 72, 73, 74, 76)
+    // Fetch featured templates (IDs: 72, 73, 74, 79)
     const [rows] = await pool.query<TemplateRow[]>(
-      'SELECT id, title, description, image_url FROM templates WHERE id IN (72, 73, 74, 76) AND is_active = TRUE ORDER BY display_order ASC'
+      'SELECT id, title, description, image_url FROM templates WHERE id IN (72, 73, 74, 79) AND is_active = TRUE ORDER BY display_order ASC'
     );
 
     const templates = rows.map((row: TemplateRow) => ({
