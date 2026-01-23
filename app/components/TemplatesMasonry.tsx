@@ -16,17 +16,36 @@ async function getTemplates(currentTemplateId: number) {
   try {
     // If currentTemplateId is 0, get all templates
     if (currentTemplateId === 0) {
+      try {
+        const [rows] = await pool.query<TemplateRow[]>(
+          "SELECT id, title, description, image_url, tags, category, coming_soon FROM templates WHERE is_active = TRUE ORDER BY display_order ASC"
+        );
+        return rows;
+      } catch (error) {
+        // If category column doesn't exist, query without it
+        console.log('Category column not found, querying without it');
+        const [rows] = await pool.query<TemplateRow[]>(
+          "SELECT id, title, description, image_url, tags, NULL as category, coming_soon FROM templates WHERE is_active = TRUE ORDER BY display_order ASC"
+        );
+        return rows;
+      }
+    }
+    
+    try {
       const [rows] = await pool.query<TemplateRow[]>(
-        "SELECT id, title, description, image_url, tags, category, coming_soon FROM templates WHERE is_active = TRUE ORDER BY display_order ASC"
+        "SELECT id, title, description, image_url, tags, category, coming_soon FROM templates WHERE is_active = TRUE AND id != ? ORDER BY display_order ASC",
+        [currentTemplateId]
+      );
+      return rows;
+    } catch (error) {
+      // If category column doesn't exist, query without it
+      console.log('Category column not found, querying without it');
+      const [rows] = await pool.query<TemplateRow[]>(
+        "SELECT id, title, description, image_url, tags, NULL as category, coming_soon FROM templates WHERE is_active = TRUE AND id != ? ORDER BY display_order ASC",
+        [currentTemplateId]
       );
       return rows;
     }
-    
-    const [rows] = await pool.query<TemplateRow[]>(
-      "SELECT id, title, description, image_url, tags, category, coming_soon FROM templates WHERE is_active = TRUE AND id != ? ORDER BY display_order ASC",
-      [currentTemplateId]
-    );
-    return rows;
   } catch (error) {
     console.error("Error fetching templates:", error);
     return [] as TemplateRow[];

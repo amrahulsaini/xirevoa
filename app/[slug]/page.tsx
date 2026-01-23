@@ -23,10 +23,21 @@ async function getTemplateBySlug(slug: string) {
     // List of outfit template IDs (includes jewelleries 62-70)
     const OUTFIT_TEMPLATE_IDS = [43, 44, 45, 46, 47, 48, 49, 50, 52, 53, 54, 55, 56, 57, 58, 59, 60, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71];
     
-    // Check regular templates
-    const [rows] = await pool.query<TemplateData[]>(
-      'SELECT id, title, description, image_url, ai_prompt, tags, category FROM templates WHERE is_active = TRUE'
-    );
+    // Try to query with category column first
+    let rows: TemplateData[];
+    try {
+      const [result] = await pool.query<TemplateData[]>(
+        'SELECT id, title, description, image_url, ai_prompt, tags, category FROM templates WHERE is_active = TRUE'
+      );
+      rows = result;
+    } catch (error) {
+      // If category column doesn't exist, query without it
+      console.log('Category column not found, querying without it');
+      const [result] = await pool.query<TemplateData[]>(
+        'SELECT id, title, description, image_url, ai_prompt, tags, NULL as category FROM templates WHERE is_active = TRUE'
+      );
+      rows = result;
+    }
     
     const template = rows.find(row => {
       const templateSlug = row.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
