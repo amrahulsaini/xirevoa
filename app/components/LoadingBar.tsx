@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
-import { Loader2 } from "lucide-react";
 
 export default function LoadingBar() {
   const pathname = usePathname();
@@ -43,11 +42,12 @@ export default function LoadingBar() {
         <div className="h-full bg-gradient-to-r from-yellow-400 via-orange-500 to-yellow-400 animate-[loading_2s_ease-in-out_infinite]"></div>
       </div>
 
-      {/* Full Screen Spinner */}
-      <div className="fixed inset-0 z-[9998] bg-black/50 backdrop-blur-sm flex items-center justify-center">
-        <div className="bg-zinc-900 border-2 border-yellow-400 rounded-2xl p-8 flex flex-col items-center gap-4 shadow-2xl shadow-yellow-400/20">
-          <Loader2 className="w-16 h-16 text-yellow-400 animate-spin" />
-          <p className="text-white font-bold text-xl">Loading...</p>
+      {/* Full Screen Overlay with Dots */}
+      <div className="fixed inset-0 z-[9998] bg-black/60 backdrop-blur-sm flex items-center justify-center">
+        <div className="flex items-center gap-3">
+          <div className="w-4 h-4 bg-yellow-400 rounded-full animate-[bounce_1s_ease-in-out_infinite]"></div>
+          <div className="w-4 h-4 bg-yellow-400 rounded-full animate-[bounce_1s_ease-in-out_0.1s_infinite]"></div>
+          <div className="w-4 h-4 bg-yellow-400 rounded-full animate-[bounce_1s_ease-in-out_0.2s_infinite]"></div>
         </div>
       </div>
     </>
