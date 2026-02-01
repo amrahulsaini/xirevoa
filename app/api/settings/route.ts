@@ -15,9 +15,28 @@ export async function POST(request: NextRequest) {
     }
 
     const userId = session.user.id;
-    const { preferred_model, preferred_resolution, preferred_aspect_ratio } = await request.json();
+    const body = await request.json();
+    
+    // Support both full settings update and partial updates (like just preferredModel)
+    const { preferred_model, preferred_resolution, preferred_aspect_ratio, preferredModel } = body;
 
-    // Validate inputs
+    // If it's a partial update (just model), update only that field
+    if (preferredModel && !preferred_resolution && !preferred_aspect_ratio) {
+      await pool.query(
+        `INSERT INTO user_settings (user_id, preferred_model) 
+         VALUES (?, ?) 
+         ON DUPLICATE KEY UPDATE 
+         preferred_model = VALUES(preferred_model)`,
+        [userId, preferredModel]
+      );
+
+      return NextResponse.json({
+        success: true,
+        message: 'Model preference updated successfully',
+      });
+    }
+
+    // Validate inputs for full update
     if (!preferred_model || !preferred_resolution || !preferred_aspect_ratio) {
       return NextResponse.json(
         { error: 'Missing required fields' },
@@ -25,7 +44,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Update or insert user settings
+    // Update or insert user settings (full update)
     await pool.query(
       `INSERT INTO user_settings (user_id, preferred_model, preferred_resolution, preferred_aspect_ratio) 
        VALUES (?, ?, ?, ?) 

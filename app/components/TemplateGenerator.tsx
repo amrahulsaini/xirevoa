@@ -29,6 +29,7 @@ interface TemplateGeneratorProps {
 export default function TemplateGenerator({ template, isOutfit = false, tags = '' }: TemplateGeneratorProps) {
   const { data: session } = useSession();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const generationRef = useRef<HTMLDivElement>(null);
   const [userImage, setUserImage] = useState<File | null>(null);
   const [userImagePreview, setUserImagePreview] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
@@ -55,7 +56,7 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
   
   // Model selection
   const [models, setModels] = useState<Model[]>([]);
-  const [selectedModel, setSelectedModel] = useState<string>('gemini-2.0-flash-exp');
+  const [selectedModel, setSelectedModel] = useState<string>('gemini-2.5-flash-image');
   const [loadingModels, setLoadingModels] = useState(true);
   
 
@@ -84,7 +85,7 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
         const res = await fetch('/api/models');
         const data = await res.json();
         setModels(data.models || []);
-        setSelectedModel(data.userPreferredModel || 'gemini-2.0-flash-exp');
+        setSelectedModel(data.userPreferredModel || 'gemini-2.5-flash-image');
       } catch (error) {
         console.error('Failed to fetch models:', error);
       } finally {
@@ -209,6 +210,11 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
     setErrorMessage(null);
     setGenerating(true);
     setProgress(0);
+
+    // Scroll to generation area
+    setTimeout(() => {
+      generationRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
 
     try {
       setProgress(10);
@@ -452,6 +458,11 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
     setErrorMessage(null);
     setGenerating(true);
     setProgress(0);
+
+    // Scroll to generation area
+    setTimeout(() => {
+      generationRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
 
     try {
       setProgress(10);
@@ -713,7 +724,7 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
 
       {/* Generating */}
       {generating && (
-        <div className="bg-zinc-900 rounded-2xl p-8 border border-zinc-800">
+        <div ref={generationRef} className="bg-zinc-900 rounded-2xl p-8 border border-zinc-800">
           <div className="aspect-square max-w-md mx-auto flex flex-col items-center justify-center">
             <div className="relative w-32 h-32 mb-6">
               {userImagePreview && (

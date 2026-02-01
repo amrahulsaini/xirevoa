@@ -82,3 +82,16 @@ body {
   white-space: nowrap;
   animation: typing 3s steps(30, end) infinite;
 }
+
+/* Loading Bar Animation */
+@keyframes loading {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}

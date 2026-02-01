@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
       is_active: Boolean(m.is_active),
     }));
 
-    let userPreferredModel = 'gemini-2.0-flash-exp';
+    let userPreferredModel = 'gemini-2.5-flash-image';
 
     // Get user's preferred model if logged in
     if (session?.user?.id) {
