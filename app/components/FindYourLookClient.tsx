@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { Upload, Sparkles, Download, RefreshCw, Loader2, Scissors, Wand2, Zap } from "lucide-react";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
@@ -97,6 +97,8 @@ export default function FindYourLookClient() {
   const generateWithHairstyle = async (hairstyleName: string, aiPrompt: string) => {
     if (!uploadedImage || !session) return;
     
+    setGenerating(true);
+    setSelectedHairstyle(hairstyleName);
     setProgress(0);
     setShowImageReveal(false);
 
@@ -132,20 +134,16 @@ export default function FindYourLookClient() {
       setTimeout(() => {
         setGeneratedImage(data.imageUrl);
         setShowImageReveal(true);
-    setShowImageReveal(false);
-    setProgress(0);
       }, 500);
     } catch (error: any) {
       clearInterval(progressInterval);
-      alert(error.message || 'Failed to animate-fade-in">
-        <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-full mb-6 animate-slide-down">
-          <Scissors className="w-6 h-6 text-blue-400 animate-pulse" />
-          <span className="text-sm font-semibold text-blue-400">AI-Powered Recommendations</span>
-        </div>
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black mb-6 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-gradient">
-          Find Your Perfect Look
-        </h1>
-        <p className="text-lg sm:text-xl text-zinc-400 max-w-3xl mx-auto leading-relaxed animate-fade-in-up
+      alert(error.message || 'Failed to generate');
+    } finally {
+      setTimeout(() => {
+        setGenerating(false);
+        setProgress(0);
+      }, 800);
+    }
   };
 
   const reset = () => {
@@ -155,24 +153,26 @@ export default function FindYourLookClient() {
     setFaceAnalysis('');
     setGeneratedImage(null);
     setSelectedHairstyle(null);
+    setShowImageReveal(false);
+    setProgress(0);
   };
-duration-300 transform ${
-            isDragging ? 'border-blue-500 bg-blue-500/10 scale-105' : 'border-zinc-700 hover:border-zinc-600 hover:scale-102'
-          }`}
-        >
-          <Upload className={`w-16 h-16 mx-auto mb-4 transition-all duration-300 ${isDragging ? 'text-blue-400 scale-110' : 'text-zinc-500'}`} />
-          <h3 className="text-2xl font-bold mb-2">Upload Your Photo</h3>
-          <p className="text-zinc-400 mb-6">Drag and drop or click to select</p>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleImageSelect}
-            className="hidden"
-          />
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/50
+
+  return (
+    <div className="container mx-auto px-4 py-12">
+      {/* Hero Section */}
+      <div className="text-center mb-16">
+        <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-full mb-6">
+          <Scissors className="w-6 h-6 text-blue-400" />
+          <span className="text-sm font-semibold text-blue-400">AI-Powered Recommendations</span>
+        </div>
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black mb-6 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+          Find Your Perfect Look
+        </h1>
+        <p className="text-lg sm:text-xl text-zinc-400 max-w-3xl mx-auto leading-relaxed">
+          Upload your photo and let our AI analyze your face shape to recommend the most flattering hairstyles
+        </p>
+      </div>
+
       {/* Upload Section */}
       {!imagePreview ? (
         <div
@@ -203,7 +203,9 @@ duration-300 transform ${
       ) : (
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-8">
-            {/* Left: Image Preview */} border-2 border-zinc-800 group">
+            {/* Left: Image Preview */}
+            <div className="space-y-4">
+              <div className="relative aspect-square rounded-2xl overflow-hidden bg-zinc-900 border-2 border-zinc-800">
                 {generating ? (
                   <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-blue-900/20 via-purple-900/20 to-pink-900/20 backdrop-blur-sm">
                     <div className="relative w-full h-full flex items-center justify-center">
@@ -212,18 +214,18 @@ duration-300 transform ${
                         <div className="w-32 h-32 bg-blue-500/20 rounded-full animate-ping" />
                         <div className="absolute w-48 h-48 bg-purple-500/20 rounded-full animate-pulse" />
                       </div>
-                       animate-fade-in-up">
-                  <a
-                    href={generatedImage}
-                    download="xirevoa-hairstyle.png"
-                    className="px-4 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold rounded-lg flex items-center justify-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-green-500/50"
-                  >
-                    <Download className="w-4 h-4" />
-                    Download
-                  </a>
-                  <button
-                    onClick={reset}
-                    className="px-4 py-3 bg-zinc-800 hover:bg-zinc-700 text-white font-bold rounded-lg flex items-center justify-center gap-2 transition-all duration-300 hover:scale-105
+                      
+                      {/* Center content */}
+                      <div className="relative z-10 text-center px-6">
+                        <div className="mb-6 relative">
+                          <div className="w-20 h-20 mx-auto relative">
+                            <div className="absolute inset-0 border-4 border-blue-500/30 rounded-full" />
+                            <div className="absolute inset-0 border-4 border-t-blue-500 border-r-purple-500 border-b-pink-500 border-l-transparent rounded-full animate-spin" />
+                            <Wand2 className="absolute inset-0 m-auto w-8 h-8 text-blue-400 animate-pulse" />
+                          </div>
+                        </div>
+                        
+                        <h3 className="text-2xl font-black text-white mb-2 animate-pulse">Creating Your Style...</h3>
                         <p className="text-blue-400 font-bold text-xl mb-6">{Math.round(progress)}%</p>
                         
                         {/* Progress bar */}
@@ -235,29 +237,26 @@ duration-300 transform ${
                         </div>
                         
                         {/* Floating particles */}
-                        <div className="absolute inset-0 pointer-events-none">duration-300 flex items-center justify-center gap-2 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/50 disabled:hover:scale-100 disabled:hover:shadow-none"
-                >
-                  {analyzing ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      <span className="animate-pulse">Analyzing...</span>
+                        <div className="absolute inset-0 pointer-events-none">
+                          <Sparkles className="absolute top-1/4 left-1/4 w-4 h-4 text-blue-400 animate-bounce" style={{ animationDelay: '0s' }} />
+                          <Sparkles className="absolute top-1/3 right-1/4 w-3 h-3 text-purple-400 animate-bounce" style={{ animationDelay: '0.2s' }} />
+                          <Sparkles className="absolute bottom-1/3 left-1/3 w-5 h-5 text-pink-400 animate-bounce" style={{ animationDelay: '0.4s' }} />
+                          <Zap className="absolute top-1/2 right-1/3 w-4 h-4 text-yellow-400 animate-ping" style={{ animationDelay: '0.1s' }} />
+                        </div>
                       </div>
                     </div>
                   </div>
                 ) : generatedImage ? (
                   <div className={`relative w-full h-full ${showImageReveal ? 'animate-reveal' : ''}`}>
                     <Image src={generatedImage} alt="Generated" fill className="object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </div>
-                {generatedImage ? (
-                  <Image src={generatedImage} alt="Generated" fill className="object-cover" />
                 ) : (
                   <Image src={imagePreview} alt="Your photo" fill className="object-cover" />
                 )}
               </div>
-               animate-fade-in-up backdrop-blur-sm">
-                <h3 className="text-xl font-bold mb-2 flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-blue-400 animate-pulse
+              
+              {generatedImage ? (
+                <div className="grid grid-cols-2 gap-2">
                   <a
                     href={generatedImage}
                     download="xirevoa-hairstyle.png"
@@ -266,29 +265,28 @@ duration-300 transform ${
                     <Download className="w-4 h-4" />
                     Download
                   </a>
-                  <button animate-fade-in">Recommended Styles</h3>
-                {recommendations.map((rec, index) => (
-                  <div
-                    key={index}
-                    className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 hover:border-zinc-700 transition-all duration-300 hover:scale-102 hover:shadow-lg hover:shadow-purple-500/10 animate-fade-in-up"
-                    style={{ animationDelay: `${index * 0.1}s` }}
+                  <button
+                    onClick={reset}
+                    className="px-4 py-3 bg-zinc-800 hover:bg-zinc-700 text-white font-bold rounded-lg flex items-center justify-center gap-2 transition-colors"
                   >
-                    <div className="flex justify-between items-start mb-2">
-                      <div>
-                        <h4 className="text-lg font-bold text-white">{rec.name}</h4>
-                        <p className="text-sm text-zinc-400">{rec.description}</p>
-                      </div>
-                    </div>
-                    <p className="text-sm text-blue-400 mb-3">{rec.reason}</p>
-                    <button
-                      onClick={() => generateWithHairstyle(rec.name, rec.aiPrompt)}
-                      disabled={generating}
-                      className="w-full px-4 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-zinc-700 disabled:to-zinc-700 text-white font-bold rounded-lg transition-all duration-300 flex items-center justify-center gap-2 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/50 disabled:hover:scale-100 disabled:hover:shadow-none"
-                    >
-                      {generating && selectedHairstyle === rec.name ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          <span className="animate-pulse">Generating...</span>me="w-5 h-5" />
+                    <RefreshCw className="w-4 h-4" />
+                    Try Another
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={analyzeAndRecommend}
+                  disabled={analyzing || recommendations.length > 0}
+                  className="w-full px-6 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:from-zinc-700 disabled:to-zinc-700 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2"
+                >
+                  {analyzing ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Analyzing...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-5 h-5" />
                       Analyze & Recommend
                     </>
                   )}
