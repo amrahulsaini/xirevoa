@@ -362,7 +362,7 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
     // Check if need to pay
     if (!hasViewedTemplatePrompt) {
       const currentXP = (session?.user as any)?.xpoints || 0;
-      if (currentXP < 1) {
+      if (currentXP < 2) {
         setShowXPModal(true);
         return;
       }
@@ -404,36 +404,8 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
       return;
     }
 
-    const currentXP = (session?.user as any)?.xpoints || 0;
-    if (currentXP < 1) {
-      setShowXPModal(true);
-      return;
-    }
-
-    try {
-      // Deduct 1 XP for editing
-      const res = await fetch('/api/deduct-xp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: 1, reason: 'Customize prompt before generation' }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        if (data.error?.includes('Insufficient')) {
-          setShowXPModal(true);
-        } else {
-          setErrorMessage(data.error || 'Failed to customize prompt');
-        }
-        return;
-      }
-
-      // XP deducted successfully - prompt will be used in generation
-      setErrorMessage(null);
-    } catch (error) {
-      console.error('Customize prompt error:', error);
-      setErrorMessage('Failed to customize prompt');
-    }
+    // No XP deduction needed - already paid when viewing for first time
+    setErrorMessage(null);
   };
 
   const handleEditPrompt = async () => {
@@ -621,11 +593,11 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
                 </h3>
                 {hasViewedTemplatePrompt ? (
                   <span className="text-xs px-3 py-1.5 bg-green-500/20 text-green-400 rounded-full font-bold border border-green-500/30">
-                    FREE VIEW
+                    FREE VIEW & EDIT
                   </span>
                 ) : (
                   <span className="text-xs px-3 py-1.5 bg-yellow-500/20 text-yellow-400 rounded-full font-bold border border-yellow-500/30">
-                    1 XP
+                    2 XP
                   </span>
                 )}
               </div>
@@ -654,7 +626,7 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
                         className="w-full px-4 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 text-white font-bold transition-all shadow-lg flex items-center justify-center gap-2"
                       >
                         <Edit3 className="w-4 h-4" />
-                        Customize Prompt (1 XP)
+                        Customize Prompt (Free)
                       </button>
                     </>
                   ) : (
@@ -676,7 +648,7 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
                             disabled={!editedPrompt.trim()}
                             className="flex-1 px-4 py-3 rounded-xl bg-yellow-500 hover:bg-yellow-600 text-black font-bold transition-colors disabled:opacity-50"
                           >
-                            Save & Use (1 XP)
+                            Save & Use (Free)
                           </button>
                           <button
                             onClick={() => {
@@ -856,7 +828,7 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
                 <button
                   onClick={handleEditPrompt}
                   disabled={!customPrompt.trim() || generating}
-                  className="flex-1 px-6 py-4 bg-gradient-to-r from-purple-600 via-purple-500 to-pink-500 hover:from-purple-700 hover:via-purple-600 hover:to-pink-600 text-white font-black rounded-xl transition-all shadow-lg shadow-purple-500/50 hover:shadow-purple-500/70 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2 text-base"
+                  className="flex-1 px-4 py-3 md:px-5 md:py-3 bg-gradient-to-r from-purple-600 via-purple-500 to-pink-500 hover:from-purple-700 hover:via-purple-600 hover:to-pink-600 text-white font-black rounded-xl transition-all shadow-lg shadow-purple-500/50 hover:shadow-purple-500/70 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2 text-sm md:text-base"
                 >
                   <Sparkles className="w-5 h-5" />
                   {generating ? 'Refining...' : 'Refine Image (1 XP)'}
@@ -866,7 +838,7 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
                     setShowPromptEditor(false);
                     setCustomPrompt('');
                   }}
-                  className="px-6 py-4 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold rounded-xl transition-all"
+                  className="px-4 py-3 md:px-5 md:py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold rounded-xl transition-all"
                 >
                   Cancel
                 </button>

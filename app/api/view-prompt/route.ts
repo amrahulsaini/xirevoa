@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
         prompt = templates[0].ai_prompt;
 
         if (!hasViewedBefore) {
-          // First time viewing - charge 1 XP
+          // First time viewing - charge 2 XP
           const [userRows]: any = await connection.query(
             'SELECT xpoints FROM users WHERE id = ?',
             [session.user.id]
@@ -95,16 +95,16 @@ export async function POST(req: NextRequest) {
 
           const currentXP = userRows[0]?.xpoints || 0;
 
-          if (currentXP < 1) {
+          if (currentXP < 2) {
             return NextResponse.json(
-              { error: 'Insufficient XP. You need 1 XP to view the prompt for the first time.' },
+              { error: 'Insufficient XP. You need 2 XP to view and edit the prompt for the first time.' },
               { status: 400 }
             );
           }
 
-          // Deduct 1 XP
+          // Deduct 2 XP
           await connection.query(
-            'UPDATE users SET xpoints = xpoints - 1 WHERE id = ?',
+            'UPDATE users SET xpoints = xpoints - 2 WHERE id = ?',
             [session.user.id]
           );
 
@@ -118,7 +118,7 @@ export async function POST(req: NextRequest) {
             success: true,
             prompt,
             isFree: false,
-            xpDeducted: 1,
+            xpDeducted: 2,
           });
         } else {
           // Already viewed before - free
