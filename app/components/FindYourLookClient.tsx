@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { Upload, Sparkles, Download, RefreshCw, Loader2, Scissors } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Upload, Sparkles, Download, RefreshCw, Loader2, Scissors, Wand2, Zap } from "lucide-react";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -27,6 +27,8 @@ export default function FindYourLookClient() {
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [selectedHairstyle, setSelectedHairstyle] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [showImageReveal, setShowImageReveal] = useState(false);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -95,8 +97,16 @@ export default function FindYourLookClient() {
   const generateWithHairstyle = async (hairstyleName: string, aiPrompt: string) => {
     if (!uploadedImage || !session) return;
     
-    setGenerating(true);
-    setSelectedHairstyle(hairstyleName);
+    setProgress(0);
+    setShowImageReveal(false);
+
+    // Smooth progress animation
+    const progressInterval = setInterval(() => {
+      setProgress(prev => {
+        if (prev < 85) return prev + Math.random() * 15;
+        return prev;
+      });
+    }, 600);
 
     try {
       const formData = new FormData();
@@ -115,12 +125,27 @@ export default function FindYourLookClient() {
         throw new Error(data.error || 'Generation failed');
       }
 
-      setGeneratedImage(data.imageUrl);
+      clearInterval(progressInterval);
+      setProgress(100);
+      
+      // Delay for smooth reveal animation
+      setTimeout(() => {
+        setGeneratedImage(data.imageUrl);
+        setShowImageReveal(true);
+    setShowImageReveal(false);
+    setProgress(0);
+      }, 500);
     } catch (error: any) {
-      alert(error.message || 'Failed to generate');
-    } finally {
-      setGenerating(false);
-    }
+      clearInterval(progressInterval);
+      alert(error.message || 'Failed to animate-fade-in">
+        <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-full mb-6 animate-slide-down">
+          <Scissors className="w-6 h-6 text-blue-400 animate-pulse" />
+          <span className="text-sm font-semibold text-blue-400">AI-Powered Recommendations</span>
+        </div>
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black mb-6 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-gradient">
+          Find Your Perfect Look
+        </h1>
+        <p className="text-lg sm:text-xl text-zinc-400 max-w-3xl mx-auto leading-relaxed animate-fade-in-up
   };
 
   const reset = () => {
@@ -131,23 +156,23 @@ export default function FindYourLookClient() {
     setGeneratedImage(null);
     setSelectedHairstyle(null);
   };
-
-  return (
-    <div className="container mx-auto px-4 py-12">
-      {/* Hero Section */}
-      <div className="text-center mb-16">
-        <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-full mb-6">
-          <Scissors className="w-6 h-6 text-blue-400" />
-          <span className="text-sm font-semibold text-blue-400">AI-Powered Recommendations</span>
-        </div>
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black mb-6 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-          Find Your Perfect Look
-        </h1>
-        <p className="text-lg sm:text-xl text-zinc-400 max-w-3xl mx-auto leading-relaxed">
-          Upload your photo and let our AI analyze your face shape to recommend the most flattering hairstyles
-        </p>
-      </div>
-
+duration-300 transform ${
+            isDragging ? 'border-blue-500 bg-blue-500/10 scale-105' : 'border-zinc-700 hover:border-zinc-600 hover:scale-102'
+          }`}
+        >
+          <Upload className={`w-16 h-16 mx-auto mb-4 transition-all duration-300 ${isDragging ? 'text-blue-400 scale-110' : 'text-zinc-500'}`} />
+          <h3 className="text-2xl font-bold mb-2">Upload Your Photo</h3>
+          <p className="text-zinc-400 mb-6">Drag and drop or click to select</p>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleImageSelect}
+            className="hidden"
+          />
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/50
       {/* Upload Section */}
       {!imagePreview ? (
         <div
@@ -178,18 +203,61 @@ export default function FindYourLookClient() {
       ) : (
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-8">
-            {/* Left: Image Preview */}
-            <div className="space-y-4">
-              <div className="relative aspect-square rounded-2xl overflow-hidden bg-zinc-900">
+            {/* Left: Image Preview */} border-2 border-zinc-800 group">
+                {generating ? (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-blue-900/20 via-purple-900/20 to-pink-900/20 backdrop-blur-sm">
+                    <div className="relative w-full h-full flex items-center justify-center">
+                      {/* Animated background circles */}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-32 h-32 bg-blue-500/20 rounded-full animate-ping" />
+                        <div className="absolute w-48 h-48 bg-purple-500/20 rounded-full animate-pulse" />
+                      </div>
+                       animate-fade-in-up">
+                  <a
+                    href={generatedImage}
+                    download="xirevoa-hairstyle.png"
+                    className="px-4 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold rounded-lg flex items-center justify-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-green-500/50"
+                  >
+                    <Download className="w-4 h-4" />
+                    Download
+                  </a>
+                  <button
+                    onClick={reset}
+                    className="px-4 py-3 bg-zinc-800 hover:bg-zinc-700 text-white font-bold rounded-lg flex items-center justify-center gap-2 transition-all duration-300 hover:scale-105
+                        <p className="text-blue-400 font-bold text-xl mb-6">{Math.round(progress)}%</p>
+                        
+                        {/* Progress bar */}
+                        <div className="w-full max-w-xs mx-auto h-2 bg-zinc-800 rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transition-all duration-300 rounded-full"
+                            style={{ width: `${progress}%` }}
+                          />
+                        </div>
+                        
+                        {/* Floating particles */}
+                        <div className="absolute inset-0 pointer-events-none">duration-300 flex items-center justify-center gap-2 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/50 disabled:hover:scale-100 disabled:hover:shadow-none"
+                >
+                  {analyzing ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <span className="animate-pulse">Analyzing...</span>
+                      </div>
+                    </div>
+                  </div>
+                ) : generatedImage ? (
+                  <div className={`relative w-full h-full ${showImageReveal ? 'animate-reveal' : ''}`}>
+                    <Image src={generatedImage} alt="Generated" fill className="object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  </div>
                 {generatedImage ? (
                   <Image src={generatedImage} alt="Generated" fill className="object-cover" />
                 ) : (
                   <Image src={imagePreview} alt="Your photo" fill className="object-cover" />
                 )}
               </div>
-              
-              {generatedImage ? (
-                <div className="grid grid-cols-2 gap-2">
+               animate-fade-in-up backdrop-blur-sm">
+                <h3 className="text-xl font-bold mb-2 flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-blue-400 animate-pulse
                   <a
                     href={generatedImage}
                     download="xirevoa-hairstyle.png"
@@ -198,28 +266,29 @@ export default function FindYourLookClient() {
                     <Download className="w-4 h-4" />
                     Download
                   </a>
-                  <button
-                    onClick={reset}
-                    className="px-4 py-3 bg-zinc-800 hover:bg-zinc-700 text-white font-bold rounded-lg flex items-center justify-center gap-2 transition-colors"
+                  <button animate-fade-in">Recommended Styles</h3>
+                {recommendations.map((rec, index) => (
+                  <div
+                    key={index}
+                    className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 hover:border-zinc-700 transition-all duration-300 hover:scale-102 hover:shadow-lg hover:shadow-purple-500/10 animate-fade-in-up"
+                    style={{ animationDelay: `${index * 0.1}s` }}
                   >
-                    <RefreshCw className="w-4 h-4" />
-                    Try Another
-                  </button>
-                </div>
-              ) : (
-                <button
-                  onClick={analyzeAndRecommend}
-                  disabled={analyzing || recommendations.length > 0}
-                  className="w-full px-6 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:from-zinc-700 disabled:to-zinc-700 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2"
-                >
-                  {analyzing ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      Analyzing...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-5 h-5" />
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <h4 className="text-lg font-bold text-white">{rec.name}</h4>
+                        <p className="text-sm text-zinc-400">{rec.description}</p>
+                      </div>
+                    </div>
+                    <p className="text-sm text-blue-400 mb-3">{rec.reason}</p>
+                    <button
+                      onClick={() => generateWithHairstyle(rec.name, rec.aiPrompt)}
+                      disabled={generating}
+                      className="w-full px-4 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-zinc-700 disabled:to-zinc-700 text-white font-bold rounded-lg transition-all duration-300 flex items-center justify-center gap-2 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/50 disabled:hover:scale-100 disabled:hover:shadow-none"
+                    >
+                      {generating && selectedHairstyle === rec.name ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span className="animate-pulse">Generating...</span>me="w-5 h-5" />
                       Analyze & Recommend
                     </>
                   )}
