@@ -32,6 +32,7 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
   const generationRef = useRef<HTMLDivElement>(null);
   const [userImage, setUserImage] = useState<File | null>(null);
   const [userImagePreview, setUserImagePreview] = useState<string | null>(null);
+  const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null); // Track if image is from history
   const [generating, setGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
@@ -134,13 +135,15 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
 
   const handleHistoryImageSelect = async (imageSource: File | string) => {
     if (imageSource instanceof File) {
+      setExistingImageUrl(null); // Clear existing URL for new uploads
       applyUserImageFile(imageSource);
     } else {
-      // Convert URL to File
+      // Convert URL to File but remember the original URL
       try {
         const response = await fetch(imageSource);
         const blob = await response.blob();
         const file = new File([blob], 'selected-image.jpg', { type: blob.type });
+        setExistingImageUrl(imageSource); // Remember the original URL
         applyUserImageFile(file);
       } catch (error) {
         console.error('Failed to load image:', error);
@@ -152,6 +155,7 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setExistingImageUrl(null); // Clear existing URL for new uploads
     applyUserImageFile(file);
   };
 
@@ -162,6 +166,7 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
 
     const file = e.dataTransfer.files?.[0];
     if (!file) return;
+    setExistingImageUrl(null); // Clear existing URL for new uploads
     applyUserImageFile(file);
   };
 
@@ -224,6 +229,11 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
       generateFormData.append('templateId', template.id.toString());
       generateFormData.append('isOutfit', isOutfit.toString());
       generateFormData.append('selectedModel', selectedModel);
+      
+      // Add existing image URL if this is from history (to avoid duplicate saves)
+      if (existingImageUrl) {
+        generateFormData.append('existingImageUrl', existingImageUrl);
+      }
       
       // Add custom prompt if user edited it
       if (promptEdited && editedPrompt.trim()) {

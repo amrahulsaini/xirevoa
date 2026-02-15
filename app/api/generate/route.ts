@@ -38,6 +38,7 @@ export async function POST(request: NextRequest) {
     const customPrompt = formData.get('customPrompt') as string | null;
     const isUniversalHairstyle = formData.get('isUniversalHairstyle') === 'true';
     const prompt = formData.get('prompt') as string | null;
+    const existingImageUrl = formData.get('existingImageUrl') as string | null; // Check if image is from history
     
     const connection = await pool.getConnection();
     
@@ -366,12 +367,20 @@ Generate the new image now.`;
         console.log(`Image saved to: ${filepath}`);
         console.log(`File size: ${generatedBuffer.length} bytes`);
 
-        // Save the user's original uploaded image too
-        const originalFilename = `original-${Date.now()}.${image.type.split('/')[1] || 'jpg'}`;
-        const originalFilepath = path.join(publicDir, originalFilename);
-        fs.writeFileSync(originalFilepath, buffer);
-        const originalImageUrl = `/api/generated/${originalFilename}`;
-        console.log(`Original image saved to: ${originalFilepath}`);
+        // Save the user's original uploaded image (or reuse existing URL if from history)
+        let originalImageUrl: string;
+        if (existingImageUrl) {
+          // Reuse the existing image URL - don't save it again
+          originalImageUrl = existingImageUrl;
+          console.log(`Reusing existing image URL: ${originalImageUrl}`);
+        } else {
+          // Save new upload
+          const originalFilename = `original-${Date.now()}.${image.type.split('/')[1] || 'jpg'}`;
+          const originalFilepath = path.join(publicDir, originalFilename);
+          fs.writeFileSync(originalFilepath, buffer);
+          originalImageUrl = `/api/generated/${originalFilename}`;
+          console.log(`Original image saved to: ${originalFilepath}`);
+        }
 
         // Save generation record to database
         let generationId: number | null = null;
