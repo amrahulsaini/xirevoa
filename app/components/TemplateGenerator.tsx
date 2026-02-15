@@ -47,7 +47,7 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
   const [promptEdited, setPromptEdited] = useState(false); // Track if user edited the prompt
   const [editedPrompt, setEditedPrompt] = useState(''); // Store edited prompt
   const [hasViewedTemplatePrompt, setHasViewedTemplatePrompt] = useState(false); // Track if user has ever viewed this template's prompt
-  const [showPromptEditor, setShowPromptEditor] = useState(false);
+  const [showPromptEditor, setShowPromptEditor] = useState(false); // Track if editor UI is expanded
   const [customPrompt, setCustomPrompt] = useState('');
   const [isDragging, setIsDragging] = useState(false);
   const [showModelPicker, setShowModelPicker] = useState(false);
@@ -400,11 +400,14 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
   };
   
   const handleSaveEditedPrompt = async () => {
-    if (!editedPrompt.trim() || !session) {
+    if (!editedPrompt.trim()) {
+      setErrorMessage('Please enter a prompt');
       return;
     }
 
-    // No XP deduction needed - already paid when viewing for first time
+    // Save the edited prompt and collapse the editor
+    setPromptEdited(true); // Mark that a custom prompt is being used
+    setShowPromptEditor(false); // Collapse the editor UI
     setErrorMessage(null);
   };
 
@@ -611,22 +614,26 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
                 </button>
               ) : (
                 <div className="space-y-4">
-                  {!promptEdited ? (
+                  {!showPromptEditor ? (
                     <>
                       {/* Fixed height card with scrolling */}
                       <div className="bg-zinc-800 rounded-xl p-4 h-32 overflow-y-auto border border-zinc-700">
-                        <p className="text-sm text-zinc-300 whitespace-pre-wrap leading-relaxed">{template.aiPrompt}</p>
+                        <p className="text-sm text-zinc-300 whitespace-pre-wrap leading-relaxed">
+                          {promptEdited && editedPrompt ? editedPrompt : template.aiPrompt}
+                        </p>
                       </div>
                       
                       <button
                         onClick={() => {
-                          setEditedPrompt(template.aiPrompt || '');
-                          setPromptEdited(true);
+                          if (!promptEdited) {
+                            setEditedPrompt(template.aiPrompt || '');
+                          }
+                          setShowPromptEditor(true);
                         }}
                         className="w-full px-4 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 text-white font-bold transition-all shadow-lg flex items-center justify-center gap-2"
                       >
                         <Edit3 className="w-4 h-4" />
-                        Customize Prompt (Free)
+                        {promptEdited ? 'Edit Custom Prompt (Free)' : 'Customize Prompt (Free)'}
                       </button>
                     </>
                   ) : (
@@ -652,8 +659,10 @@ export default function TemplateGenerator({ template, isOutfit = false, tags = '
                           </button>
                           <button
                             onClick={() => {
-                              setPromptEdited(false);
-                              setEditedPrompt('');
+                              setShowPromptEditor(false);
+                              if (!promptEdited) {
+                                setEditedPrompt('');
+                              }
                             }}
                             className="px-4 py-3 rounded-xl border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-white font-semibold transition-colors"
                           >
