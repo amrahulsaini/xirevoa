@@ -16,6 +16,7 @@ export default function Footer() {
             <ul className="space-y-1.5">
               <li><a href="/hairstyles" className="text-zinc-400 hover:text-yellow-400 transition-colors text-sm">Hairstyles</a></li>
               <li><a href="/cinematic-universe" className="text-zinc-400 hover:text-yellow-400 transition-colors text-sm">Cinematic</a></li>
+              <li><a href="/studio-ghibli" className="text-zinc-400 hover:text-yellow-400 transition-colors text-sm">Studio Ghibli</a></li>
               <li><a href="/view-your-iconic-outfit" className="text-zinc-400 hover:text-yellow-400 transition-colors text-sm">Outfits</a></li>
             </ul>
           </div>

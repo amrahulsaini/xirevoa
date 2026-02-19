@@ -4,6 +4,7 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import AutoScrollBanner from "./components/AutoScrollBanner";
 import FeaturedBanner from "./components/FeaturedBanner";
+import StudioGhibliBanner from "./components/StudioGhibliBanner";
 import pool from "@/lib/db";
 import { RowDataPacket } from "mysql2";
 
@@ -85,6 +86,9 @@ export default async function Home({
   
   // Fetch outfit templates (IDs 43-50)
   const outfitTemplates = templates.filter(t => [43, 44, 45, 46, 47, 48, 49, 50, 52, 53, 54, 55, 56, 57, 58, 59, 60].includes(t.id));
+  
+  // Fetch Studio Ghibli templates (IDs 84, 86, 87, 88, 89)
+  const studioGhibliTemplates = templates.filter(t => [84, 86, 87, 88, 89].includes(t.id));
   
   // If searching, show grid view
   if (searchParams.search) {
@@ -191,6 +195,9 @@ export default async function Home({
     <div className="min-h-screen bg-black">
       {/* Featured Banner */}
       <FeaturedBanner />
+      
+      {/* Studio Ghibli Banner */}
+      <StudioGhibliBanner />
       
       {/* Animated Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
@@ -341,6 +348,39 @@ export default async function Home({
 
                       {/* Arrow */}
                       <div className="text-yellow-400 group-hover/card:translate-x-1 transition-transform">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </div>
+                  </a>
+                )}
+
+                {/* Studio Ghibli Banner */}
+                {studioGhibliTemplates.length > 0 && (
+                  <a
+                    href="/studio-ghibli"
+                    className="flex-shrink-0 w-96 group/card bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-900 rounded-xl p-6 border border-zinc-700 hover:border-green-500/50 transition-all hover:shadow-lg hover:shadow-green-500/20 overflow-hidden relative snap-start"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-green-500/5 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity"></div>
+                    <div className="flex items-center gap-4 relative z-10">
+                      {/* Single Preview Image */}
+                      <div className="relative w-24 h-24 rounded-lg overflow-hidden border-2 border-zinc-700 group-hover/card:border-green-500/50 transition-all flex-shrink-0">
+                        <img src={studioGhibliTemplates[0].image} alt="" className="w-full h-full object-cover object-top" />
+                      </div>
+                      
+                      {/* Text Content */}
+                      <div className="flex-1 min-w-0">
+                        <h2 className="text-base font-bold text-white group-hover/card:text-green-400 transition-colors">
+                          ✨ Studio Ghibli Magic
+                        </h2>
+                        <p className="text-xs text-zinc-400">
+                          Enter the enchanting world of Ghibli
+                        </p>
+                      </div>
+
+                      {/* Arrow */}
+                      <div className="text-green-400 group-hover/card:translate-x-1 transition-transform">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
@@ -554,6 +594,83 @@ export default async function Home({
                   )}
                 </div>
               </a>
+            </div>
+          </section>
+        )}
+
+        {/* Studio Ghibli Section */}
+        {studioGhibliTemplates.length > 0 && (
+          <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
+            <div className="relative overflow-hidden rounded-3xl border-2 border-green-500/30 bg-gradient-to-br from-green-900/20 via-teal-900/20 to-blue-900/20 p-8 sm:p-12 group hover:border-green-400/60 transition-all">
+              {/* Animated Background */}
+              <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute w-96 h-96 bg-green-400/10 rounded-full blur-3xl -top-48 -left-48 animate-pulse" />
+                <div className="absolute w-96 h-96 bg-teal-400/10 rounded-full blur-3xl top-1/2 -right-48 animate-pulse" style={{ animationDelay: '1s' }} />
+                <div className="absolute w-96 h-96 bg-blue-400/10 rounded-full blur-3xl -bottom-48 left-1/4 animate-pulse" style={{ animationDelay: '2s' }} />
+              </div>
+
+              {/* Content */}
+              <div className="relative z-10">
+                <div className="text-center mb-8">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-teal-500 rounded-full mb-4 shadow-lg shadow-green-500/50">
+                    <span className="text-sm font-black text-white">✨ STUDIO GHIBLI MAGIC ✨</span>
+                  </div>
+                  <h2 className="text-3xl sm:text-4xl font-black mb-3">
+                    <span className="bg-gradient-to-r from-green-400 via-teal-400 to-blue-400 bg-clip-text text-transparent">
+                      Enter the Enchanting World of Ghibli
+                    </span>
+                  </h2>
+                  <p className="text-white/80 text-base sm:text-lg max-w-2xl mx-auto">
+                    Transform yourself into magical Studio Ghibli characters! 🌿✨
+                  </p>
+                </div>
+
+                {/* Templates Grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-6">
+                  {studioGhibliTemplates.map((template) => (
+                    <a
+                      key={template.id}
+                      href={`/${template.slug}`}
+                      className="group/ghibli relative bg-zinc-900/80 rounded-xl overflow-hidden border-2 border-green-500/30 hover:border-green-400 transition-all hover:scale-105 hover:shadow-xl hover:shadow-green-500/30"
+                    >
+                      <div className="relative aspect-[3/4] overflow-hidden">
+                        <img
+                          src={template.image}
+                          alt={template.title}
+                          className="w-full h-full object-cover object-top group-hover/ghibli:scale-110 transition-transform duration-500"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-70 group-hover/ghibli:opacity-50 transition-opacity" />
+                        
+                        {/* Hover Overlay */}
+                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/ghibli:opacity-100 transition-all duration-300">
+                          <div className="px-3 py-2 bg-gradient-to-r from-green-500 to-teal-500 text-white font-bold rounded-full text-sm shadow-lg">
+                            Try Now ✨
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="p-3">
+                        <h3 className="font-bold text-white text-sm group-hover/ghibli:text-green-400 transition-colors line-clamp-1">
+                          {template.title}
+                        </h3>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+
+                {/* View All Button */}
+                <div className="text-center">
+                  <a
+                    href="/studio-ghibli"
+                    className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white font-bold rounded-xl transition-all shadow-lg shadow-green-500/50 hover:shadow-green-500/70 hover:scale-105"
+                  >
+                    <span>View All Ghibli Templates</span>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </a>
+                </div>
+              </div>
             </div>
           </section>
         )}
