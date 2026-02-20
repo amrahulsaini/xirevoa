@@ -84,11 +84,9 @@ export default function ProfileClient({ user, isOwnProfile }: ProfileClientProps
             <div className="relative group">
               <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full overflow-hidden border-4 border-purple-500/50 bg-gradient-to-br from-purple-900/50 to-blue-900/50">
                 {profilePicture ? (
-                  <Image
+                  <img
                     src={profilePicture}
                     alt={user.username}
-                    width={160}
-                    height={160}
                     className="w-full h-full object-cover"
                   />
                 ) : (
