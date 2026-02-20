@@ -27,68 +27,77 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Convert image to base64
-    const bytes = await imageFile.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    const base64Image = buffer.toString('base64');
-
-    // Step 1: Analyze the user's face to get age, features
-    const analyzeResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/analyze-face`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ image: base64Image }),
-    });
-
-    if (!analyzeResponse.ok) {
-      throw new Error('Failed to analyze face');
-    }
-
-    const faceData = await analyzeResponse.json();
-    const { age, gender: detectedGender, ethnicity, features } = faceData;
-
-    // Step 2: Generate matching partner
-    const partnerGender = gender === 'girl' ? 'boy' : 'girl';
-    const partnerPrompt = `A ${age}-year-old ${partnerGender === 'boy' ? 'handsome young man' : 'beautiful young woman'}, ${ethnicity || 'asian'} ethnicity, professional portrait photo, looking at camera, perfect lighting, detailed face, high quality, realistic, age ${age}, suitable partner for a ${gender}`;
-
-    const partnerResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        prompt: partnerPrompt,
-        model: 'flux-realism',
-        aspectRatio: '1:1',
-      }),
-    });
-
-    if (!partnerResponse.ok) {
-      throw new Error('Failed to generate partner image');
-    }
-
-    const partnerData = await partnerResponse.json();
-    const partnerImageUrl = partnerData.imageUrl;
-
-    // Step 3: Save user's image to public folder
+    // Save user's image to public folder
     const uploadsDir = path.join(process.cwd(), 'public', 'generated', 'matches');
     if (!fs.existsSync(uploadsDir)) {
       fs.mkdirSync(uploadsDir, { recursive: true });
     }
 
     const timestamp = Date.now();
+    const bytes = await imageFile.arrayBuffer();
+    const buffer = Buffer.from(bytes);
     const userFilename = `user_${session.user.id}_${timestamp}.jpg`;
     const userFilepath = path.join(uploadsDir, userFilename);
     fs.writeFileSync(userFilepath, buffer);
     const userImageUrl = `/generated/matches/${userFilename}`;
 
-    // Step 4: Generate couple photo using both images
-    const couplePrompt = `A romantic couple photo, ${age}-year-old ${gender === 'girl' ? 'beautiful woman and handsome man' : 'handsome man and beautiful woman'}, standing close together, smiling, perfect lighting, professional photography, high quality, realistic, matching couple, ${ethnicity || 'asian'} ethnicity`;
+    // Determine template ID based on gender
+    // Template 73: Generate boy companion (for girls)
+    // Template 74: Generate girl companion (for boys)
+    const templateId = gender === 'girl' ? 73 : 74;
 
-    const coupleResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/generate`, {
+    // Get template details
+    const connection = await pool.getConnection();
+    let template: any;
+    
+    try {
+      const [templates]: any = await connection.query(
+        'SELECT * FROM templates WHERE id = ?',
+        [templateId]
+      );
+      
+      if (templates.length === 0) {
+        throw new Error('Template not found');
+      }
+      
+      template = templates[0];
+    } finally {
+      connection.release();
+    }
+
+    // Convert user image to base64 for generation
+    const base64Image = buffer.toString('base64');
+
+    // Generate partner using template
+    const partnerResponse = await fetch(`${process.env.REPLICATE_WEBHOOK_URL || 'http://localhost:3012'}/api/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        templateId: templateId,
+        userImage: base64Image,
+        aspectRatio: '1:1',
+      }),
+    });
+
+    if (!partnerResponse.ok) {
+      const errorData = await partnerResponse.json();
+      throw new Error(errorData.error || 'Failed to generate partner image');
+    }
+
+    const partnerData = await partnerResponse.json();
+    const partnerImageUrl = partnerData.imageUrl;
+
+    // Generate couple photo using the opposite template's prompt with both
+    const couplePrompt = `A romantic couple photo, young man and woman together, smiling at camera, standing close, perfect lighting, professional photography, high quality, realistic`;
+    
+    const coupleResponse = await fetch(`${process.env.REPLICATE_WEBHOOK_URL || 'http://localhost:3012'}/api/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         prompt: couplePrompt,
-        model: 'flux-realism',
+        model: template.model || 'flux-realism',
         aspectRatio: '1:1',
+        userImage: base64Image,
       }),
     });
 
@@ -99,31 +108,26 @@ export async function POST(request: NextRequest) {
     const coupleData = await coupleResponse.json();
     const coupleImageUrl = coupleData.imageUrl;
 
-    // Step 5: Save generation to database
-    const connection = await pool.getConnection();
+    // Save generations to database
+    const conn = await pool.getConnection();
     try {
-      await connection.query(
+      await conn.query(
         'INSERT INTO generations (user_id, template_id, prompt, image_url, model, status) VALUES (?, ?, ?, ?, ?, ?)',
-        [session.user.id, null, `Find Match: ${partnerPrompt}`, partnerImageUrl, 'flux-realism', 'completed']
+        [session.user.id, templateId, template.prompt, partnerImageUrl, template.model, 'completed']
       );
 
-      await connection.query(
+      await conn.query(
         'INSERT INTO generations (user_id, template_id, prompt, image_url, model, status) VALUES (?, ?, ?, ?, ?, ?)',
-        [session.user.id, null, `Couple Photo: ${couplePrompt}`, coupleImageUrl, 'flux-realism', 'completed']
+        [session.user.id, null, couplePrompt, coupleImageUrl, template.model, 'completed']
       );
     } finally {
-      connection.release();
+      conn.release();
     }
 
     return NextResponse.json({
       userImageUrl,
       partnerImageUrl,
       coupleImageUrl,
-      analysis: {
-        age,
-        gender: detectedGender,
-        ethnicity,
-      },
     });
 
   } catch (error: any) {
