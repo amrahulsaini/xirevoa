@@ -67,6 +67,9 @@ export default async function Home({
 }) {
   const templates = await getTemplates(searchParams.search);
   
+  // Fetch find your match templates (IDs 73, 74)
+  const matchTemplates = templates.filter(t => [73, 74].includes(t.id));
+  
   // Fetch hairstyle templates (IDs 23-27)
   const hairstyleTemplates = templates.filter(t => [23, 24, 25, 26, 27].includes(t.id));
   
@@ -226,28 +229,40 @@ export default async function Home({
               {/* Auto-Scrollable container */}
               <AutoScrollBanner>
                 {/* Find Your Match Banner - NEW */}
-                <a
-                  href="/find-your-match"
-                  className="flex-shrink-0 w-96 group/card bg-gradient-to-r from-pink-900/50 via-purple-900/50 to-pink-900/50 rounded-xl p-6 border border-pink-500/30 hover:border-pink-500 transition-all hover:shadow-lg hover:shadow-pink-500/30 overflow-hidden relative snap-start"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-pink-500/10 to-purple-500/10 opacity-0 group-hover/card:opacity-100 transition-opacity"></div>
-                  <div className="flex items-center gap-4 relative z-10">
-                    <div className="text-6xl">❤️</div>
-                    <div className="flex-1 min-w-0">
-                      <h2 className="text-base font-bold text-white group-hover/card:text-pink-400 transition-colors">
-                        💑 Find Your Perfect Match
-                      </h2>
-                      <p className="text-xs text-zinc-400">
-                        AI generates your ideal partner & couple photo
-                      </p>
+                {matchTemplates.length > 0 && (
+                  <a
+                    href="/find-your-match"
+                    className="flex-shrink-0 w-96 group/card bg-gradient-to-r from-pink-900/50 via-purple-900/50 to-pink-900/50 rounded-xl p-6 border border-pink-500/30 hover:border-pink-500 transition-all hover:shadow-lg hover:shadow-pink-500/30 overflow-hidden relative snap-start"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-pink-500/10 to-purple-500/10 opacity-0 group-hover/card:opacity-100 transition-opacity"></div>
+                    <div className="flex items-center gap-4 relative z-10">
+                      {/* Preview Images */}
+                      <div className="flex gap-2">
+                        {matchTemplates.slice(0, 2).map((template) => (
+                          <div key={template.id} className="relative w-12 h-12 rounded-lg overflow-hidden border-2 border-pink-500/50 flex-shrink-0">
+                            <Image src={template.image} alt="" width={48} height={48} className="w-full h-full object-cover" priority loading="eager" quality={75} />
+                          </div>
+                        ))}
+                      </div>
+                      
+                      {/* Text Content */}
+                      <div className="flex-1 min-w-0">
+                        <h2 className="text-base font-bold text-white group-hover/card:text-pink-400 transition-colors">
+                          💑 Find Your Perfect Match
+                        </h2>
+                        <p className="text-xs text-zinc-400">
+                          AI generates your ideal partner
+                        </p>
+                      </div>
+
+                      <div className="text-pink-500 group-hover/card:translate-x-1 transition-transform">
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
                     </div>
-                    <div className="text-pink-500 group-hover/card:translate-x-1 transition-transform">
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </div>
-                  </div>
-                </a>
+                  </a>
+                )}
 
                 {/* Hairstyle Banner */}
                 {hairstyleTemplates.length > 0 && (

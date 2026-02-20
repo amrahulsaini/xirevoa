@@ -113,30 +113,30 @@ export default function FindYourMatchClient() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 py-20">
-      <div className="container mx-auto px-4 max-w-6xl">
+    <section className="container mx-auto px-4 sm:px-6 py-12">
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 bg-clip-text text-transparent mb-4">
-            Find Your Perfect Match
+          <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 bg-clip-text text-transparent mb-4">
+            Find Your Perfect Match ❤️
           </h1>
-          <p className="text-gray-600 text-lg">
+          <p className="text-zinc-400 text-lg">
             Upload your photo and let AI generate your ideal partner, then see how you both look together!
           </p>
         </div>
 
         {step === 'upload' && (
-          <div className="bg-white rounded-2xl shadow-xl p-8 max-w-2xl mx-auto">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl p-8 max-w-2xl mx-auto">
             {/* Gender Selection */}
             <div className="mb-6">
-              <label className="block text-gray-700 font-semibold mb-3">I am a:</label>
+              <label className="block text-white font-semibold mb-3">I am a:</label>
               <div className="flex gap-4">
                 <button
                   onClick={() => setGender('girl')}
                   className={`flex-1 py-3 px-6 rounded-xl font-semibold transition ${
                     gender === 'girl'
-                      ? 'bg-pink-600 text-white shadow-lg'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      ? 'bg-gradient-to-r from-pink-600 to-pink-500 text-white shadow-lg shadow-pink-500/30'
+                      : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700 border border-zinc-700'
                   }`}
                 >
                   👧 Girl
@@ -145,8 +145,8 @@ export default function FindYourMatchClient() {
                   onClick={() => setGender('boy')}
                   className={`flex-1 py-3 px-6 rounded-xl font-semibold transition ${
                     gender === 'boy'
-                      ? 'bg-blue-600 text-white shadow-lg'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      ? 'bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-500/30'
+                      : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700 border border-zinc-700'
                   }`}
                 >
                   👦 Boy
@@ -156,8 +156,8 @@ export default function FindYourMatchClient() {
 
             {/* File Upload */}
             <div className="mb-6">
-              <label className="block text-gray-700 font-semibold mb-3">Upload Your Photo:</label>
-              <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-purple-500 transition cursor-pointer">
+              <label className="block text-white font-semibold mb-3">Upload Your Photo:</label>
+              <div className="border-2 border-dashed border-zinc-700 rounded-xl p-8 text-center hover:border-yellow-500 transition cursor-pointer bg-zinc-800/50">
                 <input
                   type="file"
                   accept="image/*"
@@ -178,8 +178,8 @@ export default function FindYourMatchClient() {
                   ) : (
                     <>
                       <div className="text-6xl mb-4">📸</div>
-                      <p className="text-gray-600">Click to upload your photo</p>
-                      <p className="text-sm text-gray-400 mt-2">Clear, front-facing photos work best</p>
+                      <p className="text-zinc-300">Click to upload your photo</p>
+                      <p className="text-sm text-zinc-500 mt-2">Clear, front-facing photos work best</p>
                     </>
                   )}
                 </label>
@@ -190,7 +190,7 @@ export default function FindYourMatchClient() {
             <button
               onClick={handleGenerate}
               disabled={!selectedFile || loading}
-              className="w-full bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-gradient-to-r from-yellow-500 via-yellow-600 to-yellow-700 text-black py-4 rounded-xl font-bold text-lg hover:shadow-lg hover:shadow-yellow-500/30 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Generating Your Match...' : '✨ Find My Perfect Match'}
             </button>
@@ -200,17 +200,17 @@ export default function FindYourMatchClient() {
         {step === 'generating' && (
           <div className="text-center py-20">
             <div className="inline-block animate-spin text-6xl mb-6">💫</div>
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">Creating Your Perfect Match...</h2>
-            <p className="text-gray-600">AI is analyzing your features and generating your ideal partner</p>
+            <h2 className="text-3xl font-bold text-white mb-4">Creating Your Perfect Match...</h2>
+            <p className="text-zinc-400">AI is analyzing your features and generating your ideal partner</p>
             <div className="mt-8 space-y-3 max-w-md mx-auto">
-              <div className="bg-white rounded-lg p-3 shadow animate-pulse">
-                <p className="text-sm text-gray-600">🔍 Analyzing your photo...</p>
+              <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3 animate-pulse">
+                <p className="text-sm text-zinc-400">🔍 Analyzing your photo...</p>
               </div>
-              <div className="bg-white rounded-lg p-3 shadow animate-pulse delay-100">
-                <p className="text-sm text-gray-600">🎨 Generating your perfect match...</p>
+              <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3 animate-pulse delay-100">
+                <p className="text-sm text-zinc-400">🎨 Generating your perfect match...</p>
               </div>
-              <div className="bg-white rounded-lg p-3 shadow animate-pulse delay-200">
-                <p className="text-sm text-gray-600">💑 Creating couple photo...</p>
+              <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3 animate-pulse delay-200">
+                <p className="text-sm text-zinc-400">💑 Creating couple photo...</p>
               </div>
             </div>
           </div>
@@ -221,7 +221,7 @@ export default function FindYourMatchClient() {
             {/* Results Grid */}
             <div className="grid md:grid-cols-3 gap-6">
               {/* User Image */}
-              <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+              <div className="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl overflow-hidden">
                 <div className="relative aspect-square">
                   <img
                     src={generatedImages.userImageUrl}
@@ -230,12 +230,12 @@ export default function FindYourMatchClient() {
                   />
                 </div>
                 <div className="p-4">
-                  <h3 className="font-bold text-lg mb-3">You</h3>
+                  <h3 className="font-bold text-lg mb-3 text-white">You</h3>
                   <div className="space-y-2">
                     <button
                       onClick={() => handleEnhancement('user', 'Make me more beautiful')}
                       disabled={enhancing === 'user'}
-                      className="w-full bg-pink-100 text-pink-700 py-2 rounded-lg hover:bg-pink-200 transition disabled:opacity-50"
+                      className="w-full bg-pink-600 hover:bg-pink-700 text-white py-2 rounded-lg transition disabled:opacity-50"
                     >
                       {enhancing === 'user' ? '✨ Enhancing...' : '✨ Make Me More Beautiful'}
                     </button>
@@ -244,7 +244,7 @@ export default function FindYourMatchClient() {
               </div>
 
               {/* Partner Image */}
-              <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+              <div className="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl overflow-hidden">
                 <div className="relative aspect-square">
                   <img
                     src={generatedImages.partnerImageUrl}
@@ -253,12 +253,12 @@ export default function FindYourMatchClient() {
                   />
                 </div>
                 <div className="p-4">
-                  <h3 className="font-bold text-lg mb-3">Your Perfect Match</h3>
+                  <h3 className="font-bold text-lg mb-3 text-white">Your Perfect Match</h3>
                   <div className="space-y-2">
                     <button
                       onClick={() => handleEnhancement('partner', 'Make them more handsome/beautiful')}
                       disabled={enhancing === 'partner'}
-                      className="w-full bg-blue-100 text-blue-700 py-2 rounded-lg hover:bg-blue-200 transition disabled:opacity-50"
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition disabled:opacity-50"
                     >
                       {enhancing === 'partner' ? '✨ Enhancing...' : '✨ Make Them More Attractive'}
                     </button>
@@ -267,7 +267,7 @@ export default function FindYourMatchClient() {
               </div>
 
               {/* Couple Image */}
-              <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+              <div className="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl overflow-hidden">
                 <div className="relative aspect-square">
                   <img
                     src={generatedImages.coupleImageUrl}
@@ -276,12 +276,12 @@ export default function FindYourMatchClient() {
                   />
                 </div>
                 <div className="p-4">
-                  <h3 className="font-bold text-lg mb-3">Together ❤️</h3>
+                  <h3 className="font-bold text-lg mb-3 text-white">Together ❤️</h3>
                   <div className="space-y-2">
                     <button
                       onClick={() => handleEnhancement('couple', 'Make this couple photo more romantic')}
                       disabled={enhancing === 'couple'}
-                      className="w-full bg-purple-100 text-purple-700 py-2 rounded-lg hover:bg-purple-200 transition disabled:opacity-50"
+                      className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg transition disabled:opacity-50"
                     >
                       {enhancing === 'couple' ? '✨ Enhancing...' : '✨ Make More Romantic'}
                     </button>
@@ -291,15 +291,15 @@ export default function FindYourMatchClient() {
             </div>
 
             {/* Custom Enhancement */}
-            <div className="bg-white rounded-2xl shadow-xl p-6 max-w-2xl mx-auto">
-              <h3 className="font-bold text-lg mb-4">Custom Enhancement</h3>
+            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl p-6 max-w-2xl mx-auto">
+              <h3 className="font-bold text-lg mb-4 text-white">Custom Enhancement</h3>
               <div className="flex gap-3">
                 <input
                   type="text"
                   value={enhancementPrompt}
                   onChange={(e) => setEnhancementPrompt(e.target.value)}
                   placeholder="Type your custom enhancement (e.g., 'Add smile', 'Better lighting')"
-                  className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="flex-1 px-4 py-3 bg-zinc-800 border border-zinc-700 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 placeholder-zinc-500"
                 />
                 <button
                   onClick={() => {
@@ -307,7 +307,7 @@ export default function FindYourMatchClient() {
                     handleEnhancement('couple', enhancementPrompt);
                   }}
                   disabled={!enhancementPrompt || enhancing !== null}
-                  className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:shadow-lg transition disabled:opacity-50"
+                  className="px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-xl font-semibold hover:shadow-lg hover:shadow-yellow-500/30 transition disabled:opacity-50"
                 >
                   Apply
                 </button>
@@ -323,7 +323,7 @@ export default function FindYourMatchClient() {
                   setPreviewUrl(null);
                   setSelectedFile(null);
                 }}
-                className="px-8 py-3 bg-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-300 transition"
+                className="px-8 py-3 bg-zinc-800 border border-zinc-700 text-white rounded-xl font-semibold hover:bg-zinc-700 transition"
               >
                 🔄 Try Another Photo
               </button>
@@ -331,6 +331,6 @@ export default function FindYourMatchClient() {
           </div>
         )}
       </div>
-    </div>
+    </section>
   );
 }
