@@ -110,27 +110,15 @@ export default async function FindYourMatchPartnerPage() {
           {/* Templates Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {templates.map((template) => (
-              <a 
-                key={template.id} 
-                href={`/gen/${template.slug}`}
-                className="group block"
-              >
-                <div className="relative overflow-hidden rounded-2xl border-2 border-pink-500/30 hover:border-pink-500 transition-all hover:shadow-xl hover:shadow-pink-500/30 hover:scale-105">
-                  <div className="relative aspect-[3/4]">
-                    <img 
-                      src={template.image} 
-                      alt={template.title}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
-                  </div>
-                  <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                    <h3 className="text-2xl font-bold group-hover:text-pink-400 transition-colors">
-                      {template.title}
-                    </h3>
-                  </div>
-                </div>
-              </a>
+              <CategoryCard
+                key={template.id}
+                id={template.id}
+                title={template.title}
+                slug={template.slug}
+                description={template.description}
+                image={template.image}
+                comingSoon={template.comingSoon}
+              />
             ))}
           </div>
         </section>
