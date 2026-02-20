@@ -46,8 +46,8 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Save to root cdn folder (for CyberPanel VPS)
-    const uploadsDir = path.join(process.cwd(), 'cdn', 'profiles');
+    // Save to public/cdn folder (which already works)
+    const uploadsDir = path.join(process.cwd(), 'public', 'cdn', 'profiles');
     if (!fs.existsSync(uploadsDir)) {
       fs.mkdirSync(uploadsDir, { recursive: true });
     }
@@ -65,8 +65,8 @@ export async function POST(request: NextRequest) {
     console.log('File exists:', fs.existsSync(filepath));
     console.log('File size:', fs.statSync(filepath).size);
 
-    // Use full CDN URL
-    const profilePictureUrl = `https://xirevoa.com/cdn/profiles/${filename}`;
+    // Use /cdn path (served from public)
+    const profilePictureUrl = `/cdn/profiles/${filename}`;
 
     // Update database
     const connection = await pool.getConnection();
