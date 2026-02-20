@@ -44,5 +44,6 @@ next-env.d.ts
 cdn/
 public/cdn/*.jpg
 public/cdn/*.png
-!public/cdn/profiles/
+# Allow profile pictures to be committed
+!public/cdn/profiles/*
 public/hero-banner.png

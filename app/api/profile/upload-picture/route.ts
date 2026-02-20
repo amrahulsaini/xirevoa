@@ -52,15 +52,28 @@ export async function POST(request: NextRequest) {
       fs.mkdirSync(uploadsDir, { recursive: true });
     }
 
-    // Generate unique filename
+    // Generate unique filename using username instead of timestamp
     const fileExtension = path.extname(file.name);
-    const filename = `${session.user.id}-${Date.now()}${fileExtension}`;
+    const username = session.user.username || session.user.id;
+    const filename = `${username}${fileExtension}`;
     const filepath = path.join(uploadsDir, filename);
 
     // Save file
     fs.writeFileSync(filepath, buffer);
 
-    const profilePictureUrl = `/cdn/profiles/${filename}`;
+    // Auto-commit the profile picture to git (for serverless deployments)
+    try {
+      const { execSync } = require('child_process');
+      execSync(`git add "${filepath}"`, { cwd: process.cwd() });
+      execSync(`git commit -m "Update profile picture for ${username}"`, { cwd: process.cwd() });
+      execSync('git push', { cwd: process.cwd() });
+    } catch (gitError) {
+      console.log('Git auto-commit skipped:', gitError);
+      // Continue even if git commands fail
+    }
+
+    // Use full CDN URL since files are served from root cdn folder
+    const profilePictureUrl = `https://xirevoa.com/cdn/profiles/${filename}`;
 
     // Update database
     const connection = await pool.getConnection();
