@@ -60,6 +60,10 @@ export async function POST(request: NextRequest) {
 
     // Save file
     fs.writeFileSync(filepath, buffer);
+    
+    console.log('Profile picture saved to:', filepath);
+    console.log('File exists:', fs.existsSync(filepath));
+    console.log('File size:', fs.statSync(filepath).size);
 
     // Use full CDN URL
     const profilePictureUrl = `https://xirevoa.com/cdn/profiles/${filename}`;
