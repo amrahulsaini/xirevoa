@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Zap, User, Menu, Search, X, Home, Image as ImageIcon, DollarSign, Sparkles, LogOut, Settings, Palette, Shirt, Camera, Film, Scissors } from "lucide-react";
+import { Zap, User, Menu, Search, X, Home, Image as ImageIcon, DollarSign, Sparkles, LogOut, Settings, Palette, Shirt, Camera, Film, Scissors, Heart } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
 
@@ -61,6 +61,7 @@ export default function Header() {
   ];
 
   const categoryItems = [
+    { href: "/find-your-match", label: "Find Your Match ❤️", icon: Heart },
     { href: "/find-your-look", label: "Find Your Look", icon: Scissors },
     { href: "/hairstyles", label: "Hairstyles", icon: Palette },
     { href: "/change-your-hairstyle-girls", label: "Girls Hairstyles", icon: Palette },
