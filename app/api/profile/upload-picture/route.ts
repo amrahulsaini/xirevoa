@@ -46,8 +46,8 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Create uploads directory in public/cdn/profiles
-    const uploadsDir = path.join(process.cwd(), 'public', 'cdn', 'profiles');
+    // Save to root cdn folder (for CyberPanel VPS)
+    const uploadsDir = path.join(process.cwd(), 'cdn', 'profiles');
     if (!fs.existsSync(uploadsDir)) {
       fs.mkdirSync(uploadsDir, { recursive: true });
     }
@@ -61,18 +61,7 @@ export async function POST(request: NextRequest) {
     // Save file
     fs.writeFileSync(filepath, buffer);
 
-    // Auto-commit the profile picture to git (for serverless deployments)
-    try {
-      const { execSync } = require('child_process');
-      execSync(`git add "${filepath}"`, { cwd: process.cwd() });
-      execSync(`git commit -m "Update profile picture for ${username}"`, { cwd: process.cwd() });
-      execSync('git push', { cwd: process.cwd() });
-    } catch (gitError) {
-      console.log('Git auto-commit skipped:', gitError);
-      // Continue even if git commands fail
-    }
-
-    // Use full CDN URL since files are served from root cdn folder
+    // Use full CDN URL
     const profilePictureUrl = `https://xirevoa.com/cdn/profiles/${filename}`;
 
     // Update database
@@ -85,11 +74,11 @@ export async function POST(request: NextRequest) {
       );
 
       if (users.length > 0 && users[0].profile_picture) {
-        // Extract filename from path
+        // Extract filename from URL
         const oldUrl = users[0].profile_picture;
         if (oldUrl.includes('/cdn/profiles/')) {
           const oldFilename = oldUrl.split('/cdn/profiles/')[1];
-          const oldFilePath = path.join(process.cwd(), 'public', 'cdn', 'profiles', oldFilename);
+          const oldFilePath = path.join(process.cwd(), 'cdn', 'profiles', oldFilename);
           if (fs.existsSync(oldFilePath)) {
             fs.unlinkSync(oldFilePath);
           }
