@@ -122,15 +122,12 @@ export default async function FindYourMatchPartnerPage() {
                       alt={template.title}
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
                   </div>
                   <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                    <h3 className="text-2xl font-bold mb-2 group-hover:text-pink-400 transition-colors">
+                    <h3 className="text-2xl font-bold group-hover:text-pink-400 transition-colors">
                       {template.title}
                     </h3>
-                    <p className="text-sm text-zinc-300 line-clamp-2">
-                      {template.description}
-                    </p>
                   </div>
                 </div>
               </a>
