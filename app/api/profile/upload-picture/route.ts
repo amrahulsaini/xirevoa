@@ -50,6 +50,7 @@ export async function POST(request: NextRequest) {
     const uploadsDir = path.join(process.cwd(), 'public', 'cdn', 'profiles');
     if (!fs.existsSync(uploadsDir)) {
       fs.mkdirSync(uploadsDir, { recursive: true });
+      console.log('Created directory:', uploadsDir);
     }
 
     // Generate unique filename using username instead of timestamp
@@ -58,15 +59,27 @@ export async function POST(request: NextRequest) {
     const filename = `${username}${fileExtension}`;
     const filepath = path.join(uploadsDir, filename);
 
+    // Delete old profile picture with same username if exists
+    const possibleExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.webp'];
+    for (const ext of possibleExtensions) {
+      const oldFilePath = path.join(uploadsDir, `${username}${ext}`);
+      if (fs.existsSync(oldFilePath) && oldFilePath !== filepath) {
+        fs.unlinkSync(oldFilePath);
+        console.log('Deleted old profile picture:', oldFilePath);
+      }
+    }
+
     // Save file
     fs.writeFileSync(filepath, buffer);
     
     console.log('Profile picture saved to:', filepath);
     console.log('File exists:', fs.existsSync(filepath));
     console.log('File size:', fs.statSync(filepath).size);
+    console.log('Directory contents:', fs.readdirSync(uploadsDir));
 
     // Use /cdn path (served from public)
     const profilePictureUrl = `/cdn/profiles/${filename}`;
+    console.log('Profile picture URL:', profilePictureUrl);
 
     // Update database
     const connection = await pool.getConnection();
@@ -82,7 +95,7 @@ export async function POST(request: NextRequest) {
         const oldUrl = users[0].profile_picture;
         if (oldUrl.includes('/cdn/profiles/')) {
           const oldFilename = oldUrl.split('/cdn/profiles/')[1];
-          const oldFilePath = path.join(process.cwd(), 'cdn', 'profiles', oldFilename);
+          const oldFilePath = path.join(process.cwd(), 'public', 'cdn', 'profiles', oldFilename);
           if (fs.existsSync(oldFilePath)) {
             fs.unlinkSync(oldFilePath);
           }
