@@ -46,8 +46,8 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Create uploads directory in cdn folder (root level, not public)
-    const uploadsDir = path.join(process.cwd(), 'cdn', 'profiles');
+    // Create uploads directory in public/cdn/profiles
+    const uploadsDir = path.join(process.cwd(), 'public', 'cdn', 'profiles');
     if (!fs.existsSync(uploadsDir)) {
       fs.mkdirSync(uploadsDir, { recursive: true });
     }
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
     // Save file
     fs.writeFileSync(filepath, buffer);
 
-    const profilePictureUrl = `https://xirevoa.com/cdn/profiles/${filename}`;
+    const profilePictureUrl = `/cdn/profiles/${filename}`;
 
     // Update database
     const connection = await pool.getConnection();
@@ -72,11 +72,11 @@ export async function POST(request: NextRequest) {
       );
 
       if (users.length > 0 && users[0].profile_picture) {
-        // Extract filename from URL
+        // Extract filename from path
         const oldUrl = users[0].profile_picture;
         if (oldUrl.includes('/cdn/profiles/')) {
           const oldFilename = oldUrl.split('/cdn/profiles/')[1];
-          const oldFilePath = path.join(process.cwd(), 'cdn', 'profiles', oldFilename);
+          const oldFilePath = path.join(process.cwd(), 'public', 'cdn', 'profiles', oldFilename);
           if (fs.existsSync(oldFilePath)) {
             fs.unlinkSync(oldFilePath);
           }
