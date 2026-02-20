@@ -231,7 +231,7 @@ export default async function Home({
                 {/* AI Companion Banner */}
                 {companionTemplates.length > 0 && companionTemplates[0] && (
                   <a
-                    href={`/gen/${companionTemplates[0].slug}`}
+                    href="/find-your-match-partner"
                     className="flex-shrink-0 w-96 group/card bg-gradient-to-r from-pink-900/50 via-purple-900/50 to-pink-900/50 rounded-xl p-6 border border-pink-500/30 hover:border-pink-500 transition-all hover:shadow-lg hover:shadow-pink-500/30 overflow-hidden relative snap-start"
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-pink-500/10 to-purple-500/10 opacity-0 group-hover/card:opacity-100 transition-opacity"></div>
