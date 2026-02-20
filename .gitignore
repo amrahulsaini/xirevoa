@@ -42,6 +42,7 @@ next-env.d.ts
 
 # large image files
 cdn/
+!app/cdn/
 public/cdn/*.jpg
 public/cdn/*.png
 # Allow profile pictures to be committed
