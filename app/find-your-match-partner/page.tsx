@@ -93,32 +93,29 @@ export default async function FindYourMatchPartnerPage() {
 
         {/* Hero Section */}
         <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
-          <div className="text-center mb-8">
+          <div className="mb-8">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full mb-4 shadow-lg shadow-pink-500/50">
               <span className="text-sm font-black text-white">💑 REALISTIC AI COMPANIONS 💑</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black mb-4">
-              <span className="bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                Create Your Perfect AI Companion
-              </span>
-            </h1>
-            <p className="text-zinc-400 text-lg max-w-2xl mx-auto">
+            <h2 className="text-2xl sm:text-3xl font-black text-white mb-2">Create Your Perfect AI Companion</h2>
+            <p className="text-zinc-400">
               Generate realistic AI companions tailored to your preferences with our advanced AI technology ❤️✨
             </p>
           </div>
           
           {/* Templates Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="columns-2 md:columns-2 lg:columns-2 gap-4 space-y-4">
             {templates.map((template) => (
-              <CategoryCard
-                key={template.id}
-                id={template.id}
-                title={template.title}
-                slug={template.slug}
-                description={template.description}
-                image={template.image}
-                comingSoon={template.comingSoon}
-              />
+              <div key={template.id} className="break-inside-avoid">
+                <CategoryCard
+                  id={template.id}
+                  title={template.title}
+                  slug={template.slug}
+                  description={template.description}
+                  image={template.image}
+                  comingSoon={template.comingSoon}
+                />
+              </div>
             ))}
           </div>
         </section>
