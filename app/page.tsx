@@ -231,31 +231,37 @@ export default async function Home({
                 {/* AI Companion Banner */}
                 {companionTemplates.length > 0 && (
                   <div className="flex-shrink-0 w-96 bg-gradient-to-r from-pink-900/50 via-purple-900/50 to-pink-900/50 rounded-xl p-6 border border-pink-500/30 hover:border-pink-500 transition-all hover:shadow-lg hover:shadow-pink-500/30 overflow-hidden relative snap-start">
-                    <div className="absolute inset-0 bg-gradient-to-r from-pink-500/10 to-purple-500/10 opacity-0 hover:opacity-100 transition-opacity"></div>
-                    <div className="flex items-center gap-4 relative z-10">
-                      {/* Preview Images */}
-                      <div className="flex gap-2">
+                    <div className="absolute inset-0 bg-gradient-to-r from-pink-500/10 to-purple-500/10 opacity-0 hover:opacity-100 transition-opacity pointer-events-none"></div>
+                    <div className="flex flex-col gap-3 relative z-10">
+                      {/* Title */}
+                      <h2 className="text-base font-bold text-white flex items-center gap-2">
+                        💑 Realistic AI Companions
+                      </h2>
+                      
+                      {/* Clickable Templates */}
+                      <div className="flex gap-3">
                         {companionTemplates.map((template) => (
-                          <a key={template.id} href={`/gen/${template.slug}`} className="relative w-12 h-12 rounded-lg overflow-hidden border-2 border-pink-500/50 flex-shrink-0 hover:scale-105 transition-transform">
-                            <Image src={template.image} alt={template.title} width={48} height={48} className="w-full h-full object-cover" priority loading="eager" quality={75} />
+                          <a 
+                            key={template.id} 
+                            href={`/gen/${template.slug}`} 
+                            className="flex-1 group relative rounded-lg overflow-hidden border-2 border-pink-500/50 hover:border-pink-500 transition-all hover:scale-105 cursor-pointer"
+                          >
+                            <div className="relative aspect-square">
+                              <Image 
+                                src={template.image} 
+                                alt={template.title} 
+                                fill
+                                className="object-cover" 
+                                priority 
+                                loading="eager" 
+                                quality={75} 
+                              />
+                            </div>
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-2">
+                              <p className="text-xs text-white font-semibold truncate">{template.title}</p>
+                            </div>
                           </a>
                         ))}
-                      </div>
-                      
-                      {/* Text Content */}
-                      <div className="flex-1 min-w-0">
-                        <h2 className="text-base font-bold text-white">
-                          💑 Realistic AI Companions
-                        </h2>
-                        <p className="text-xs text-zinc-400">
-                          {companionTemplates.length} AI companion styles
-                        </p>
-                      </div>
-
-                      <div className="text-pink-500">
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
                       </div>
                     </div>
                   </div>
