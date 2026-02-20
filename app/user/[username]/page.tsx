@@ -56,12 +56,12 @@ async function getUserByUsername(username: string) {
   }
 }
 
-export default async function ProfilePage({ params }: { params: { username: string } }) {
+export default async function ProfilePage({ params }: { params: Promise<{ username: string }> }) {
   const session = await getServerSession(authOptions);
-  const username = params.username;
+  const { username } = await params;
 
   console.log('Profile page accessed - username:', username);
-  console.log('Params:', JSON.stringify(params));
+  console.log('Username from params:', username);
 
   if (!username || username.trim() === '') {
     return (
