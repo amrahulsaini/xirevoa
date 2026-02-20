@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
     // Save file
     fs.writeFileSync(filepath, buffer);
 
-    const profilePictureUrl = `https://xirevoa.com/cdn/profiles/${filename}`;
+    const profilePictureUrl = `/cdn/profiles/${filename}`;
 
     // Update database
     const connection = await pool.getConnection();

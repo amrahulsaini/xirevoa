@@ -126,7 +126,7 @@ export default function Header() {
                   >
                     {session.user?.image ? (
                       <img 
-                        src={session.user.image.startsWith('http') ? session.user.image : `https://xirevoa.com${session.user.image}`} 
+                        src={session.user.image} 
                         alt={session.user.name || 'User'} 
                         className="w-full h-full object-cover" 
                       />
