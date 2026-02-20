@@ -42,5 +42,7 @@ next-env.d.ts
 
 # large image files
 cdn/
-public/cdn/
+public/cdn/*.jpg
+public/cdn/*.png
+!public/cdn/profiles/
 public/hero-banner.png
