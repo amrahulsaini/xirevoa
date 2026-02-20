@@ -104,7 +104,7 @@ export default async function FindYourMatchPartnerPage() {
           </div>
           
           {/* Templates Grid */}
-          <div className="columns-2 md:columns-2 lg:columns-2 gap-4 space-y-4">
+          <div className="columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-4 space-y-4">
             {templates.map((template) => (
               <div key={template.id} className="break-inside-avoid">
                 <CategoryCard
