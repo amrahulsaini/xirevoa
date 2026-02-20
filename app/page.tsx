@@ -5,6 +5,7 @@ import Footer from "./components/Footer";
 import AutoScrollBanner from "./components/AutoScrollBanner";
 import FeaturedBanner from "./components/FeaturedBanner";
 import StudioGhibliBanner from "./components/StudioGhibliBanner";
+import Image from "next/image";
 import pool from "@/lib/db";
 import { RowDataPacket } from "mysql2";
 
@@ -234,7 +235,7 @@ export default async function Home({
                     <div className="flex items-center gap-4 relative z-10">
                       {/* Single Preview Image */}
                       <div className="relative w-24 h-24 rounded-lg overflow-hidden border-2 border-zinc-700 group-hover/card:border-yellow-500/50 transition-all flex-shrink-0">
-                        <img src={hairstyleTemplates[0].image} alt="" className="w-full h-full object-cover object-top" />
+                        <Image src={hairstyleTemplates[0].image} alt="" width={96} height={96} className="w-full h-full object-cover object-top" priority loading="eager" quality={75} />
                       </div>
                       
                       {/* Text Content */}
@@ -267,7 +268,7 @@ export default async function Home({
                     <div className="flex items-center gap-4 relative z-10">
                       {/* Single Preview Image */}
                       <div className="relative w-24 h-24 rounded-lg overflow-hidden border-2 border-zinc-700 group-hover/card:border-yellow-500/50 transition-all flex-shrink-0">
-                        <img src={eightyTemplates[0].image} alt="" className="w-full h-full object-cover object-top" />
+                        <Image src={eightyTemplates[0].image} alt="" width={96} height={96} className="w-full h-full object-cover object-top" loading="lazy" quality={75} />
                       </div>
                       
                       {/* Text Content */}
@@ -300,7 +301,7 @@ export default async function Home({
                     <div className="flex items-center gap-4 relative z-10">
                       {/* Single Preview Image */}
                       <div className="relative w-24 h-24 rounded-lg overflow-hidden border-2 border-zinc-700 group-hover/card:border-yellow-500/50 transition-all flex-shrink-0">
-                        <img src={cinematicTemplates[0].image} alt="" className="w-full h-full object-cover object-top" />
+                        <Image src={cinematicTemplates[0].image} alt="" width={96} height={96} className="w-full h-full object-cover object-top" loading="lazy" quality={75} />
                       </div>
                       
                       {/* Text Content */}
@@ -333,7 +334,7 @@ export default async function Home({
                     <div className="flex items-center gap-4 relative z-10">
                       {/* Single Preview Image */}
                       <div className="relative w-24 h-24 rounded-lg overflow-hidden border-2 border-zinc-700 group-hover/card:border-yellow-500/50 transition-all flex-shrink-0">
-                        <img src={instagramTemplates[0].image} alt="" className="w-full h-full object-cover object-top" />
+                        <Image src={instagramTemplates[0].image} alt="" width={96} height={96} className="w-full h-full object-cover object-top" loading="lazy" quality={75} />
                       </div>
                       
                       {/* Text Content */}
@@ -366,7 +367,7 @@ export default async function Home({
                     <div className="flex items-center gap-4 relative z-10">
                       {/* Single Preview Image */}
                       <div className="relative w-24 h-24 rounded-lg overflow-hidden border-2 border-zinc-700 group-hover/card:border-green-500/50 transition-all flex-shrink-0">
-                        <img src={studioGhibliTemplates[0].image} alt="" className="w-full h-full object-cover object-top" />
+                        <Image src={studioGhibliTemplates[0].image} alt="" width={96} height={96} className="w-full h-full object-cover object-top" loading="lazy" quality={75} />
                       </div>
                       
                       {/* Text Content */}
@@ -418,10 +419,14 @@ export default async function Home({
                   <div className="grid grid-cols-2 gap-1 h-full">
                     {girlsHairstyleTemplates.slice(0, 4).map((template, index) => (
                       <div key={template.id} className="overflow-hidden">
-                        <img 
+                        <Image
                           src={template.image} 
                           alt=""
+                          width={400}
+                          height={500}
                           className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-500"
+                          loading="lazy"
+                          quality={75}
                         />
                       </div>
                     ))}
@@ -465,10 +470,14 @@ export default async function Home({
                     <div className="grid grid-cols-2 gap-1 h-full">
                       {jewelleryTemplates.slice(0, 4).map((template, index) => (
                         <div key={template.id} className="overflow-hidden">
-                          <img 
+                          <Image
                             src={template.image} 
                             alt=""
+                            width={400}
+                            height={500}
                             className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-500"
+                            loading="lazy"
+                            quality={75}
                           />
                         </div>
                       ))}
@@ -516,10 +525,14 @@ export default async function Home({
                       <div className="grid grid-cols-2 gap-1 h-full">
                         {outfitTemplates.slice(0, 4).map((template) => (
                           <div key={template.id} className="overflow-hidden">
-                            <img 
+                            <Image
                               src={template.image} 
                               alt=""
+                              width={400}
+                              height={500}
                               className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-500"
+                              loading="lazy"
+                              quality={75}
                             />
                           </div>
                         ))}
@@ -634,10 +647,14 @@ export default async function Home({
                       className="group/ghibli relative bg-zinc-900/80 rounded-xl overflow-hidden border-2 border-green-500/30 hover:border-green-400 transition-all hover:scale-105 hover:shadow-xl hover:shadow-green-500/30"
                     >
                       <div className="relative aspect-[3/4] overflow-hidden">
-                        <img
+                        <Image
                           src={template.image}
                           alt={template.title}
+                          width={400}
+                          height={533}
                           className="w-full h-full object-cover object-top group-hover/ghibli:scale-110 transition-transform duration-500"
+                          loading="lazy"
+                          quality={75}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-70 group-hover/ghibli:opacity-50 transition-opacity" />
                         

@@ -116,6 +116,12 @@ export default function StudioGhibliBanner() {
                         alt={template.title}
                         fill
                         className="object-cover object-top group-hover:scale-110 transition-transform duration-700"
+                        priority={index < 2}
+                        loading={index < 2 ? "eager" : "lazy"}
+                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
+                        quality={85}
+                        placeholder="blur"
+                        blurDataURL="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='500'%3E%3Crect fill='%2318181b' width='400' height='500'/%3E%3C/svg%3E"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-70 group-hover:opacity-50 transition-opacity" />
                       

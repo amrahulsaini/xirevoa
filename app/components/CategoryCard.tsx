@@ -47,6 +47,11 @@ export default function CategoryCard({
             width={600}
             height={800}
             className="w-full h-auto object-cover"
+            priority={false}
+            loading="lazy"
+            placeholder="blur"
+            blurDataURL="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='500'%3E%3Crect fill='%2318181b' width='400' height='500'/%3E%3C/svg%3E"
+            quality={85}
             onLoadingComplete={() => {}}
             onError={() => {
               setImgSrc(
