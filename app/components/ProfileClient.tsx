@@ -85,11 +85,12 @@ export default function ProfileClient({ user, isOwnProfile }: ProfileClientProps
               <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full overflow-hidden border-4 border-purple-500/50 bg-gradient-to-br from-purple-900/50 to-blue-900/50">
                 {profilePicture ? (
                   <Image
-                    src={profilePicture}
+                    src={profilePicture.startsWith('http') ? profilePicture : `https://xirevoa.com${profilePicture}`}
                     alt={user.username}
                     width={160}
                     height={160}
                     className="w-full h-full object-cover"
+                    unoptimized={!profilePicture.startsWith('http')}
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">

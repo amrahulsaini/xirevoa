@@ -125,7 +125,11 @@ export default function Header() {
                     className="user-btn w-9 h-9 sm:w-10 sm:h-10 bg-zinc-800 hover:bg-zinc-700 rounded-full flex items-center justify-center transition-colors overflow-hidden border-2 border-yellow-500/20"
                   >
                     {session.user?.image ? (
-                      <img src={session.user.image} alt={session.user.name || 'User'} className="w-full h-full object-cover" />
+                      <img 
+                        src={session.user.image.startsWith('http') ? session.user.image : `https://xirevoa.com${session.user.image}`} 
+                        alt={session.user.name || 'User'} 
+                        className="w-full h-full object-cover" 
+                      />
                     ) : (
                       <User className="w-5 h-5 sm:w-6 sm:h-6 text-zinc-400" />
                     )}

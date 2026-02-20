@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(bytes);
 
     // Create uploads directory if it doesn't exist
-    const uploadsDir = path.join(process.cwd(), 'public', 'uploads', 'profiles');
+    const uploadsDir = path.join(process.cwd(), 'public', 'cdn', 'profiles');
     if (!fs.existsSync(uploadsDir)) {
       fs.mkdirSync(uploadsDir, { recursive: true });
     }
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
     // Save file
     fs.writeFileSync(filepath, buffer);
 
-    const profilePictureUrl = `/uploads/profiles/${filename}`;
+    const profilePictureUrl = `https://xirevoa.com/cdn/profiles/${filename}`;
 
     // Update database
     const connection = await pool.getConnection();
