@@ -285,15 +285,6 @@ export default function FindYourLookClient() {
                       </div>
                     </div>
                   </div>
-                        <div className="absolute inset-0 pointer-events-none">
-                          <Sparkles className="absolute top-1/4 left-1/4 w-4 h-4 text-blue-400 animate-bounce" style={{ animationDelay: '0s' }} />
-                          <Sparkles className="absolute top-1/3 right-1/4 w-3 h-3 text-purple-400 animate-bounce" style={{ animationDelay: '0.2s' }} />
-                          <Sparkles className="absolute bottom-1/3 left-1/3 w-5 h-5 text-pink-400 animate-bounce" style={{ animationDelay: '0.4s' }} />
-                          <Zap className="absolute top-1/2 right-1/3 w-4 h-4 text-yellow-400 animate-ping" style={{ animationDelay: '0.1s' }} />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
                 ) : generatedImage ? (
                   <div className={`relative w-full h-full ${showImageReveal ? 'animate-reveal' : ''}`}>
                     <Image src={generatedImage} alt="Generated" fill className="object-cover" />
