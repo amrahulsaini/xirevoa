@@ -114,6 +114,7 @@ export default function FindYourLookClient() {
       const formData = new FormData();
       formData.append('image', uploadedImage);
       formData.append('prompt', aiPrompt);
+      formData.append('model', 'gemini-2.5-flash-image');
       formData.append('isUniversalHairstyle', 'true');
 
       const response = await fetch('/api/generate', {
@@ -207,36 +208,83 @@ export default function FindYourLookClient() {
             <div className="space-y-4">
               <div className="relative aspect-square rounded-2xl overflow-hidden bg-zinc-900 border-2 border-zinc-800">
                 {generating ? (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-blue-900/20 via-purple-900/20 to-pink-900/20 backdrop-blur-sm">
-                    <div className="relative w-full h-full flex items-center justify-center">
-                      {/* Animated background circles */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-blue-900/30 via-purple-900/30 to-pink-900/30 backdrop-blur-md">
+                    <div className="relative w-full h-full flex items-center justify-center p-8">
+                      {/* Animated background effects */}
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-32 h-32 bg-blue-500/20 rounded-full animate-ping" />
-                        <div className="absolute w-48 h-48 bg-purple-500/20 rounded-full animate-pulse" />
+                        <div className="w-64 h-64 bg-blue-500/10 rounded-full animate-ping" style={{ animationDuration: '2s' }} />
+                        <div className="absolute w-80 h-80 bg-purple-500/10 rounded-full animate-pulse" style={{ animationDuration: '3s' }} />
+                        <div className="absolute w-96 h-96 bg-pink-500/5 rounded-full animate-ping" style={{ animationDuration: '4s' }} />
                       </div>
                       
-                      {/* Center content */}
-                      <div className="relative z-10 text-center px-6">
-                        <div className="mb-6 relative">
-                          <div className="w-20 h-20 mx-auto relative">
-                            <div className="absolute inset-0 border-4 border-blue-500/30 rounded-full" />
-                            <div className="absolute inset-0 border-4 border-t-blue-500 border-r-purple-500 border-b-pink-500 border-l-transparent rounded-full animate-spin" />
-                            <Wand2 className="absolute inset-0 m-auto w-8 h-8 text-blue-400 animate-pulse" />
+                      {/* Main card */}
+                      <div className="relative z-10 w-full max-w-md">
+                        <div className="bg-zinc-900/80 backdrop-blur-xl border-2 border-zinc-700/50 rounded-2xl p-8 shadow-2xl">
+                          {/* Animated icon */}
+                          <div className="mb-6 relative">
+                            <div className="w-24 h-24 mx-auto relative">
+                              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 rounded-2xl blur-xl animate-pulse" />
+                              <div className="absolute inset-0 border-4 border-zinc-700/50 rounded-2xl" />
+                              <div className="absolute inset-0 border-4 border-t-blue-500 border-r-purple-500 border-b-pink-500 border-l-transparent rounded-2xl animate-spin" style={{ animationDuration: '2s' }} />
+                              <Wand2 className="absolute inset-0 m-auto w-10 h-10 text-white animate-pulse" />
+                            </div>
+                          </div>
+                          
+                          {/* Title and subtitle */}
+                          <h3 className="text-2xl font-black text-white mb-2 text-center">✨ Creating Magic...</h3>
+                          <p className="text-zinc-400 text-center mb-6">Applying {selectedHairstyle}</p>
+                          
+                          {/* Large progress percentage */}
+                          <div className="text-center mb-6">
+                            <span className="text-5xl font-black bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                              {Math.round(progress)}%
+                            </span>
+                          </div>
+                          
+                          {/* Enhanced progress bar */}
+                          <div className="relative">
+                            <div className="w-full h-3 bg-zinc-800 rounded-full overflow-hidden shadow-inner">
+                              <div 
+                                className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transition-all duration-500 ease-out rounded-full relative overflow-hidden"
+                                style={{ width: `${progress}%` }}
+                              >
+                                <div className="absolute inset-0 bg-white/30 animate-shimmer" />
+                              </div>
+                            </div>
+                            <div className="mt-2 flex justify-between text-xs text-zinc-500">
+                              <span>Processing...</span>
+                              <span>Almost there!</span>
+                            </div>
+                          </div>
+                          
+                          {/* Progress stages */}
+                          <div className="mt-6 space-y-2">
+                            <div className={`flex items-center gap-2 transition-opacity ${progress > 0 ? 'opacity-100' : 'opacity-30'}`}>
+                              <div className={`w-2 h-2 rounded-full ${progress > 0 ? 'bg-blue-500' : 'bg-zinc-700'}`} />
+                              <span className="text-sm text-zinc-400">Analyzing your photo</span>
+                            </div>
+                            <div className={`flex items-center gap-2 transition-opacity ${progress > 30 ? 'opacity-100' : 'opacity-30'}`}>
+                              <div className={`w-2 h-2 rounded-full ${progress > 30 ? 'bg-purple-500' : 'bg-zinc-700'}`} />
+                              <span className="text-sm text-zinc-400">Generating hairstyle</span>
+                            </div>
+                            <div className={`flex items-center gap-2 transition-opacity ${progress > 70 ? 'opacity-100' : 'opacity-30'}`}>
+                              <div className={`w-2 h-2 rounded-full ${progress > 70 ? 'bg-pink-500' : 'bg-zinc-700'}`} />
+                              <span className="text-sm text-zinc-400">Finalizing details</span>
+                            </div>
                           </div>
                         </div>
-                        
-                        <h3 className="text-2xl font-black text-white mb-2 animate-pulse">Creating Your Style...</h3>
-                        <p className="text-blue-400 font-bold text-xl mb-6">{Math.round(progress)}%</p>
-                        
-                        {/* Progress bar */}
-                        <div className="w-full max-w-xs mx-auto h-2 bg-zinc-800 rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transition-all duration-300 rounded-full"
-                            style={{ width: `${progress}%` }}
-                          />
-                        </div>
-                        
-                        {/* Floating particles */}
+                      </div>
+                      
+                      {/* Floating decorative elements */}
+                      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                        <Sparkles className="absolute top-[20%] left-[15%] w-5 h-5 text-blue-400 animate-bounce" style={{ animationDelay: '0s', animationDuration: '2s' }} />
+                        <Sparkles className="absolute top-[30%] right-[20%] w-4 h-4 text-purple-400 animate-bounce" style={{ animationDelay: '0.5s', animationDuration: '2.5s' }} />
+                        <Sparkles className="absolute bottom-[35%] left-[25%] w-6 h-6 text-pink-400 animate-bounce" style={{ animationDelay: '1s', animationDuration: '3s' }} />
+                        <Zap className="absolute top-[50%] right-[30%] w-5 h-5 text-yellow-400 animate-ping" style={{ animationDelay: '0.2s' }} />
+                        <Scissors className="absolute bottom-[25%] right-[15%] w-5 h-5 text-blue-300 animate-pulse" style={{ animationDelay: '0.8s' }} />
+                      </div>
+                    </div>
+                  </div>
                         <div className="absolute inset-0 pointer-events-none">
                           <Sparkles className="absolute top-1/4 left-1/4 w-4 h-4 text-blue-400 animate-bounce" style={{ animationDelay: '0s' }} />
                           <Sparkles className="absolute top-1/3 right-1/4 w-3 h-3 text-purple-400 animate-bounce" style={{ animationDelay: '0.2s' }} />
