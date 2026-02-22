@@ -64,7 +64,7 @@ Be creative and specific with hairstyle names and descriptions. Make the AI prom
 
     console.log('=== FACE ANALYSIS START ===');
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash-thinking-exp-01-21',
+      model: 'gemini-2.5-flash-image',
       contents: [
         {
           parts: [
