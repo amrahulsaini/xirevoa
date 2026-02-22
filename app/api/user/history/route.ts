@@ -6,8 +6,9 @@ import { RowDataPacket } from 'mysql2';
 
 interface GenerationRow extends RowDataPacket {
   id: number;
-  image_url: string;
-  prompt: string;
+  original_image_url: string;
+  generated_image_url: string;
+  template_title: string;
   created_at: Date;
 }
 
@@ -26,23 +27,37 @@ export async function GET() {
 
     // Fetch all generations for this user
     const [rows] = await pool.query<GenerationRow[]>(
-      `SELECT id, image_url, prompt, created_at 
+      `SELECT id, original_image_url, generated_image_url, template_title, created_at 
        FROM generations 
-       WHERE user_id = ? AND status = 'completed' AND image_url IS NOT NULL
+       WHERE user_id = ?
        ORDER BY created_at DESC 
-       LIMIT 50`,
+       LIMIT 100`,
       [userId]
     );
 
-    const generations: any[] = rows.map(row => ({
-      id: row.id,
-      url: row.image_url,
-      template: row.prompt || 'Generated Image',
-      createdAt: row.created_at,
-    }));
+    // Extract unique uploads (original images)
+    const uploadsSet = new Set<string>();
+    rows.forEach(row => {
+      if (row.original_image_url) {
+        uploadsSet.add(row.original_image_url);
+      }
+    });
+    const uploads = Array.from(uploadsSet);
+
+    // Map generations
+    const generations: any[] = rows
+      .filter(row => row.generated_image_url)
+      .map(row => ({
+        id: row.id,
+        url: row.generated_image_url,
+        template: row.template_title || 'Generated Image',
+        createdAt: row.created_at,
+      }));
+
+      }));
 
     return NextResponse.json({
-      uploads: [],
+      uploads,
       generations,
     });
   } catch (error) {
