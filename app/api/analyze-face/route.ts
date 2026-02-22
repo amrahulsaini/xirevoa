@@ -44,6 +44,8 @@ Then, recommend 3 SPECIFIC hairstyles that would look amazing on them. For each 
 3. WHY it suits their face shape and features (be specific)
 4. A detailed AI PROMPT to generate this hairstyle on their photo
 
+CRITICAL: All prompts must emphasize that ONLY the hairstyle should change. The person's face, facial features, skin tone, eye color, face shape, expression, clothing, accessories, background, and everything else MUST remain completely unchanged and identical to the original photo.
+
 Format your response EXACTLY like this:
 
 FACE_ANALYSIS: [Your analysis of their face shape and features in 2-3 sentences]
@@ -52,7 +54,7 @@ HAIRSTYLE_1:
 NAME: [Hairstyle name]
 DESCRIPTION: [Brief description]
 REASON: [Why it suits them]
-PROMPT: [Detailed prompt: "Create a photorealistic portrait of the person with [detailed hairstyle description]. Maintain their exact facial features, skin tone, and natural beauty. The hairstyle should feature [specific details about cut, length, texture, styling]. Natural lighting, professional photography, 8K HD quality."]
+PROMPT: [Detailed prompt: "ONLY change the hairstyle to [detailed hairstyle description]. Keep the person's exact face, facial features, skin tone, eye color, face shape, expression, clothing, accessories, and background completely identical and unchanged. The new hairstyle should feature [specific details about cut, length, texture, styling]. Professional photography, 8K HD quality, photorealistic."]
 
 HAIRSTYLE_2:
 [Same format]
@@ -65,9 +67,9 @@ Be creative and specific with hairstyle names and descriptions. Make the AI prom
 Additionally, provide 4 QUICK SUGGESTIONS for simple hairstyle transformations. Format like this:
 
 QUICK_SUGGESTIONS:
-1. TITLE: [Short title like "Make hair curly"] | EMOJI: [relevant emoji] | PROMPT: [Detailed AI prompt]
-2. TITLE: [Short title] | EMOJI: [relevant emoji] | PROMPT: [Detailed AI prompt]
-3. TITLE: [Short title] | EMOJI: [relevant emoji] | PROMPT: [Detailed AI prompt]
+1. TITLE: [Short title like "Make hair curly"] | EMOJI: [relevant emoji] | PROMPT: [Detailed AI prompt that emphasizes ONLY changing hairstyle, keeping everything else identical]
+2. TITLE: [Short title] | EMOJI: [relevant emoji] | PROMPT: [Detailed AI prompt that emphasizes ONLY changing hairstyle]
+3. TITLE: [Short title] | EMOJI: [relevant emoji] | PROMPT: [Detailed AI prompt that emphasizes ONLY changing hairstyle]
 4. TITLE: [Short title] | EMOJI: [relevant emoji] | PROMPT: [Detailed AI prompt]`;
 
     console.log('=== FACE ANALYSIS START ===');
@@ -136,19 +138,19 @@ QUICK_SUGGESTIONS:
           name: "Modern Layered Cut",
           description: "Versatile layered hairstyle with natural movement",
           reason: "Complements most face shapes with its balanced proportions",
-          aiPrompt: "Create a photorealistic portrait of the person with a modern layered haircut featuring soft, face-framing layers. The layers should add volume and movement. Maintain exact facial features, skin tone, and natural beauty. Natural lighting, professional styling, 8K HD quality."
+          aiPrompt: "ONLY change the hairstyle to a modern layered haircut featuring soft, face-framing layers. The layers should add volume and movement. Keep the person's exact face, facial features, skin tone, eye color, expression, clothing, accessories, and background completely identical and unchanged. Professional photography, 8K HD quality, photorealistic."
         },
         {
           name: "Soft Wavy Style",
           description: "Elegant waves that add dimension and texture",
           reason: "Softens features and adds a touch of glamour",
-          aiPrompt: "Create a photorealistic portrait of the person with soft, flowing waves. The waves should be natural-looking with gentle movement and shine. Maintain exact facial features, skin tone, and natural beauty. Soft lighting, elegant styling, 8K HD quality."
+          aiPrompt: "ONLY change the hairstyle to soft, flowing waves. The waves should be natural-looking with gentle movement and shine. Keep the person's exact face, facial features, skin tone, eye color, expression, clothing, accessories, and background completely identical and unchanged. Professional photography, 8K HD quality, photorealistic."
         },
         {
           name: "Sleek Straight Look",
           description: "Polished straight hair with a glossy finish",
           reason: "Creates a sophisticated and timeless appearance",
-          aiPrompt: "Create a photorealistic portrait of the person with sleek, straight hair with a glossy, healthy shine. The hair should be perfectly smooth and polished. Maintain exact facial features, skin tone, and natural beauty. Studio lighting, high-end finish, 8K HD quality."
+          aiPrompt: "ONLY change the hairstyle to sleek, straight hair with a glossy, healthy shine. The hair should be perfectly smooth and polished. Keep the person's exact face, facial features, skin tone, eye color, expression, clothing, accessories, and background completely identical and unchanged. Professional photography, 8K HD quality, photorealistic."
         }
       ];
 
@@ -160,10 +162,10 @@ QUICK_SUGGESTIONS:
     // Ensure we have fallback quick suggestions if AI didn't provide them
     if (quickSuggestions.length < 4) {
       const fallbackSuggestions = [
-        { title: "Make hair curly", icon: "✨", prompt: "Transform this person's hairstyle to beautiful curly hair with natural curls, maintaining their facial features and expression. Professional photography, 8K quality." },
-        { title: "Add highlights", icon: "💫", prompt: "Add beautiful blonde highlights to this person's hair while keeping their natural base color, maintaining their facial features. Professional salon quality, 8K." },
-        { title: "Short pixie cut", icon: "✂️", prompt: "Transform this person's hairstyle to a trendy short pixie cut, maintaining their facial features and natural beauty. Modern style, professional photography, 8K." },
-        { title: "Long wavy style", icon: "🌊", prompt: "Transform this person's hairstyle to long, flowing wavy hair with natural texture, maintaining their facial features. Professional photography, 8K quality." }
+        { title: "Make hair curly", icon: "✨", prompt: "ONLY change the hairstyle to beautiful curly hair with natural curls. Keep the person's exact face, facial features, skin tone, eye color, expression, clothing, and background completely identical and unchanged. Professional photography, 8K quality, photorealistic." },
+        { title: "Add highlights", icon: "💫", prompt: "ONLY add beautiful blonde highlights to the hair while keeping the natural base color. Keep the person's exact face, facial features, skin tone, eye color, expression, clothing, and background completely identical and unchanged. Professional salon quality, 8K, photorealistic." },
+        { title: "Short pixie cut", icon: "✂️", prompt: "ONLY change the hairstyle to a trendy short pixie cut. Keep the person's exact face, facial features, skin tone, eye color, expression, clothing, and background completely identical and unchanged. Modern style, professional photography, 8K, photorealistic." },
+        { title: "Long wavy style", icon: "🌊", prompt: "ONLY change the hairstyle to long, flowing wavy hair with natural texture. Keep the person's exact face, facial features, skin tone, eye color, expression, clothing, and background completely identical and unchanged. Professional photography, 8K quality, photorealistic." }
       ];
 
       while (quickSuggestions.length < 4 && fallbackSuggestions.length > 0) {
