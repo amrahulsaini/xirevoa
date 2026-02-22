@@ -1,16 +1,23 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { Upload, Sparkles, Download, RefreshCw, Loader2, Scissors, Wand2, Zap } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Upload, Sparkles, Download, RefreshCw, Loader2, Scissors, Wand2, Zap, Image as ImageIcon } from "lucide-react";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import ImageHistoryModal from "./ImageHistoryModal";
 
 interface HairstyleRecommendation {
   name: string;
   description: string;
   reason: string;
   aiPrompt: string;
+}
+
+interface QuickSuggestion {
+  title: string;
+  prompt: string;
+  icon: string;
 }
 
 export default function FindYourLookClient() {
@@ -29,6 +36,8 @@ export default function FindYourLookClient() {
   const [isDragging, setIsDragging] = useState(false);
   const [progress, setProgress] = useState(0);
   const [showImageReveal, setShowImageReveal] = useState(false);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [quickSuggestions, setQuickSuggestions] = useState<QuickSuggestion[]>([]);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -62,6 +71,35 @@ export default function FindYourLookClient() {
     }
   };
 
+  const handleHistoryImageSelect = async (imageSource: File | string) => {
+    if (imageSource instanceof File) {
+      setUploadedImage(imageSource);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(imageSource);
+    } else {
+      try {
+        const response = await fetch(imageSource);
+        const blob = await response.blob();
+        const file = new File([blob], 'selected-image.jpg', { type: blob.type });
+        setUploadedImage(file);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreview(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      } catch (error) {
+        console.error('Failed to load image:', error);
+      }
+    }
+    setRecommendations([]);
+    setGeneratedImage(null);
+    setFaceAnalysis('');
+    setShowHistoryModal(false);
+  };
+
   const analyzeAndRecommend = async () => {
     if (!uploadedImage || !session) {
       router.push('/auth/login');
@@ -87,6 +125,15 @@ export default function FindYourLookClient() {
 
       setFaceAnalysis(data.faceShape);
       setRecommendations(data.recommendations);
+      
+      // Generate quick suggestions
+      const suggestions: QuickSuggestion[] = [
+        { title: "Make my hair curly", prompt: "Transform this person's hairstyle to beautiful curly hair with natural curls, maintaining their facial features and expression. Professional photography, 8K quality.", icon: "✨" },
+        { title: "Add highlights", prompt: "Add beautiful blonde highlights to this person's hair while keeping their natural base color, maintaining their facial features. Professional salon quality, 8K.", icon: "💫" },
+        { title: "Short pixie cut", prompt: "Transform this person's hairstyle to a trendy short pixie cut, maintaining their facial features and natural beauty. Modern style, professional photography, 8K.", icon: "✂️" },
+        { title: "Long wavy style", prompt: "Transform this person's hairstyle to long, flowing wavy hair with natural texture, maintaining their facial features. Professional photography, 8K quality.", icon: "🌊" }
+      ];
+      setQuickSuggestions(suggestions);
     } catch (error: any) {
       alert(error.message || 'Failed to analyze face');
     } finally {
@@ -194,19 +241,31 @@ export default function FindYourLookClient() {
             onChange={handleImageSelect}
             className="hidden"
           />
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold rounded-xl transition-all"
-          >
-            Choose Photo
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="flex-1 px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2"
+            >
+              <Upload className="w-5 h-5" />
+              Upload New
+            </button>
+            {session && (
+              <button
+                onClick={() => setShowHistoryModal(true)}
+                className="flex-1 px-8 py-4 bg-zinc-800 hover:bg-zinc-700 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2"
+              >
+                <ImageIcon className="w-5 h-5" />
+                From Gallery
+              </button>
+            )}
+          </div>
         </div>
       ) : (
         <div className="max-w-6xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-8">
+          <div className="grid lg:grid-cols-2 gap-8 mb-8">
             {/* Left: Image Preview */}
             <div className="space-y-4">
-              <div className="relative aspect-square rounded-2xl overflow-hidden bg-zinc-900 border-2 border-zinc-800">
+              <div className="relative aspect-square rounded-2xl overflow-visible bg-zinc-900 border-2 border-zinc-800">
                 {generating ? (
                   <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-blue-900/30 via-purple-900/30 to-pink-900/30 backdrop-blur-md">
                     <div className="relative w-full h-full flex items-center justify-center p-8">
@@ -345,6 +404,28 @@ export default function FindYourLookClient() {
               </div>
             )}
 
+            {quickSuggestions.length > 0 && !recommendations.length && (
+              <div className="space-y-3 mb-6">
+                <h3 className="text-xl font-bold flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-yellow-400" />
+                  Quick AI Suggestions
+                </h3>
+                <div className="grid grid-cols-2 gap-2">
+                  {quickSuggestions.map((suggestion, index) => (
+                    <button
+                      key={index}
+                      onClick={() => generateWithHairstyle(suggestion.title, suggestion.prompt)}
+                      disabled={generating}
+                      className="p-3 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 rounded-lg transition-all text-left disabled:opacity-50"
+                    >
+                      <div className="text-2xl mb-1">{suggestion.icon}</div>
+                      <div className="text-sm font-semibold text-white">{suggestion.title}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {recommendations.length > 0 && (
               <div className="space-y-3">
                 <h3 className="text-2xl font-bold">Recommended Styles</h3>
@@ -391,6 +472,14 @@ export default function FindYourLookClient() {
           </div>
         </div>
         </div>
+      )}
+
+      {/* Image History Modal */}
+      {showHistoryModal && (
+        <ImageHistoryModal
+          onSelectImage={handleHistoryImageSelect}
+          onClose={() => setShowHistoryModal(false)}
+        />
       )}
     </div>
   );
