@@ -60,7 +60,15 @@ HAIRSTYLE_2:
 HAIRSTYLE_3:
 [Same format]
 
-Be creative and specific with hairstyle names and descriptions. Make the AI prompts detailed and photorealistic.`;
+Be creative and specific with hairstyle names and descriptions. Make the AI prompts detailed and photorealistic.
+
+Additionally, provide 4 QUICK SUGGESTIONS for simple hairstyle transformations. Format like this:
+
+QUICK_SUGGESTIONS:
+1. TITLE: [Short title like "Make hair curly"] | EMOJI: [relevant emoji] | PROMPT: [Detailed AI prompt]
+2. TITLE: [Short title] | EMOJI: [relevant emoji] | PROMPT: [Detailed AI prompt]
+3. TITLE: [Short title] | EMOJI: [relevant emoji] | PROMPT: [Detailed AI prompt]
+4. TITLE: [Short title] | EMOJI: [relevant emoji] | PROMPT: [Detailed AI prompt]`;
 
     console.log('=== FACE ANALYSIS START ===');
     const response = await ai.models.generateContent({
@@ -102,6 +110,24 @@ Be creative and specific with hairstyle names and descriptions. Make the AI prom
       });
     }
 
+    // Extract quick suggestions
+    const quickSuggestionsMatch = analysisText.match(/QUICK_SUGGESTIONS:\s*([\s\S]+?)(?=\n\n[A-Z_]+:|$)/);
+    const quickSuggestions = [];
+    
+    if (quickSuggestionsMatch) {
+      const suggestionsText = quickSuggestionsMatch[1];
+      const suggestionRegex = /\d+\.\s*TITLE:\s*(.+?)\s*\|\s*EMOJI:\s*(.+?)\s*\|\s*PROMPT:\s*([\s\S]+?)(?=\n\d+\.|$)/g;
+      let suggestionMatch;
+      
+      while ((suggestionMatch = suggestionRegex.exec(suggestionsText)) !== null) {
+        quickSuggestions.push({
+          title: suggestionMatch[1].trim(),
+          icon: suggestionMatch[2].trim(),
+          prompt: suggestionMatch[3].trim(),
+        });
+      }
+    }
+
     // Ensure we have at least 3 recommendations
     if (recommendations.length < 3) {
       // Add fallback recommendations if AI didn't provide enough
@@ -131,13 +157,29 @@ Be creative and specific with hairstyle names and descriptions. Make the AI prom
       }
     }
 
+    // Ensure we have fallback quick suggestions if AI didn't provide them
+    if (quickSuggestions.length < 4) {
+      const fallbackSuggestions = [
+        { title: "Make hair curly", icon: "✨", prompt: "Transform this person's hairstyle to beautiful curly hair with natural curls, maintaining their facial features and expression. Professional photography, 8K quality." },
+        { title: "Add highlights", icon: "💫", prompt: "Add beautiful blonde highlights to this person's hair while keeping their natural base color, maintaining their facial features. Professional salon quality, 8K." },
+        { title: "Short pixie cut", icon: "✂️", prompt: "Transform this person's hairstyle to a trendy short pixie cut, maintaining their facial features and natural beauty. Modern style, professional photography, 8K." },
+        { title: "Long wavy style", icon: "🌊", prompt: "Transform this person's hairstyle to long, flowing wavy hair with natural texture, maintaining their facial features. Professional photography, 8K quality." }
+      ];
+
+      while (quickSuggestions.length < 4 && fallbackSuggestions.length > 0) {
+        quickSuggestions.push(fallbackSuggestions.shift()!);
+      }
+    }
+
     console.log('=== FACE ANALYSIS SUCCESS ===');
     console.log('Recommendations:', recommendations.length);
+    console.log('Quick Suggestions:', quickSuggestions.length);
 
     return NextResponse.json({
       success: true,
       faceShape: faceAnalysis,
       recommendations: recommendations.slice(0, 3),
+      quickSuggestions: quickSuggestions.slice(0, 4),
     });
 
   } catch (error: any) {

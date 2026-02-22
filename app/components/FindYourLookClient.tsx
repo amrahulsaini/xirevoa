@@ -125,15 +125,7 @@ export default function FindYourLookClient() {
 
       setFaceAnalysis(data.faceShape);
       setRecommendations(data.recommendations);
-      
-      // Generate quick suggestions
-      const suggestions: QuickSuggestion[] = [
-        { title: "Make my hair curly", prompt: "Transform this person's hairstyle to beautiful curly hair with natural curls, maintaining their facial features and expression. Professional photography, 8K quality.", icon: "✨" },
-        { title: "Add highlights", prompt: "Add beautiful blonde highlights to this person's hair while keeping their natural base color, maintaining their facial features. Professional salon quality, 8K.", icon: "💫" },
-        { title: "Short pixie cut", prompt: "Transform this person's hairstyle to a trendy short pixie cut, maintaining their facial features and natural beauty. Modern style, professional photography, 8K.", icon: "✂️" },
-        { title: "Long wavy style", prompt: "Transform this person's hairstyle to long, flowing wavy hair with natural texture, maintaining their facial features. Professional photography, 8K quality.", icon: "🌊" }
-      ];
-      setQuickSuggestions(suggestions);
+      setQuickSuggestions(data.quickSuggestions || []);
     } catch (error: any) {
       alert(error.message || 'Failed to analyze face');
     } finally {
