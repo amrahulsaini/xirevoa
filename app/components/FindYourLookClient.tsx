@@ -215,42 +215,37 @@ export default function FindYourLookClient() {
 
       {/* Upload Section */}
       {!imagePreview ? (
-        <div
-          onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-          onDragLeave={() => setIsDragging(false)}
-          onDrop={handleDrop}
-          className={`max-w-2xl mx-auto border-2 border-dashed rounded-2xl p-12 text-center transition-all ${
-            isDragging ? 'border-blue-500 bg-blue-500/10' : 'border-zinc-700 hover:border-zinc-600'
-          }`}
-        >
-          <Upload className="w-16 h-16 mx-auto mb-4 text-zinc-500" />
-          <h3 className="text-2xl font-bold mb-2">Upload Your Photo</h3>
-          <p className="text-zinc-400 mb-6">Drag and drop or click to select</p>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleImageSelect}
-            className="hidden"
-          />
-          <div className="flex gap-3">
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="flex-1 px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2"
-            >
-              <Upload className="w-5 h-5" />
-              Upload New
-            </button>
-            {session && (
+        <div className="max-w-2xl mx-auto">
+          <div
+            onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+            onDragLeave={() => setIsDragging(false)}
+            onDrop={handleDrop}
+            onClick={() => fileInputRef.current?.click()}
+            className={`border-2 border-dashed rounded-2xl p-12 text-center transition-all cursor-pointer ${
+              isDragging ? 'border-blue-500 bg-blue-500/10' : 'border-zinc-700 hover:border-zinc-600'
+            }`}
+          >
+            <Upload className="w-16 h-16 mx-auto mb-4 text-zinc-500" />
+            <h3 className="text-2xl font-bold mb-2">Upload your photo</h3>
+            <p className="text-zinc-400">Drag & drop here, or click to choose (max 10MB)</p>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImageSelect}
+              className="hidden"
+            />
+          </div>
+          {session && (
+            <div className="text-center mt-4">
               <button
                 onClick={() => setShowHistoryModal(true)}
-                className="flex-1 px-8 py-4 bg-zinc-800 hover:bg-zinc-700 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2"
+                className="text-yellow-400 hover:text-yellow-300 font-semibold underline transition-colors"
               >
-                <ImageIcon className="w-5 h-5" />
-                From Gallery
+                Or select from your uploads & generations
               </button>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       ) : (
         <div className="max-w-6xl mx-auto">
