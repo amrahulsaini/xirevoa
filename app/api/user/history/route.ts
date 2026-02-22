@@ -54,8 +54,6 @@ export async function GET() {
         createdAt: row.created_at,
       }));
 
-      }));
-
     return NextResponse.json({
       uploads,
       generations,
