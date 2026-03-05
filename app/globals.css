@@ -203,15 +203,6 @@ body {
 
 /* Smooth image loading */
 img {
-  transition: opacity 0.3s ease;
-}
-
-img[loading] {
-  opacity: 0;
-}
-
-img.loaded,
-img:not([loading]) {
   opacity: 1;
 }
 
