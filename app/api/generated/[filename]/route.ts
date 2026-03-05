@@ -21,11 +21,14 @@ export async function GET(
     // Read the file
     const imageBuffer = fs.readFileSync(filepath);
 
-    // Return the image with proper headers
+    // Return the image with proper headers for fast loading
     return new NextResponse(imageBuffer, {
       headers: {
         'Content-Type': 'image/png',
+        'Content-Length': imageBuffer.length.toString(),
         'Cache-Control': 'public, max-age=31536000, immutable',
+        'X-Content-Type-Options': 'nosniff',
+        'Accept-Ranges': 'bytes',
       },
     });
   } catch (error: any) {

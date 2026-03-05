@@ -5,7 +5,7 @@ import pool from '@/lib/db';
 import { GoogleGenAI, createUserContent } from '@google/genai';
 import { RowDataPacket, ResultSetHeader } from 'mysql2';
 
-const EDIT_COST = 1; // Editing costs 1 XP
+const EDIT_COST = 1; // Default editing cost, overridden by model cost
 
 interface UserSettingsRow extends RowDataPacket {
   preferred_model: string;
@@ -45,17 +45,11 @@ export async function POST(request: NextRequest) {
     }
 
     const currentXP = userRows[0].xpoints;
-    if (currentXP < EDIT_COST) {
-      return NextResponse.json({ 
-        error: 'Insufficient XP', 
-        required: EDIT_COST, 
-        current: currentXP 
-      }, { status: 402 });
-    }
 
     // Use selectedModel if provided, otherwise get user's preferred model
-    let preferredModel = selectedModel || 'gemini-2.0-flash-exp';
-    let modelName = 'Gemini 2.0 Flash';
+    let preferredModel = selectedModel || 'gemini-2.5-flash-image';
+    let modelName = 'Gemini 2.5 Flash';
+    let xpCost = EDIT_COST;
 
     if (!selectedModel) {
       const [settingsRows] = await pool.query<UserSettingsRow[]>(
@@ -76,12 +70,20 @@ export async function POST(request: NextRequest) {
 
     if (modelRows.length > 0) {
       if (!modelRows[0].is_active) {
-        // Fall back to default if model is inactive
-        preferredModel = 'gemini-2.0-flash-exp';
-        modelName = 'Gemini 2.0 Flash';
+        preferredModel = 'gemini-2.5-flash-image';
+        modelName = 'Gemini 2.5 Flash';
       } else {
         modelName = modelRows[0].model_name;
+        xpCost = modelRows[0].xp_cost;
       }
+    }
+
+    if (currentXP < xpCost) {
+      return NextResponse.json({ 
+        error: 'Insufficient XP', 
+        required: xpCost, 
+        current: currentXP 
+      }, { status: 402 });
     }
 
     // Convert image to base64
@@ -165,17 +167,17 @@ export async function POST(request: NextRequest) {
 
     const imageUrl = `/api/generated/${filename}`;
 
-    // Deduct XP (don't insert into generations - this is a refinement, not a new generation)
+    // Deduct XP based on model cost
     await pool.query(
       'UPDATE users SET xpoints = xpoints - ? WHERE id = ?',
-      [EDIT_COST, userId]
+      [xpCost, userId]
     );
 
     return NextResponse.json({ 
       success: true, 
       imageUrl,
       modelUsed: modelName,
-      xpSpent: EDIT_COST
+      xpSpent: xpCost
     });
 
   } catch (error: any) {
