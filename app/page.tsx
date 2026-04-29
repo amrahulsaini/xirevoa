@@ -4,7 +4,6 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import AutoScrollBanner from "./components/AutoScrollBanner";
 import FeaturedBanner from "./components/FeaturedBanner";
-import StudioGhibliBanner from "./components/StudioGhibliBanner";
 import Image from "next/image";
 import pool from "@/lib/db";
 import { RowDataPacket } from "mysql2";
@@ -200,8 +199,7 @@ export default async function Home({
       {/* Featured Banner */}
       <FeaturedBanner />
       
-      {/* Studio Ghibli Banner */}
-      <StudioGhibliBanner />
+      {/* Studio Ghibli Banner removed per request */}
       
       {/* Animated Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
