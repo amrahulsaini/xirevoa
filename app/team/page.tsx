@@ -46,7 +46,7 @@ export default function TeamPage() {
         <div className="grid gap-8 lg:grid-cols-[320px_1fr] items-start max-w-5xl">
           <div className="rounded-3xl border border-zinc-800 bg-zinc-950/70 p-5 shadow-xl shadow-black/20">
             <div className="relative aspect-square overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900">
-              <Image src={me.photo} alt={me.name} fill className="object-cover" priority />
+              <Image src={me.photo} alt={me.name} fill className="object-cover" priority unoptimized />
             </div>
             <div className="mt-5">
               <h2 className="text-2xl font-bold">{me.name}</h2>
