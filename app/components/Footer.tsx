@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Footer() {
   return (
     <footer className="border-t border-zinc-800/50 bg-black/50 backdrop-blur-xl py-8 sm:py-10">
@@ -6,42 +8,42 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-bold mb-3 text-sm">Product</h4>
             <ul className="space-y-1.5">
-              <li><a href="/features" className="text-zinc-400 hover:text-yellow-400 transition-colors text-sm">Features</a></li>
-              <li><a href="/pricing" className="text-zinc-400 hover:text-yellow-400 transition-colors text-sm">Pricing</a></li>
-              <li><a href="/gallery" className="text-zinc-400 hover:text-yellow-400 transition-colors text-sm">Gallery</a></li>
+              <li><Link href="/features" className="text-zinc-400 hover:text-yellow-400 transition-colors text-sm">Features</Link></li>
+              <li><Link href="/pricing" className="text-zinc-400 hover:text-yellow-400 transition-colors text-sm">Pricing</Link></li>
+              <li><Link href="/gallery" className="text-zinc-400 hover:text-yellow-400 transition-colors text-sm">Gallery</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="text-white font-bold mb-3 text-sm">Templates</h4>
             <ul className="space-y-1.5">
-              <li><a href="/hairstyles" className="text-zinc-400 hover:text-yellow-400 transition-colors text-sm">Hairstyles</a></li>
-              <li><a href="/cinematic-universe" className="text-zinc-400 hover:text-yellow-400 transition-colors text-sm">Cinematic</a></li>
-              <li><a href="/models" className="text-zinc-400 hover:text-yellow-400 transition-colors text-sm">Models</a></li>
-              <li><a href="/view-your-iconic-outfit" className="text-zinc-400 hover:text-yellow-400 transition-colors text-sm">Outfits</a></li>
+              <li><Link href="/hairstyles" className="text-zinc-400 hover:text-yellow-400 transition-colors text-sm">Hairstyles</Link></li>
+              <li><Link href="/cinematic-universe" className="text-zinc-400 hover:text-yellow-400 transition-colors text-sm">Cinematic</Link></li>
+              <li><Link href="/models" className="text-zinc-400 hover:text-yellow-400 transition-colors text-sm">Models</Link></li>
+              <li><Link href="/view-your-iconic-outfit" className="text-zinc-400 hover:text-yellow-400 transition-colors text-sm">Outfits</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="text-white font-bold mb-3 text-sm">Resources</h4>
             <ul className="space-y-1.5">
-              <li><a href="/" className="text-zinc-400 hover:text-yellow-400 transition-colors text-sm">Home</a></li>
-              <li><a href="/features" className="text-zinc-400 hover:text-yellow-400 transition-colors text-sm">How It Works</a></li>
-              <li><a href="/faq" className="text-zinc-400 hover:text-yellow-400 transition-colors text-sm">FAQ</a></li>
-              <li><a href="/team" className="text-zinc-400 hover:text-yellow-400 transition-colors text-sm">Team</a></li>
+              <li><Link href="/" className="text-zinc-400 hover:text-yellow-400 transition-colors text-sm">Home</Link></li>
+              <li><Link href="/features" className="text-zinc-400 hover:text-yellow-400 transition-colors text-sm">How It Works</Link></li>
+              <li><Link href="/faq" className="text-zinc-400 hover:text-yellow-400 transition-colors text-sm">FAQ</Link></li>
+              <li><Link href="/team" className="text-zinc-400 hover:text-yellow-400 transition-colors text-sm">Team</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="text-white font-bold mb-3 text-sm">Legal</h4>
             <ul className="space-y-1.5">
-              <li><a href="/privacy" className="text-zinc-400 hover:text-yellow-400 transition-colors text-sm">Privacy</a></li>
-              <li><a href="/terms" className="text-zinc-400 hover:text-yellow-400 transition-colors text-sm">Terms</a></li>
-              <li><a href="/refund" className="text-zinc-400 hover:text-yellow-400 transition-colors text-sm">Refund</a></li>
+              <li><Link href="/privacy" className="text-zinc-400 hover:text-yellow-400 transition-colors text-sm">Privacy</Link></li>
+              <li><Link href="/terms" className="text-zinc-400 hover:text-yellow-400 transition-colors text-sm">Terms</Link></li>
+              <li><Link href="/refund" className="text-zinc-400 hover:text-yellow-400 transition-colors text-sm">Refund</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="text-white font-bold mb-3 text-sm">Support</h4>
             <ul className="space-y-1.5">
-              <li><a href="/faq" className="text-zinc-400 hover:text-yellow-400 transition-colors text-sm">FAQ</a></li>
-              <li><a href="/contact" className="text-zinc-400 hover:text-yellow-400 transition-colors text-sm">Contact</a></li>
+              <li><Link href="/faq" className="text-zinc-400 hover:text-yellow-400 transition-colors text-sm">FAQ</Link></li>
+              <li><Link href="/contact" className="text-zinc-400 hover:text-yellow-400 transition-colors text-sm">Contact</Link></li>
             </ul>
           </div>
         </div>
